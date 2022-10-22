@@ -12,3 +12,14 @@ services:
     tty: true
     ports:
       - 8081:80
+  doc:
+    image: swaggerapi/swagger-ui:latest
+    container_name: doc
+    restart: always
+    volumes:
+      - ./docs/openapi.yml:/usr/share/nginx/html/openapi.yml
+    environment:
+      - URL=http://localhost/openapi.yml
+      - SWAGGER_JSON=./docs/openapi.yml
+    ports:
+      - 80:8080
