@@ -1,0 +1,13 @@
+{
+	"name": "point-app-backend",
+	"dockerComposeFile": [
+		"../docker-compose.yml"
+	],
+	"service": "app",
+	"workspaceFolder": "/app",
+	"settings": {},
+	"extensions": [
+		"golang.go",
+		"42crunch.vscode-openapi"
+	]
+}
