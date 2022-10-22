@@ -1,0 +1,14 @@
+services:
+  app:
+    container_name: app
+    restart: always
+    build:
+      args:
+        - target=dev
+    volumes:
+      - ./:/app
+    environment:
+      - GO_ENV=development
+    tty: true
+    ports:
+      - 8081:80
