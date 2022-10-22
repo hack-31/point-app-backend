@@ -1,0 +1,52 @@
+openapi: 3.0.0
+info:
+  version: 0.0.0
+  title: point-app-backend RESTful API
+  description: >-
+    ハッカソン2022で作成するポイントアプリのバックエンドAPI
+servers:
+  - url: 'http://{host}:8081/api/v1'
+    description: go service api server endpoint application
+    variables:
+      host:
+        default: localhost
+        enum:
+          - localhost
+paths:
+  /:
+    get:
+      tags:
+        - root
+      summary: ルート。
+      description: |
+        ルート
+      responses:
+        '200':
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  method:
+                    type: string
+                    example: "GET"
+                  message:
+                    type: string
+                    example: "successfully"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: integer
+                          example: "hello world"
+                required:
+                  - statusCode
+                  - method
+                  - message
