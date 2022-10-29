@@ -28,4 +28,5 @@ WORKDIR /app
 
 RUN apk update && apk add alpine-sdk
 
-RUN go install github.com/cosmtrek/air@latest
+RUN go install github.com/cosmtrek/air@latest 
+RUN go install github.com/k0kubun/sqldef/cmd/mysqldef@latest

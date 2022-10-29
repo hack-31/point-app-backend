@@ -8,7 +8,14 @@ services:
     volumes:
       - ./:/app
     environment:
-      - GO_ENV=development
+      GO_ENV: development
+      DB_HOST: point-app-db
+      DB_PORT: 3306
+      DB_USER: admin
+      DB_PASSWORD: password
+      DB_NAME: point_app
+      REDIS_HOST: point-app-redis
+      REDIS_PORT: 6379
     tty: true
     ports:
       - 8081:80
@@ -23,3 +30,32 @@ services:
       - SWAGGER_JSON=./docs/openapi.yml
     ports:
       - 80:8080
+  db:
+    image: mysql:8.0.31
+    platform: linux/amd64
+    container_name: point-app-db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: point_app
+    volumes:
+      - point-app-db-data:/var/lib/mysql
+      - $PWD/_tools/mysql/conf.d:/etc/mysql/conf.d:cached
+    ports:
+      - "33306:3306"
+  cache:
+    image: "redis:latest"
+    container_name: point-app-redis
+    ports:
+      - "36379:6379"
+    volumes:
+      - point-app-redis-data:/data
+  panel:
+    image: "adminer:latest"
+    restart: always
+    ports:
+      - 8082:8080
+volumes:
+  point-app-db-data:
+  point-app-redis-data:

@@ -13,16 +13,38 @@ servers:
         enum:
           - localhost
 paths:
-  /:
-    get:
+  /register:
+    post:
       tags:
-        - root
-      summary: ルート。
+        - user
+      summary: ユーザ登録
       description: |
-        ルート
+        クライアントが入力する情報をもとにユーザ情報を登録する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 山田太郎
+                email:
+                  type: string
+                  format: email
+                  example: yamada@hoge.hoge
+                password:
+                  type: string
+                  format: password
+                  example: qwerty123456789
+              required:
+                - name
+                - email
+                - password
       responses:
         '200':
-          description: 取得成功
+          description: ユーザ情報登録成功
           content:
             application/json:
               schema:
@@ -34,19 +56,64 @@ paths:
                     example: 200
                   method:
                     type: string
-                    example: "GET"
+                    example: "POST"
                   message:
                     type: string
-                    example: "successfully"
+                    example: "ユーザ登録に成功しました。"
                   data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        message:
-                          type: integer
-                          example: "hello world"
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
                 required:
                   - statusCode
                   - method
                   - message
+                  - data
+        '409':
+          description: |
+            登録済みのメールアドレス
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 409
+                  method:
+                    type: string
+                    example: "POST"
+                  message:
+                    type: string
+                    example: "登録済みのメールアドレスです。"
+                  data: 
+                    type: object
+                    example: null
+        '500':
+          $ref: '#/components/responses/500Error'
+components:
+  responses:
+    500Error:
+      description: |
+        サーバー上のエラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: int64
+                example: "500"
+              method:
+                type: string
+                example: "POST"
+              message: 
+                type: string
+                example: "サーバー側で何らかのエラーが発生しました。"
+              data:
+                type: object
+                example: null
