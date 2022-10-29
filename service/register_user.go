@@ -15,17 +15,17 @@ type RegisterUser struct {
 }
 
 // ユーザ登録サービス
-// 
+//
 // @params ctx コンテキスト
-// 
+//
 // @params namae ユーザ名
-// 
+//
 // @param password パスワード
-// 
+//
 // @params email メールアドレス
-// 
+//
 // @params role ロール
-// 
+//
 // @return ユーザ情報
 func (r *RegisterUser) RegisterUser(ctx context.Context, name, password, email string, role int) (*entity.User, error) {
 
