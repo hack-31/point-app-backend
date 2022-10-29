@@ -19,8 +19,8 @@ type Password struct {
 //
 // @return パスワードオブジェクト
 func NewPasswrod(pwd *string) (*Password, error) {
-	if 10 < utf8.RuneCountInString(*pwd) {
-		return nil, fmt.Errorf("cannot use password over 11 char")
+	if 20 < utf8.RuneCountInString(*pwd) {
+		return nil, fmt.Errorf("cannot use password over 21 char")
 	}
 	return &Password{value: *pwd}, nil
 }
