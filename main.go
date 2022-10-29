@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/config"
+	"github.com/hack-31/point-app-backend/repository"
 	routers "github.com/hack-31/point-app-backend/router"
 )
 
@@ -43,6 +44,12 @@ func run(ctx context.Context) error {
 		AllowWildcard: true,
 	}))
 
-	routers.SetRouting(ctx, router)
+	db, cleanup, err := repository.New(ctx, cfg)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
+
+	routers.SetRouting(ctx, db, router)
 	return router.Run(fmt.Sprintf(":%d", cfg.Port))
 }
