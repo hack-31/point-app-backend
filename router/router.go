@@ -21,6 +21,9 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine) {
 	clocker := clock.RealClocker{}
 	rep := repository.Repository{Clocker: clocker}
 
+	healthCheckhandler := handler.NewHealthCheckHandler()
+	router.GET("/healthcheck", healthCheckhandler.ServeHTTP)
+
 	groupRoute := router.Group("/api/v1")
 
 	registerHandler := handler.NewRegisterUserHandler(&service.RegisterUser{DB: db, Repo: &rep})
