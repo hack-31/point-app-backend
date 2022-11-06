@@ -9,7 +9,7 @@ services:
       - ./:/app
     environment:
       GO_ENV: development
-      DB_HOST: point-app-db
+      DB_HOST: db
       DB_PORT: 3306
       DB_USER: admin
       DB_PASSWORD: password
