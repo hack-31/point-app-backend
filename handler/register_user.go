@@ -29,7 +29,7 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	ctx.ShouldBindJSON(&input)
 	
 	// TODO: ユーザからadmin, generalなどの文字列を受けとって東麓する
-	generalRole := 0
+	generalRole := 1
 	u, err := ru.Service.RegisterUser(ctx, input.Name, input.Password, input.Email, generalRole)
 
 	if err != nil {

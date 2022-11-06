@@ -62,6 +62,15 @@ $ make dry-migrate
 $ maae migrate
 ```
 
+# 初期データ挿入
+
+`./_tool/mysql/seed.sql`に初期データを挿入するコマンドを記述
+AWS cloud9の[point-app-dev](https://ap-northeast-1.console.aws.amazon.com/cloud9/home/environments/9e3ee1e0dda0408b80b541ecd88be4da?permissions=owner)で以下のコマンドで挿入
+
+```sh
+$ make seed
+```
+
 # 各ディレクトリの説明
 詳しい説明は、各ディレクトリのREADME.mdに些細されているものもあります。
 
@@ -87,3 +96,30 @@ $ maae migrate
   - 各種環境変数などの設定値など
 - `/utils`
   - ユーティリティパッケージ
+
+# デプロイ
+GitHub Action, Codepipelineによる自動デプロイになります。mainブランチにマージされると自動でデプロイされます。
+GitHub Actionでは、Docker Imageを作成、ECRに登録を行い、Codepipelineでは、ECRからImageを取得し、ECSにデプロイします。
+
+## 手動デプロイ方法
+AWS cloud9の[point-app-dev](https://ap-northeast-1.console.aws.amazon.com/cloud9/home/environments/9e3ee1e0dda0408b80b541ecd88be4da?permissions=owner)にて以下のコマンド実行
+
+```sh
+$ pwd
+/home/ec2-user/environment/point-app-backend
+# 値の設定
+$ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+$ IMAGE_TAG=$(git rev-parse HEAD)
+$ ECR_REGISTRY=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
+# ビルド
+$ docker image build \
+  -t ${ECR_REGISTRY}/point-app-backend:latest \
+  -t ${ECR_REGISTRY}/point-app-backend:${IMAGE_TAG}  \
+  --target deploy ./ --no-cache
+# ECRログイン
+$ aws ecr --region ap-northeast-1 get-login-password | docker login --username AWS --password-stdin ${ECR_REGISTRY}/point-app-backend
+# ECR push
+$ docker image push -a ${ECR_REGISTRY}/point-app-backend
+```
+
+ECRにデプロイされると、latestタグの更新がトリガーとなり、codepipelineによってECSにデプロイが走ります。

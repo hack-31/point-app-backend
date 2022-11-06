@@ -1,16 +1,25 @@
 .PHONY: help build build-local up down logs ps test
 .DEFAULT_GOAL := help
 
-DOCKER_TAG := latest
 build: ## Build docker image to deploy
-	docker build -t budougumi0617/gotodo:${DOCKER_TAG} \
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+	IMAGE_TAG=$(git rev-parse HEAD)
+	ECR_REGISTRY=${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com
+	docker image build \
+		-t ${ECR_REGISTRY}/point-app-backend:latest \
+		-t ${ECR_REGISTRY}/point-app-backend:${IMAGE_TAG}  \
 		--target deploy ./
 
 build-local: ## Build docker image to local development
-	docker compose build --no-cache
+	docker compose build --no-cache --target deploy ./
 
 build-up: ## Build docker image and up container
 	docker compose up -d --build
+
+push: ## push to ECR
+	AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+	aws ecr --region ap-northeast-1 get-login-password | docker login --username AWS --password-stdin https://${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/point-app-backend
+	docker image push -a ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/point-app-backend
 
 serve: ## serve with air 
 	docker compose exec app air
@@ -28,10 +37,13 @@ ps: ## Check container status
 	docker compose ps
 
 dry-migrate: ## Try migration
-	mysqldef -u admin -p password -h db -P 3306 point_app --dry-run < ./_tools/mysql/schema.sql
+	mysqldef -u ${DB_USER} -p ${DB_PASSWORD} -h ${DB_HOST} -P ${DB_PORT} ${DB_NAME} --dry-run < ./_tools/mysql/schema.sql
 
 migrate:  ## Execute migration
-	mysqldef -u admin -p password -h db -P 3306 point_app < ./_tools/mysql/schema.sql
+	mysqldef -u ${DB_USER} -p ${DB_PASSWORD} -h ${DB_HOST} -P ${DB_PORT} ${DB_NAME} < ./_tools/mysql/schema.sql
+
+seed: ## seed data to db
+	mysql ${DB_NAME} -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} < ./_tools/mysql/seed.sql 
 
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
