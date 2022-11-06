@@ -62,6 +62,15 @@ $ make dry-migrate
 $ maae migrate
 ```
 
+# 初期データ挿入
+
+`./_tool/mysql/seed.sql`に初期データを挿入するコマンドを記述
+AWS cloud9の[point-app-dev](https://ap-northeast-1.console.aws.amazon.com/cloud9/home/environments/9e3ee1e0dda0408b80b541ecd88be4da?permissions=owner)で以下のコマンドで挿入
+
+```sh
+$ make seed
+```
+
 # 各ディレクトリの説明
 詳しい説明は、各ディレクトリのREADME.mdに些細されているものもあります。
 
