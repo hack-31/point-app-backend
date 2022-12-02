@@ -26,7 +26,7 @@ FROM golang:1.19.2-alpine3.16 AS dev
 
 WORKDIR /app
 
-RUN apk update && apk add alpine-sdk
+RUN apk update && apk add alpine-sdk && apk add jq
 
 RUN go install github.com/cosmtrek/air@latest 
 RUN go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
