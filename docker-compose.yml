@@ -16,6 +16,10 @@ services:
       DB_NAME: point_app
       REDIS_HOST: point-app-redis
       REDIS_PORT: 6379
+      AWS_ENDPOINT: http://aws:4566
+      AWS_ACCESS_KEY_ID: accesskey
+      AWS_SECRET_KEY: secretkey
+      AWS_REGION: ap-northeast-1
     tty: true
     ports:
       - 8081:80
@@ -56,6 +60,15 @@ services:
     restart: always
     ports:
       - 8082:8080
+  aws:
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+    tty: true
+    environment:
+      - SERVICES=ses
+      - DEFAULT_REGION=ap-northeast-1
 volumes:
   point-app-db-data:
   point-app-redis-data:
