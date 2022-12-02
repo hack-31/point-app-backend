@@ -3,8 +3,12 @@
 1. メールを送信する
 
 ```go:go
+import "github.com/hack-31/point-app-backend/utils/email"
+
+// 略
+
 // メールを送信
-result, err := mail.SendMail("recipient@sample.com", "お知らせメール", "初めまして。\nお知らせです。\n")
+result, err := email.SendMail("recipient@sample.com", "お知らせメール", "初めまして。\nお知らせです。\n")
 
 if err != nil {
   // 失敗
