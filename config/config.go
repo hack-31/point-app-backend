@@ -12,8 +12,8 @@ type Config struct {
 	DBUser            string `env:"DB_USER" envDefault:"admin"`
 	DBPassword        string `env:"DB_PASSWORD" envDefault:"password"`
 	DBName            string `env:"DB_NAME" envDefault:"point_app"`
-	RedisHost         string `env:"REDIS_HOST" envDefault:"db"`
-	RedisPort         int    `env:"REDIS_PORT" envDefault:"36379"`
+	RedisHost         string `env:"REDIS_HOST" envDefault:"cache"`
+	RedisPort         int    `env:"REDIS_PORT" envDefault:"6379"`
 	AWSEndpoint       string `env:"AWS_ENDPOINT" envDefault:""`
 	AWSId             string `env:"AWS_ACCESS_KEY_ID" envDefault:"accesskey"`
 	AWSSecret         string `env:"AWS_SECRET_KEY" envDefault:"secretkey"`
