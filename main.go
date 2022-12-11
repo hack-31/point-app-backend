@@ -37,8 +37,7 @@ func run(ctx context.Context) error {
 	router := gin.Default()
 	// ミドルウェアの設定
 	router.Use(cors.New(cors.Config{
-		// TODO: 一旦全てのドメインを許可
-		AllowOrigins:  []string{"*"},
+		AllowOrigins:  []string{"http://localhost", "https://*.dkjrwfcbom7qp.amplifyapp.com"},
 		AllowMethods:  []string{"*"},
 		AllowHeaders:  []string{"*"},
 		AllowWildcard: true,
