@@ -11,13 +11,15 @@ import (
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
 )
+
 // DBへの接続
-// 
-// @params ctx コンテキスト
-// 
-// @params cfg 接続設定の環境変数
-// 
-// @return (DBインスタンス, DBクローズ関数(予備先素でdeferで呼ぶ必要あり), エラー)
+// @params
+// ctx コンテキスト
+// cfg 接続設定の環境変数
+//
+// @return
+// *sqlx.DB DBインスタンス,
+// func() DBクローズ関数(予備先素でdeferで呼ぶ必要あり)
 func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	// sqlx.Connectを使うと内部でpingする
 	db, err := sql.Open("mysql",
