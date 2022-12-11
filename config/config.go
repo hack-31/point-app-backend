@@ -19,6 +19,7 @@ type Config struct {
 	AWSSecret         string `env:"AWS_SECRET_KEY" envDefault:"secretkey"`
 	AWSRegion         string `env:"AWS_REGION" envDefault:"ap-northeast-1"`
 	SenderMailAddress string `env:"SENDER_MAIL_ADDRESS" envDefault:"sample@sample.com"`
+	FrontEndpoint     string `env:"FRONT_ENDPOINT" envDefault:"http://localhost:3000"`
 }
 
 // 環境変数の構造体を返却

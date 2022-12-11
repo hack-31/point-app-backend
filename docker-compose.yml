@@ -20,6 +20,8 @@ services:
       AWS_ACCESS_KEY_ID: accesskey
       AWS_SECRET_KEY: secretkey
       AWS_REGION: ap-northeast-1
+      SENDER_MAIL_ADDRESS: example@example.com
+      FRONT_ENDPOINT: http://localhost:3000
     tty: true
     ports:
       - 8081:80
