@@ -13,4 +13,5 @@ const (
 
 var (
 	ErrAlreadyEntry = errors.New("duplicate entry")
+	ErrNotFound     = errors.New("not found")
 )

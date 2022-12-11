@@ -16,7 +16,7 @@ paths:
   /register:
     post:
       tags:
-        - user
+        - サンプル
       summary: ユーザ登録
       description: |
         クライアントが入力する情報をもとにユーザ情報を登録する
@@ -94,6 +94,286 @@ paths:
                     example: null
         '500':
           $ref: '#/components/responses/500Error'
+
+  /temporary_users:
+    post:
+      tags:
+        - ユーザ登録
+      summary: ユーザ仮登録
+      description: |
+        - クライアントが入力する情報をもとにユーザ情報を仮登録する
+        - 指定したメールアドレスに本登録するためのメールが送られる
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                familyName:
+                  type: string
+                  example: 山田
+                familyNameKana:
+                  type: string
+                  example: ヤマダ
+                firstName:
+                  type: string
+                  example: 太郎
+                firstNameKana:
+                  type: string
+                  example: タロウ
+                email:
+                  type: string
+                  format: email
+                  example: yamada@hoge.hoge
+                password:
+                  type: string
+                  format: password
+                  example: qwerty123456789
+              required:
+                - firstName
+                - firstNameKana
+                - familyName
+                - familyNameKana
+                - email
+                - password
+      responses:
+        '200':
+          description: ユーザ情報登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  method:
+                    type: string
+                    example: "POST"
+                  message:
+                    type: string
+                    example: "本登録メールを送信しました。"
+                  data:
+                    type: object
+                    example: null
+                required:
+                  - statusCode
+                  - method
+                  - message
+                  - data
+        '409':
+          description: |
+            登録済みのメールアドレス
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 409
+                  method:
+                    type: string
+                    example: "POST"
+                  message:
+                    type: string
+                    example: "登録済みのメールアドレスの登録できません。"
+                  data: 
+                    type: object
+                    example: null
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /users:
+    post:
+      tags:
+        - ユーザ登録
+      summary: ユーザ本登録
+      description: |
+        - 有効期限内にリクエストをすると本登録を行う
+        - temporaryUserUUIDは、仮登録で指定したメールアドレスに送信される
+        - セッションキーには有効期限がある
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temporaryUserUUID:
+                  type: string
+                  example: 8e8d0f82-89a1-4cc6-ba25-13c864ad09db
+      responses:
+        '200':
+          description: 本登録完了
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  method:
+                    type: string
+                    example: "POST"
+                  message:
+                    type: string
+                    example: "本登録が完了しました。"
+                  data: 
+                    type: object
+                    properties:
+                      userId:
+                        type: integer
+                        example: 24
+                      userSessionKey:
+                        type: string
+                        example: hfdsali28fdad89af.d8a9ckafjdlsa9fd8dkl88fd9a9f.fdasfdsadsakfdlkajfd8a9
+
+        '401':
+          description: |
+            有効期限切れまたは無効なセッションキー
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 401
+                  method:
+                    type: string
+                    example: "POST"
+                  message:
+                    type: string
+                    example: "セッションキーが、有効期限切れまたは、無効なため本登録できませんでした。"
+                  data: 
+                    type: object
+                    example: null
+
+        '500':
+          $ref: '#/components/responses/500Error'    
+
+  /sessions:
+    post:
+      tags:
+        - 認証
+      summary: サインイン
+      description: |
+        - メールアドレスとパスワードで認証する
+        - セッションキー(トークン)を生成し、返却
+        - 保護されたエンドポイントのリクエストヘッダーにセッションキーを付与する必要がある
+      responses:
+        '200':
+          description: 認証が成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  method:
+                    type: string
+                    example: POST
+                  message:
+                    type: string
+                    example: "サインイン成功しました。"
+                  data:
+                    type: object
+                    properties:
+                      userSessionKey:
+                        type: string
+                        example: hfdsali28fdad89af.d8a9ckafjdlsa9fd8dkl88fd9a9f.fdasfdsadsakfdlkajfd8a9
+        '401':
+          description: メールアドレス、または、パスワードが異なる
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 401
+                  method:
+                    type: string
+                    example: POST
+                  message:
+                    type: string
+                    example: "メールアドレスまたはパスワードが異なります。"
+                  data: 
+                    type: object
+                    example: null
+        '500':
+          $ref: '#/components/responses/500Error'    
+
+  /sessions/{sessionId}:
+    delete:
+      tags:
+        - 認証
+      summary: サインアウト
+      description: |
+        - セッションIDを削除し、サインアウト処理を行う
+      parameters:
+        - in: path
+          name: sessionId
+          schema: 
+            type: string
+          description: |
+            - セッションIDを削除し、ログアウト処理とする
+          required: true
+      responses:
+        '200':
+          description: サインアウトが成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  method:
+                    type: string
+                    example: DELETE
+                  message:
+                    type: string
+                    example: "サインアウトが成功しました。"
+                  data:
+                    type: object
+                    example: null
+        '404':
+          description: 無効なセッションID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 404
+                  method:
+                    type: string
+                    example: DELETE
+                  message:
+                    type: string
+                    example: "セッションキーが無効です。"
+                  data: 
+                    type: object
+                    example: null
+        '500':
+          $ref: '#/components/responses/500Error'    
+
 components:
   responses:
     500Error:

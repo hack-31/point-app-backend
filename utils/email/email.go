@@ -40,6 +40,42 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 	}
 	svc := ses.New(sess)
 
+	// 送信元メールアドレスの検証
+	_, err = svc.VerifyEmailIdentity(&ses.VerifyEmailIdentityInput{EmailAddress: aws.String(cfg.SenderMailAddress)})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case ses.ErrCodeMessageRejected:
+				return nil, fmt.Errorf("message rejected: %w", aerr)
+			case ses.ErrCodeMailFromDomainNotVerifiedException:
+				return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
+			case ses.ErrCodeConfigurationSetDoesNotExistException:
+				return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
+			default:
+				return nil, aerr
+			}
+		}
+		return nil, err
+	}
+
+	// 送信先メールアドレスの検証
+	_, err = svc.VerifyEmailIdentity(&ses.VerifyEmailIdentityInput{EmailAddress: aws.String(recipient)})
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case ses.ErrCodeMessageRejected:
+				return nil, fmt.Errorf("message rejected: %w", aerr)
+			case ses.ErrCodeMailFromDomainNotVerifiedException:
+				return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
+			case ses.ErrCodeConfigurationSetDoesNotExistException:
+				return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
+			default:
+				return nil, aerr
+			}
+		}
+		return nil, err
+	}
+
 	// 送信メールの作成
 	input := &ses.SendEmailInput{
 		Destination: &ses.Destination{

@@ -37,3 +37,25 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 	u.ID = entity.UserID(id)
 	return nil
 }
+
+// メールでユーザが存在するか検索する
+// @params
+// ctx context
+// db dbインスタンス
+// email email
+//
+// @returns
+// entity.User ユーザ情報
+func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *string) (entity.User, error) {
+	sql := `SELECT * FROM users WHERE email = ? LIMIT 1`
+	var user entity.User
+
+	if err := db.GetContext(ctx, &user, sql, email); err != nil {
+		// 見つけられない時(その他のエラーも含む)
+		// 見つけられない時のエラーは利用側で
+		// errors.Is(err, sql.ErrNoRows)
+		// で判断する
+		return user, err
+	}
+	return user, nil
+}

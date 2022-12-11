@@ -16,8 +16,7 @@ import (
 // @param ctx コンテキスト
 //
 // @param router ルーター
-func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine) {
-
+func SetRouting(ctx context.Context, db *sqlx.DB, cache *repository.KVS, router *gin.Engine) {
 	clocker := clock.RealClocker{}
 	rep := repository.Repository{Clocker: clocker}
 
@@ -28,4 +27,7 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine) {
 
 	registerHandler := handler.NewRegisterUserHandler(&service.RegisterUser{DB: db, Repo: &rep})
 	groupRoute.POST("/register", registerHandler.ServeHTTP)
+
+	registerTempUser := handler.NewRegisterTemporaryUserHandler(&service.RegisterTemporaryUser{DB: db, Cache: cache, Repo: &rep})
+	groupRoute.POST("/temporary_users", registerTempUser.ServeHTTP)
 }

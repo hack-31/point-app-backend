@@ -44,12 +44,17 @@ func run(ctx context.Context) error {
 		AllowWildcard: true,
 	}))
 
+	// DB関係初期化
 	db, cleanup, err := repository.New(ctx, cfg)
 	if err != nil {
 		return err
 	}
 	defer cleanup()
+	cache, err := repository.NewKVS(ctx, cfg)
+	if err != nil {
+		return err
+	}
 
-	routers.SetRouting(ctx, db, router)
+	routers.SetRouting(ctx, db, cache, router)
 	return router.Run(fmt.Sprintf(":%d", cfg.Port))
 }
