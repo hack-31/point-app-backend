@@ -47,3 +47,16 @@ func (k *KVS) Load(ctx context.Context, key string) (string, error) {
 	}
 	return value, nil
 }
+
+// 値を削除
+//
+// @params
+// ctx context
+// key key
+func (k *KVS) Delete(ctx context.Context, key *string) error {
+	_, err := k.Cli.Del(ctx, *key).Result()
+	if err != nil {
+		return fmt.Errorf("failed to delete by %q: %w", *key, ErrNotFound)
+	}
+	return nil
+}
