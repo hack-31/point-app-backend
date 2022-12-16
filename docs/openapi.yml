@@ -99,7 +99,7 @@ paths:
     post:
       tags:
         - ユーザ登録
-      summary: ユーザ仮登録(サインアップ)
+      summary: サインアップ(ユーザ仮登録)
       description: |
         - ユーザが入力した情報をもとにユーザ情報を仮登録する
         - 指定したメールアドレスに確認コードを送る
@@ -195,7 +195,7 @@ paths:
     post:
       tags:
         - ユーザ登録
-      summary: ユーザ本登録(サインアップ)
+      summary: サインアップ(ユーザ本登録)
       description: |
         - ユーザーの本登録を行う
         - 確認コードconfirmCodeは、仮登録で指定したメールアドレスに送信される
@@ -316,42 +316,45 @@ paths:
                     type: string
                     example: "取得成功しました。"
                   data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        familyName:
-                          type: string
-                        familyNameKana:
-                          type: string
-                        firstName:
-                          type: string
-                        firstNameKana:
-                          type: string
-                        email:
-                          type: string
-                          format: email
-                        acquisitionPoint:
-                          type: number
-                      example:
-                        - familytName: 山田
-                          familyNameKana: ヤマダ
-                          firstName: 太郎
-                          firstNameKana: タロウ
-                          email: yamada@sample.com
-                          acquisitionPoint: 200
-                        - familytName: 本郷
-                          familyNameKana: ホンゴウ
-                          firstName: 奏
-                          firstNameKana: カナタ
-                          email: hongo@sample.com
-                          acquisitionPoint: 1000000
-                        - familytName: 本田
-                          familyNameKana: ホンダ
-                          firstName: 美優
-                          firstNameKana: ミユ
-                          email: honda@sample.com
-                          acquisitionPoint: 11100
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            familyName:
+                              type: string
+                            familyNameKana:
+                              type: string
+                            firstName:
+                              type: string
+                            firstNameKana:
+                              type: string
+                            email:
+                              type: string
+                              format: email
+                            acquisitionPoint:
+                              type: number
+                        example:
+                          - familytName: 山田
+                            familyNameKana: ヤマダ
+                            firstName: 太郎
+                            firstNameKana: タロウ
+                            email: yamada@sample.com
+                            acquisitionPoint: 200
+                          - familytName: 本郷
+                            familyNameKana: ホンゴウ
+                            firstName: 奏
+                            firstNameKana: カナタ
+                            email: hongo@sample.com
+                            acquisitionPoint: 1000000
+                          - familytName: 本田
+                            familyNameKana: ホンダ
+                            firstName: 美優
+                            firstNameKana: ミユ
+                            email: honda@sample.com
+                            acquisitionPoint: 11100
 
         '401':
           $ref: '#/components/responses/401UnauthorizedError'
