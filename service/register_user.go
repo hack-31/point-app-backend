@@ -4,50 +4,54 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/entity"
 	"github.com/hack-31/point-app-backend/repository"
 )
 
 type RegisterUser struct {
-	DB   repository.Execer
-	Repo UserRegister
+	DB    repository.Execer
+	Cache *repository.KVS
+	Repo  UserRegister
 }
 
 // ユーザ登録サービス
 //
-// @params ctx コンテキスト
-//
-// @params namae ユーザ名
-//
-// @param password パスワード
-//
-// @params email メールアドレス
-//
-// @params role ロール
+// @params ctx コンテキスト, temporaryUserId 一時保存ユーザid
 //
 // @return ユーザ情報
-func (r *RegisterUser) RegisterUser(ctx context.Context, name, password, email string, role int) (*entity.User, error) {
-
-	pwd, err := user.NewPasswrod(&password)
+func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId string) (*entity.User, error) {
+	// 一時ユーザ情報を復元
+	u, err := r.Cache.Load(ctx, temporaryUserId)
 	if err != nil {
-		return nil, fmt.Errorf("cannot password: %w", err)
+		return nil, fmt.Errorf("cannot load user in redis: %w", err)
 	}
 
-	hashPwd, err := pwd.CreateHash()
-	if err != nil {
-		return nil, fmt.Errorf("cannot hash password: %w", err)
+	// 復元が成功したら一時ユーザ情報除削
+	if err := r.Cache.Delete(ctx, temporaryUserId); err != nil {
+		return nil, fmt.Errorf("cannot delete in redis: %w", err)
 	}
 
+	// 復元したユーザ情報を解析
+	temporyUser := user.NewTemporaryUserString(u)
+	firstName, firstNameKana, familyName, familyNameKana, email, hashPass := temporyUser.Split()
+
+	// DBに保存
 	user := &entity.User{
-		Name:     name,
-		Password: string(hashPwd),
-		Role:     role,
-		Email:    email,
+		FirstName:      firstName,
+		FirstNameKana:  firstNameKana,
+		FamilyName:     familyName,
+		FamilyNameKana: familyNameKana,
+		Email:          email,
+		Password:       hashPass,
+		SendingPoint:   constant.DefaultSendingPoint,
 	}
-
 	if err := r.Repo.RegisterUser(ctx, r.DB, user); err != nil {
 		return nil, fmt.Errorf("failed to register: %w", err)
 	}
+
+	// TODO: セッションキー(token)作成
+
 	return user, nil
 }
