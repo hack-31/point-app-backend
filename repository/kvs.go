@@ -43,7 +43,7 @@ func (k *KVS) Save(ctx context.Context, key, value string, minute time.Duration)
 func (k *KVS) Load(ctx context.Context, key string) (string, error) {
 	value, err := k.Cli.Get(ctx, key).Result()
 	if err != nil {
-		return "", fmt.Errorf("failed to get by %q: %w", key, ErrNotFound)
+		return "", fmt.Errorf("failed to get by %q: %w", key, ErrNotFoundSession)
 	}
 	return value, nil
 }
@@ -53,10 +53,10 @@ func (k *KVS) Load(ctx context.Context, key string) (string, error) {
 // @params
 // ctx context
 // key key
-func (k *KVS) Delete(ctx context.Context, key *string) error {
-	_, err := k.Cli.Del(ctx, *key).Result()
+func (k *KVS) Delete(ctx context.Context, key string) error {
+	_, err := k.Cli.Del(ctx, key).Result()
 	if err != nil {
-		return fmt.Errorf("failed to delete by %q: %w", *key, ErrNotFound)
+		return fmt.Errorf("failed to delete by %q: %w", key, ErrNotFoundSession)
 	}
 	return nil
 }

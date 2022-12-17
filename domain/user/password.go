@@ -18,11 +18,11 @@ type Password struct {
 // @params pwd パスワード
 //
 // @return パスワードオブジェクト
-func NewPasswrod(pwd *string) (*Password, error) {
-	if 20 < utf8.RuneCountInString(*pwd) {
-		return nil, fmt.Errorf("cannot use password over 21 char")
+func NewPasswrod(pwd string) (*Password, error) {
+	if 50 < utf8.RuneCountInString(pwd) {
+		return nil, fmt.Errorf("cannot use password over 51 char")
 	}
-	return &Password{value: *pwd}, nil
+	return &Password{value: pwd}, nil
 }
 
 func (pwd *Password) CreateHash() (string, error) {

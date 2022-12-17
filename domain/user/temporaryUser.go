@@ -26,10 +26,9 @@ func NewTemporaryUserString(temporaryUserString string) *TemporaryUserString {
 //
 // @returns
 // 連結したユーザ
-func (tus *TemporaryUserString) Join(firstName, firstNameKana, familyName, familyNameKana, email, password *string) *string {
-	temp := fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s", *firstName, *firstNameKana, *familyName, *familyNameKana, *email, *password)
-	tus.value = temp
-	return &temp
+func (tus *TemporaryUserString) Join(firstName, firstNameKana, familyName, familyNameKana, email, password string) string {
+	tus.value = fmt.Sprintf("%s\n%s\n%s\n%s\n%s\n%s", firstName, firstNameKana, familyName, familyNameKana, email, password)
+	return tus.value
 }
 
 // 開業で区切られた1つの文字列になっているユーザ情報を分解する
@@ -41,9 +40,9 @@ func (tus *TemporaryUserString) Join(firstName, firstNameKana, familyName, famil
 // familyName 名字
 // familyNameKana 名字カナ
 // email メールアドレス
-// password パスワード
-func (tus *TemporaryUserString) Split() (firstName, firstNameKana, familyName, familyNameKana, email, password *string) {
+// hashPass パスワード
+func (tus *TemporaryUserString) Split() (firstName, firstNameKana, familyName, familyNameKana, email, hashPass string) {
 	reg := "\r\n|\n"
 	arr := regexp.MustCompile(reg).Split(tus.value, -1)
-	return &arr[0], &arr[1], &arr[2], &arr[3], &arr[4], &arr[5]
+	return arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]
 }

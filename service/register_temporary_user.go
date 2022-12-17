@@ -47,7 +47,8 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	// ユーザ情報をキャッシュに保存
 	tempUserInfo := user.NewTemporaryUserString("")
 	uid := uuid.New().String()
-	err = r.Cache.Save(ctx, uid, *tempUserInfo.Join(&firstName, &firstNameKana, &familyName, &familyNameKana, &email, &password), 60)
+	userString := tempUserInfo.Join(firstName, firstNameKana, familyName, familyNameKana, email, hashPass)
+	err = r.Cache.Save(ctx, uid, userString, 60)
 	if err != nil {
 		return fmt.Errorf("failed to save in cache: %w", err)
 	}
