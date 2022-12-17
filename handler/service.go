@@ -11,5 +11,5 @@ type RegisterUserService interface {
 }
 
 type RegisterTemporaryUserService interface {
-	RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) error
+	RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) (string, error)
 }
