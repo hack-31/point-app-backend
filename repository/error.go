@@ -12,6 +12,6 @@ const (
 )
 
 var (
-	ErrAlreadyEntry    = errors.New("登録済みのユーザなので、登録できませんでした。")
+	ErrAlreadyEntry    = errors.New("登録済みのメールアドレスは登録できません。")
 	ErrNotFoundSession = errors.New("確認コードまたは、セッションキーが無効です。")
 )
