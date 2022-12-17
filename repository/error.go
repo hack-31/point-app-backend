@@ -12,6 +12,6 @@ const (
 )
 
 var (
-	ErrAlreadyEntry = errors.New("duplicate entry")
-	ErrNotFound     = errors.New("not found")
+	ErrAlreadyEntry    = errors.New("登録済みのユーザなので、登録できませんでした。")
+	ErrNotFoundSession = errors.New("確認コードまたは、セッションキーが無効です。")
 )
