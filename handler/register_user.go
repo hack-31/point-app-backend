@@ -24,6 +24,7 @@ func NewRegisterUserHandler(s RegisterUserService) *RegisterUser {
 func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	var input struct {
 		TemporaryUserId string `json:"temporaryUserId"`
+		ConfirmCode     string `json:"confirmCode"`
 	}
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
@@ -35,13 +36,18 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 			&input.TemporaryUserId,
 			validation.Required,
 		),
+		validation.Field(
+			&input.ConfirmCode,
+			validation.Required,
+			validation.Length(4, 4),
+		),
 	)
 	if err != nil {
 		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
 		return
 	}
 
-	u, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId)
+	u, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
 			APIResponse(ctx, repository.ErrNotFoundSession.Error(), http.StatusUnauthorized, http.MethodPost, nil)
