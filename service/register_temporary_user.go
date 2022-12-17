@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/config"
+	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/repository"
@@ -57,7 +59,7 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	tempUserInfo := user.NewTemporaryUserString("")
 	uid := uuid.New().String()
 	userString := tempUserInfo.Join(firstName, firstNameKana, familyName, familyNameKana, email, hashPass)
-	err = r.Cache.Save(ctx, uid, userString, 60)
+	err = r.Cache.Save(ctx, uid, userString, time.Duration(constant.ConfirmationCodeExpiration_m))
 	if err != nil {
 		return fmt.Errorf("failed to save in cache: %w", err)
 	}
