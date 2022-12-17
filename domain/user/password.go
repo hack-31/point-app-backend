@@ -25,7 +25,7 @@ func NewPasswrod(pwd *string) (*Password, error) {
 	return &Password{value: *pwd}, nil
 }
 
-func (pwd *Password) CreateHash() ([]byte, error) {
+func (pwd *Password) CreateHash() (string, error) {
 	pw, err := bcrypt.GenerateFromPassword([]byte(pwd.value), bcrypt.DefaultCost)
-	return pw, err
+	return string(pw), err
 }
