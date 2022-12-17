@@ -19,7 +19,7 @@ const (
 
 // メールを送信する
 //
-// @params 
+// @params
 // recipient 送信先のメールアドレス
 // subject 件名
 // textBody テキストボディ

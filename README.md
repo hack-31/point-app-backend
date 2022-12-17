@@ -28,6 +28,7 @@ $ make serve
 - API http://localhost:8081
 - swagger-ui http://localhost:80
 - adminer http://localhost:8082
+- aws http://localhost:4566
 
 ソースコードを書く際、vscodeを利用しているユーザは、[Dev container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)を利用して開発することを推奨する。
 コンテナ内のファイルを直接修正でき、[Goの拡張機能](https://github.com/golang/vscode-go)により型補完や保存時フォーマットが使えるようになる。
@@ -73,7 +74,11 @@ $ make seed
 
 # 各ディレクトリの説明
 詳しい説明は、各ディレクトリのREADME.mdに些細されているものもあります。
-
+- `/router`
+  - ルーティング処理を書きます
+- `/docs`
+  - ドキュメントが配置
+  - swaggerなどを修正する際は`/docs/openapi.yml`で行う
 - `/handler`
   - ハンドラー層
   - クライアントのデータをバリデーション
@@ -81,7 +86,7 @@ $ make seed
 - `/service`
   - サービス層
   - ドメイン層、リポジトリ層を利用してユースケースを実現する
-- `/domein`
+- `/domain`
   - ドメイン層
   - サービス間(ユースケース間)をまたがるロジックを記述
 - `/repository`
@@ -94,6 +99,8 @@ $ make seed
   - `/_tools/mysql/schema.sql`にテーブル作成のためのDDL定義
 - `/config`
   - 各種環境変数などの設定値など
+- `/constant`
+  - サービス全体として定数などを定義
 - `/utils`
   - ユーティリティパッケージ
 
