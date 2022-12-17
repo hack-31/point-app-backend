@@ -14,7 +14,12 @@ RUN go build -trimpath -ldflags "-w -s" -o app
 # 本番環境
 FROM debian:bullseye-slim AS deploy
 
-RUN apt-get update
+# X509: Certificate Signed by Unknown Authorityエラーを回避する
+RUN apt-get update \
+ && apt-get install -y --force-yes --no-install-recommends apt-transport-https curl ca-certificates \
+ && apt-get clean \
+ && apt-get autoremove \
+ && rm -rf /var/lib/apt/lists/*
 
 COPY --from=deploy-builder /app/app .
 

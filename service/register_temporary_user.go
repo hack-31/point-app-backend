@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/config"
+	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/repository"
@@ -30,9 +32,18 @@ type RegisterTemporaryUser struct {
 // password パスワード
 func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) error {
 	// メール値オブジェクト作成
-	mail, err := user.NewEmail(&email, r.Repo)
+	mail, err := user.NewEmail(email, r.Repo)
 	if err != nil {
 		return fmt.Errorf("cannot create mail object: %w", err)
+	}
+	pass, err := user.NewPasswrod(password)
+	if err != nil {
+		return fmt.Errorf("cannot create passwrod object: %w", err)
+	}
+	// ハッシュ化
+	hashPass, err := pass.CreateHash()
+	if err != nil {
+		return fmt.Errorf("cannot create hash passwrod: %w", err)
 	}
 
 	// 登録可能なメールか確認
@@ -47,7 +58,8 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	// ユーザ情報をキャッシュに保存
 	tempUserInfo := user.NewTemporaryUserString("")
 	uid := uuid.New().String()
-	err = r.Cache.Save(ctx, uid, *tempUserInfo.Join(&firstName, &firstNameKana, &familyName, &familyNameKana, &email, &password), 60)
+	userString := tempUserInfo.Join(firstName, firstNameKana, familyName, familyNameKana, email, hashPass)
+	err = r.Cache.Save(ctx, uid, userString, time.Duration(constant.ConfirmationCodeExpiration_m))
 	if err != nil {
 		return fmt.Errorf("failed to save in cache: %w", err)
 	}

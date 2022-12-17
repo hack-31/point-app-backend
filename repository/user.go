@@ -11,22 +11,23 @@ import (
 
 // ユーザ情報永続化
 //
-// @params ctx コンテキスト
-//
-// @paramas db dbの値(インスタンス)
-//
-// @params u ユーザエンティティ
+// @params
+// ctx コンテキスト
+// db dbの値(インスタンス)
+// u ユーザエンティティ
 func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User) error {
 	u.CreatedAt = r.Clocker.Now()
-	u.ModifiedAt = r.Clocker.Now()
+	u.UpdateAt = r.Clocker.Now()
+
 	sql := `INSERT INTO users (
-			name, email, password, role_id, created_at, modified_at
-		) VALUES (?, ?, ?, ?, ?, ?)`
-	result, err := db.ExecContext(ctx, sql, u.Name, u.Email, u.Password, u.Role, u.CreatedAt, u.ModifiedAt)
+			first_name, first_name_kana, family_name, family_name_kana, email, password, sending_point, created_at, update_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
+	result, err := db.ExecContext(ctx, sql, u.FirstName, u.FirstNameKana, u.FamilyName, u.FamilyNameKana, u.Email, u.Password, u.SendingPoint, u.CreatedAt, u.UpdateAt)
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLDuplicateEntry {
-			return fmt.Errorf("cannot create same name user: %w", ErrAlreadyEntry)
+			return fmt.Errorf("cannot create same email user: %w", ErrAlreadyEntry)
 		}
 		return err
 	}

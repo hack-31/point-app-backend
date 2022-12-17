@@ -16,11 +16,11 @@ type Email struct {
 	repository domain.RegisterTemporaryUserRep
 }
 
-func NewEmail(mail *string, rep domain.RegisterTemporaryUserRep) (*Email, error) {
-	if 256 < utf8.RuneCountInString(*mail) {
+func NewEmail(mail string, rep domain.RegisterTemporaryUserRep) (*Email, error) {
+	if 256 < utf8.RuneCountInString(mail) {
 		return nil, fmt.Errorf("cannot use email over 257 char")
 	}
-	return &Email{value: *mail, repository: rep}, nil
+	return &Email{value: mail, repository: rep}, nil
 }
 
 // emailでユーザ検索

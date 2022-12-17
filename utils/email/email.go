@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/hack-31/point-app-backend/config"
+	"github.com/hack-31/point-app-backend/utils/function"
 )
 
 const (
@@ -18,11 +19,10 @@ const (
 
 // メールを送信する
 //
-// @params recipient 送信者のメールアドレス
-//
-// @params subject 件名
-//
-// @params textBody テキストボディ
+// @params
+// recipient 送信先のメールアドレス
+// subject 件名
+// textBody テキストボディ
 func SendMail(recipient string, subject string, textBody string) (*ses.SendEmailOutput, error) {
 	// 環境変数の読み込み
 	cfg, err := config.New()
@@ -33,6 +33,7 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(cfg.AWSRegion),
 		Endpoint:    aws.String(cfg.AWSEndpoint),
+		MaxRetries:  aws.Int(3),
 		Credentials: credentials.NewStaticCredentials(cfg.AWSId, cfg.AWSSecret, "")},
 	)
 	if err != nil {
@@ -40,40 +41,37 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 	}
 	svc := ses.New(sess)
 
-	// 送信元メールアドレスの検証
-	_, err = svc.VerifyEmailIdentity(&ses.VerifyEmailIdentityInput{EmailAddress: aws.String(cfg.SenderMailAddress)})
+	// 検証済みメールアドレス一覧取得
+	result, err := svc.ListIdentities(&ses.ListIdentitiesInput{IdentityType: aws.String("EmailAddress")})
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case ses.ErrCodeMessageRejected:
-				return nil, fmt.Errorf("message rejected: %w", aerr)
-			case ses.ErrCodeMailFromDomainNotVerifiedException:
-				return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
-			case ses.ErrCodeConfigurationSetDoesNotExistException:
-				return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
-			default:
-				return nil, aerr
-			}
-		}
 		return nil, err
 	}
 
-	// 送信先メールアドレスの検証
-	_, err = svc.VerifyEmailIdentity(&ses.VerifyEmailIdentityInput{EmailAddress: aws.String(recipient)})
-	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case ses.ErrCodeMessageRejected:
-				return nil, fmt.Errorf("message rejected: %w", aerr)
-			case ses.ErrCodeMailFromDomainNotVerifiedException:
-				return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
-			case ses.ErrCodeConfigurationSetDoesNotExistException:
-				return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
-			default:
-				return nil, aerr
+	// 検証メール一覧をポインタスライスから値スライスに変換
+	mailList := []string{}
+	for _, email := range result.Identities {
+		mailList = append(mailList, *email)
+	}
+
+	// 検証メール一覧に送信元メールアドレスが含まれていない場合の検証メール送信
+	shouldValite := !function.Contains(mailList, cfg.SenderMailAddress)
+	if shouldValite {
+		_, err = svc.VerifyEmailIdentity(&ses.VerifyEmailIdentityInput{EmailAddress: aws.String(cfg.SenderMailAddress)})
+		if err != nil {
+			if aerr, ok := err.(awserr.Error); ok {
+				switch aerr.Code() {
+				case ses.ErrCodeMessageRejected:
+					return nil, fmt.Errorf("message rejected: %w", aerr)
+				case ses.ErrCodeMailFromDomainNotVerifiedException:
+					return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
+				case ses.ErrCodeConfigurationSetDoesNotExistException:
+					return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
+				default:
+					return nil, aerr
+				}
 			}
+			return nil, err
 		}
-		return nil, err
 	}
 
 	// 送信メールの作成
@@ -100,8 +98,7 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 	}
 
 	// メールの送信
-	result, err := svc.SendEmail(input)
-
+	res, err := svc.SendEmail(input)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
@@ -117,5 +114,5 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 		}
 		return nil, err
 	}
-	return result, nil
+	return res, nil
 }

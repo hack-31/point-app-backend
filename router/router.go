@@ -25,8 +25,8 @@ func SetRouting(ctx context.Context, db *sqlx.DB, cache *repository.KVS, router 
 
 	groupRoute := router.Group("/api/v1")
 
-	registerHandler := handler.NewRegisterUserHandler(&service.RegisterUser{DB: db, Repo: &rep})
-	groupRoute.POST("/register", registerHandler.ServeHTTP)
+	registerHandler := handler.NewRegisterUserHandler(&service.RegisterUser{DB: db, Cache: cache, Repo: &rep})
+	groupRoute.POST("/users", registerHandler.ServeHTTP)
 
 	registerTempUser := handler.NewRegisterTemporaryUserHandler(&service.RegisterTemporaryUser{DB: db, Cache: cache, Repo: &rep})
 	groupRoute.POST("/temporary_users", registerTempUser.ServeHTTP)
