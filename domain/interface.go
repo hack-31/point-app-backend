@@ -12,3 +12,7 @@ import (
 type RegisterTemporaryUserRep interface {
 	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (entity.User, error)
 }
+
+type UserRegister interface {
+	RegisterUser(ctx context.Context, db repository.Execer, u *entity.User) error
+}

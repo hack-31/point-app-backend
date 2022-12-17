@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hack-31/point-app-backend/constant"
+	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/entity"
 	"github.com/hack-31/point-app-backend/repository"
@@ -13,7 +14,7 @@ import (
 type RegisterUser struct {
 	DB    repository.Execer
 	Cache *repository.KVS
-	Repo  UserRegister
+	Repo  domain.UserRegister
 }
 
 // ユーザ登録サービス
