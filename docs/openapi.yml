@@ -266,7 +266,7 @@ paths:
 
         '409':
           description: |
-            登録済みのデータ
+            登録済みのメールアドレス
           content:
             application/json:
               schema:
@@ -281,7 +281,7 @@ paths:
                     example: "POST"
                   message:
                     type: string
-                    example: "登録済みのユーザなので、登録できませんでした。"
+                    example: "登録済みのメールアドレスは登録できません。"
                   data: 
                     type: object
                     example: null
