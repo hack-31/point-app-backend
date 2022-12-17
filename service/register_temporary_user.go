@@ -30,9 +30,18 @@ type RegisterTemporaryUser struct {
 // password パスワード
 func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) error {
 	// メール値オブジェクト作成
-	mail, err := user.NewEmail(&email, r.Repo)
+	mail, err := user.NewEmail(email, r.Repo)
 	if err != nil {
 		return fmt.Errorf("cannot create mail object: %w", err)
+	}
+	pass, err := user.NewPasswrod(password)
+	if err != nil {
+		return fmt.Errorf("cannot create passwrod object: %w", err)
+	}
+	// ハッシュ化
+	hashPass, err := pass.CreateHash()
+	if err != nil {
+		return fmt.Errorf("cannot create hash passwrod: %w", err)
 	}
 
 	// 登録可能なメールか確認
