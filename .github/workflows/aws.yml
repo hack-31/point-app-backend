@@ -8,6 +8,8 @@ on:
 env:
   AWS_REGION: ap-northeast-1              # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: point-app-backend       # file, e.g. .aws/task-definition.json
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+  JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
 
 permissions:
   contents: read
@@ -21,6 +23,12 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+
+    - name: generate secret key in JWT
+      run: echo ${JWT_SECRET_KEY} ./auth/certificate/secret.pem
+
+    - name: generate public key in JWT
+      run: echo ${JWT_PUBLIC_KEY} ./auth/certificate/public.pem
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
