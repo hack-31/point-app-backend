@@ -47,7 +47,7 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 		return
 	}
 
-	u, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
+	u, jwt, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
 			APIResponse(ctx, repository.ErrNotFoundSession.Error(), http.StatusUnauthorized, http.MethodPost, nil)
@@ -62,7 +62,8 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	}
 
 	rsp := struct {
-		ID entity.UserID `json:"userId"`
-	}{ID: u.ID}
+		ID    entity.UserID `json:"userId"`
+		Token string        `json:"accessToken"`
+	}{ID: u.ID, Token: jwt}
 	APIResponse(ctx, "本登録が完了しました。", http.StatusCreated, http.MethodPost, rsp)
 }
