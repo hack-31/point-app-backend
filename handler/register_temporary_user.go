@@ -30,12 +30,13 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 		Password       string `json:"password"`
 		Email          string `json:"email"`
 	}
-
+	// ユーザから正しいパラメータでポストデータが送られていない
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		APIResponse(ctx, err.Error(), http.StatusInternalServerError, http.MethodPost, nil)
+		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
 		return
 	}
 
+	// バリデーション検証
 	err := validation.ValidateStruct(&input,
 		validation.Field(
 			&input.FamilyName,
@@ -68,17 +69,17 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 			validation.Required,
 			validation.Length(1, 50),
 		))
-
 	if err != nil {
 		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
 		return
 	}
+	// サービスにユーザ仮登録処理を依頼
+	sessionID, err := ru.Service.RegisterTemporaryUser(ctx, input.FirstName, input.FirstNameKana, input.FamilyName, input.FamilyNameKana, input.Email, input.Password)
 
-	err = ru.Service.RegisterTemporaryUser(ctx, input.FirstName, input.FirstNameKana, input.FamilyName, input.FamilyNameKana, input.Email, input.Password)
-
+	// エラーレスポンスを返す
 	if err != nil {
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			APIResponse(ctx, "登録済みのメールアドレスの登録できません。", http.StatusConflict, http.MethodPost, nil)
+			APIResponse(ctx, repository.ErrAlreadyEntry.Error(), http.StatusConflict, http.MethodPost, nil)
 			return
 		}
 
@@ -86,5 +87,9 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 		return
 	}
 
-	APIResponse(ctx, "本登録メールを送信しました。", http.StatusOK, http.MethodPost, nil)
+	// 成功時のレスポンスを返す
+	rsp := struct {
+		ID string `json:"temporaryUserId"`
+	}{ID: sessionID}
+	APIResponse(ctx, "本登録メールを送信しました。", http.StatusOK, http.MethodPost, rsp)
 }

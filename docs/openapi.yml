@@ -237,14 +237,14 @@ paths:
                       userId:
                         type: integer
                         example: 24
-                      sessionKey:
+                      accessToken:
                         type: string
-                        example: hfdsali28fdad89af.d8a9ckafjdlsa9fd8dkl88fd9a9f.fdasfdsadsakfdlkajfd8a9
+                        example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzEzMDcyNjYsImlhdCI6MTY3MTMwNTQ2NiwiaXNzIjoiZ2l0aHViLmNvbS9oYWNrLTMxL3BvaW50LWFwcC1iYWNrZW5kIiwianRpIjoiZGJkNzU3MzItNzFmZC00ZDQ4LWIyNmYtMTdlNTkwMjRlNDYxIiwicm9sZSI6InlhbWFkYUBzZmRhYXNtcGxlLmNvbSIsInN1YiI6ImFjY2Vzc190b2tlbiIsInVzZXJfbmFtZSI6MzQ0fQ.cE8BtV82WELa4mE7I0V92zriMTCPS9ztzaL-SZW0zJc3oLCameUI0OPa3pCjv-_YGUF3PyDmh5NuP0cKLZE2tT68fyvskhs_RgaaY-N6_tHFHzY9d8wiMyBO4fuGyp1tFX9BwUSvzLTDynhXDMN2DeaFGBapXoFgiI0dZE215dsPgtXCSOaz536hJShWOKTPgBEJ7uVRMATKJ--g0SUomj29P4bmHPYUIQyAoZSXZH-m3oOR-Et9F_MjuTy2BwZE6SNIO6oeAbdfzIW7f1qxSjM_5T64n_X_1O_gdRP0_ebcp4s7w2y4MX5c79gYKnAolwEMY5pVEqYFf-Eeig_G4Be6Tp_xm9zHcMi_aarQ7vbPebT6KXLZn5y5a0MraG0TnnOluZo-_Os5CEwFAfaOr2Y67NIZRcnnDvX9gLfAvaapyvBfcQ8DOXjimH-MOxjGGM0RYRZ9U9QLn3NgTZkrgmvbUlJJcRuCX48PaCtRiU_GdmOOTA3LA141_sk8Ce0YUiUqmWASD0DmuPJIfkGgHbqugXPgchHMl68U6oli22BuRTal3WHg4JQPgqKTeqt9bruVTecJ5XAIzdcvLEY_Nz62jc1VX4aY8Ty6dB1zlQbbriuN78DId0qwv5aqeHzv5StKChZOayRSchu_lSZVfq7s8N4DHJxg0SgvD0qoDd8
         '400':
            $ref: '#/components/responses/400Error'
         '401':
           description: |
-            確認コードまたはセッションキーが無効
+            確認コードまたはトークンが無効
           content:
             application/json:
               schema:
@@ -259,14 +259,14 @@ paths:
                     example: "POST"
                   message:
                     type: string
-                    example: "確認コードまたは、セッションキーが無効です。"
+                    example: "確認コードまたは、トークンが無効です。"
                   data: 
                     type: object
                     example: null
 
         '409':
           description: |
-            登録済みのデータ
+            登録済みのメールアドレス
           content:
             application/json:
               schema:
@@ -281,7 +281,7 @@ paths:
                     example: "POST"
                   message:
                     type: string
-                    example: "登録済みのユーザなので、登録できませんでした。"
+                    example: "登録済みのメールアドレスは登録できません。"
                   data: 
                     type: object
                     example: null
@@ -361,15 +361,15 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'    
 
-  /sessions:
+  /tokens:
     post:
       tags:
         - 認証
       summary: サインイン
       description: |
         - メールアドレスとパスワードで認証する
-        - セッションキー(トークン)を生成し、返却
-        - 保護されたエンドポイントのリクエストヘッダーにセッションキーを付与する必要がある
+        - トークン(トークン)を生成し、返却
+        - 保護されたエンドポイントのリクエストヘッダーにトークンを付与する必要がある
       requestBody:
         required: true
         content:
@@ -409,9 +409,9 @@ paths:
                   data:
                     type: object
                     properties:
-                      sessionKey:
+                      accessToken:
                         type: string
-                        example: hfdsali28fdad89af.d8a9ckafjdlsa9fd8dkl88fd9a9f.fdasfdsadsakfdlkajfd8a9
+                        example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzEzMDcyNjYsImlhdCI6MTY3MTMwNTQ2NiwiaXNzIjoiZ2l0aHViLmNvbS9oYWNrLTMxL3BvaW50LWFwcC1iYWNrZW5kIiwianRpIjoiZGJkNzU3MzItNzFmZC00ZDQ4LWIyNmYtMTdlNTkwMjRlNDYxIiwicm9sZSI6InlhbWFkYUBzZmRhYXNtcGxlLmNvbSIsInN1YiI6ImFjY2Vzc190b2tlbiIsInVzZXJfbmFtZSI6MzQ0fQ.cE8BtV82WELa4mE7I0V92zriMTCPS9ztzaL-SZW0zJc3oLCameUI0OPa3pCjv-_YGUF3PyDmh5NuP0cKLZE2tT68fyvskhs_RgaaY-N6_tHFHzY9d8wiMyBO4fuGyp1tFX9BwUSvzLTDynhXDMN2DeaFGBapXoFgiI0dZE215dsPgtXCSOaz536hJShWOKTPgBEJ7uVRMATKJ--g0SUomj29P4bmHPYUIQyAoZSXZH-m3oOR-Et9F_MjuTy2BwZE6SNIO6oeAbdfzIW7f1qxSjM_5T64n_X_1O_gdRP0_ebcp4s7w2y4MX5c79gYKnAolwEMY5pVEqYFf-Eeig_G4Be6Tp_xm9zHcMi_aarQ7vbPebT6KXLZn5y5a0MraG0TnnOluZo-_Os5CEwFAfaOr2Y67NIZRcnnDvX9gLfAvaapyvBfcQ8DOXjimH-MOxjGGM0RYRZ9U9QLn3NgTZkrgmvbUlJJcRuCX48PaCtRiU_GdmOOTA3LA141_sk8Ce0YUiUqmWASD0DmuPJIfkGgHbqugXPgchHMl68U6oli22BuRTal3WHg4JQPgqKTeqt9bruVTecJ5XAIzdcvLEY_Nz62jc1VX4aY8Ty6dB1zlQbbriuN78DId0qwv5aqeHzv5StKChZOayRSchu_lSZVfq7s8N4DHJxg0SgvD0qoDd8
         '401':
           description: メールアドレス、または、パスワードが異なる
           content:
@@ -435,20 +435,20 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'    
 
-  /sessions/{sessionKey}:
+  /tokens/{accessToken}:
     delete:
       tags:
         - 認証
       summary: サインアウト
       description: |
-        - セッションキーを削除し、サインアウト処理を行う
+        - トークンを削除し、サインアウト処理を行う
       parameters:
         - in: path
-          name: sessionKey
+          name: accessToken
           schema: 
             type: string
           description: |
-            - セッションキーを削除し、ログアウト処理とする
+            - トークンを削除し、ログアウト処理とする
           required: true
       responses:
         '200':
@@ -472,7 +472,7 @@ paths:
                     type: object
                     example: null
         '404':
-          description: 無効なセッションキー
+          description: 無効なトークン
           content:
             application/json:
               schema:
@@ -487,7 +487,7 @@ paths:
                     example: DELETE
                   message:
                     type: string
-                    example: "セッションキーが無効です。"
+                    example: "トークンが無効です。"
                   data: 
                     type: object
                     example: null

@@ -8,16 +8,11 @@
 $ git clone https://github.com/hack-31/point-app-backend.git
 $ cd ./point-app-backend
 
-$ docker compose up -d --build
-$ docker compose exec app sh
-# サーバー起動
-$ air
-```
-
-[Makefile](./Makefile)Makefileを擁しているため以下のコマンドでも可能
-
-```sh
+# JWTに必要なキー生成
+$ make create-key
+# ビルド、コンテナ起動
 $ make build-up
+# サーバー起動
 $ make serve
 ```
 
@@ -74,6 +69,8 @@ $ make seed
 
 # 各ディレクトリの説明
 詳しい説明は、各ディレクトリのREADME.mdに些細されているものもあります。
+- `/auth`
+  - JWT認証におけるトークン作成や検証を行う処理が書かれたパッケージ
 - `/router`
   - ルーティング処理を書きます
 - `/docs`

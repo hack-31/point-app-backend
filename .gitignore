@@ -1,2 +1,5 @@
 /tmp
 .DS_Store
+.env
+secret.pem
+public.pem

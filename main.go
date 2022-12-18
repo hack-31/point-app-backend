@@ -49,11 +49,15 @@ func run(ctx context.Context) error {
 		return err
 	}
 	defer cleanup()
-	cache, err := repository.NewKVS(ctx, cfg)
+
+	err = routers.SetRouting(ctx, db, router, cfg)
+	if err != nil {
+		return err
+	}
+	err = routers.SetAuthRouting(ctx, db, router, cfg)
 	if err != nil {
 		return err
 	}
 
-	routers.SetRouting(ctx, db, cache, router)
 	return router.Run(fmt.Sprintf(":%d", cfg.Port))
 }

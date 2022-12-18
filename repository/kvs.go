@@ -9,9 +9,17 @@ import (
 	"github.com/hack-31/point-app-backend/config"
 )
 
-func NewKVS(ctx context.Context, cfg *config.Config) (*KVS, error) {
+type CacheType int
+
+const (
+	JWT                   CacheType = 0
+	TemporaryUserRegister CacheType = 1
+)
+
+func NewKVS(ctx context.Context, cfg *config.Config, t CacheType) (*KVS, error) {
 	cli := redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d", cfg.RedisHost, cfg.RedisPort),
+		DB:   int(t),
 	})
 	if err := cli.Ping(ctx).Err(); err != nil {
 		return nil, err
@@ -57,6 +65,15 @@ func (k *KVS) Delete(ctx context.Context, key string) error {
 	_, err := k.Cli.Del(ctx, key).Result()
 	if err != nil {
 		return fmt.Errorf("failed to delete by %q: %w", key, ErrNotFoundSession)
+	}
+	return nil
+}
+
+// 有効期限を延長
+func (k *KVS) Expire(ctx context.Context, key string, minitue time.Duration) error {
+	_, err := k.Cli.Expire(ctx, key, minitue*time.Minute).Result()
+	if err != nil {
+		return fmt.Errorf("failed to expire by %q: %w", key, ErrNotFoundSession)
 	}
 	return nil
 }

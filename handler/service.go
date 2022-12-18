@@ -7,9 +7,9 @@ import (
 )
 
 type RegisterUserService interface {
-	RegisterUser(ctx context.Context, temporaryUserId string) (*entity.User, error)
+	RegisterUser(ctx context.Context, temporaryUserId, confirmCode string) (*entity.User, string, error)
 }
 
 type RegisterTemporaryUserService interface {
-	RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) error
+	RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) (string, error)
 }

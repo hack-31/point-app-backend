@@ -24,6 +24,7 @@ func NewRegisterUserHandler(s RegisterUserService) *RegisterUser {
 func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	var input struct {
 		TemporaryUserId string `json:"temporaryUserId"`
+		ConfirmCode     string `json:"confirmCode"`
 	}
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
@@ -35,13 +36,18 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 			&input.TemporaryUserId,
 			validation.Required,
 		),
+		validation.Field(
+			&input.ConfirmCode,
+			validation.Required,
+			validation.Length(4, 4),
+		),
 	)
 	if err != nil {
 		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
 		return
 	}
 
-	u, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId)
+	u, jwt, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
 			APIResponse(ctx, repository.ErrNotFoundSession.Error(), http.StatusUnauthorized, http.MethodPost, nil)
@@ -56,7 +62,8 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	}
 
 	rsp := struct {
-		ID entity.UserID `json:"userId"`
-	}{ID: u.ID}
+		ID    entity.UserID `json:"userId"`
+		Token string        `json:"accessToken"`
+	}{ID: u.ID, Token: jwt}
 	APIResponse(ctx, "本登録が完了しました。", http.StatusCreated, http.MethodPost, rsp)
 }

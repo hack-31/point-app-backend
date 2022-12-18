@@ -51,6 +51,10 @@ read-mail-h: ## 送信メールを見る(ホスト側)
 read-mail-c: ## 送信メールを見る(コンテナ側)
 	curl -v http://aws:4566/_localstack/ses/ | jq .
 
+create-key: ## JWTに必要なkeyを作成する
+	openssl genrsa 4096 > ./auth/certificate/secret.pem
+	openssl rsa -pubout < ./auth/certificate/secret.pem > ./auth/certificate/public.pem
+
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
