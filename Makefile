@@ -10,8 +10,8 @@ build: ## Build docker image to deploy
 		-t ${ECR_REGISTRY}/point-app-backend:${IMAGE_TAG}  \
 		--target deploy ./
 
-build-local: ## Build docker image to local development
-	docker compose build --no-cache --target deploy ./
+build-l: ## Build docker image to local development
+	docker build --no-cache --target deploy ./
 
 build-up: ## Build docker image and up container
 	docker compose up -d --build

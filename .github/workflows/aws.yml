@@ -25,10 +25,10 @@ jobs:
       uses: actions/checkout@v3
 
     - name: generate secret key in JWT
-      run: echo ${JWT_SECRET_KEY} ./auth/certificate/secret.pem
+      run: echo ${JWT_SECRET_KEY} > ./auth/certificate/secret.pem
 
     - name: generate public key in JWT
-      run: echo ${JWT_PUBLIC_KEY} ./auth/certificate/public.pem
+      run: echo ${JWT_PUBLIC_KEY} > ./auth/certificate/public.pem
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

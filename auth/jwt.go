@@ -95,7 +95,7 @@ func (j *JWTer) GenerateToken(ctx context.Context, u entity.User) ([]byte, error
 // @params
 // ctx コンテキスト
 // r リクエスト情報
-// 
+//
 // @returns
 // トークン
 func (j *JWTer) GetToken(ctx context.Context, r *http.Request) (jwt.Token, error) {
@@ -132,7 +132,7 @@ func (j *JWTer) FillContext(ctx *gin.Context) error {
 	}
 	uid := fmt.Sprintf("%v", id)
 	jwi, err := j.Store.Load(ctx, uid)
-	if  err != nil {
+	if err != nil {
 		return fmt.Errorf("GetToken: %v expired: %w", id, err)
 	}
 
@@ -152,7 +152,7 @@ func (j *JWTer) FillContext(ctx *gin.Context) error {
 }
 
 // メールをコンテキストに代入
-// 
+//
 // @paramss
 // ctx コンテキスト
 // tok トークン
