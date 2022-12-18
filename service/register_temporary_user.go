@@ -16,7 +16,7 @@ import (
 
 type RegisterTemporaryUser struct {
 	DB    repository.Queryer
-	Cache *repository.KVS
+	Cache domain.Cache
 	Repo  domain.RegisterTemporaryUserRep
 }
 
