@@ -8,20 +8,18 @@ import (
 	"github.com/hack-31/point-app-backend/repository"
 )
 
-// エンドポイントごとにインターフェースを作る
-
-type RegisterTemporaryUserRep interface {
+// Userに対するインターフェース
+type UserRepo interface {
 	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (entity.User, error)
-}
-
-type UserRegister interface {
 	RegisterUser(ctx context.Context, db repository.Execer, u *entity.User) error
 }
 
+// トークンに対するインターフェース
 type TokenGenerator interface {
 	GenerateToken(ctx context.Context, u entity.User) ([]byte, error)
 }
 
+// キャッシュに対するインターフェース
 type Cache interface {
 	Save(ctx context.Context, key, value string, minute time.Duration) error
 	Load(ctx context.Context, key string) (string, error)
