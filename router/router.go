@@ -15,7 +15,7 @@ import (
 
 // 認証がないルーティングの設定を行う
 //
-// @param 
+// @param
 // ctx コンテキスト
 // router ルーター
 func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *config.Config) error {
@@ -47,6 +47,9 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 
 	registerTempUser := handler.NewRegisterTemporaryUserHandler(&service.RegisterTemporaryUser{DB: db, Cache: cache, Repo: &rep})
 	groupRoute.POST("/temporary_users", registerTempUser.ServeHTTP)
+
+	signin := handler.NewSigninHandler(&service.Signin{DB: db, Cache: cache, Repo: &rep, TokenGenerator: jwter})
+	groupRoute.POST("/tokens", signin.ServeHTTP)
 
 	return nil
 }

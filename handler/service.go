@@ -13,3 +13,7 @@ type RegisterUserService interface {
 type RegisterTemporaryUserService interface {
 	RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) (string, error)
 }
+
+type SigninService interface {
+	Signin(ctx context.Context, email, password string) (string, error)
+}
