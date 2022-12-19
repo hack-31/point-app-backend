@@ -14,7 +14,7 @@ import (
 type RegisterUser struct {
 	DB             repository.Execer
 	Cache          domain.Cache
-	Repo           domain.UserRegister
+	Repo           domain.UserRepo
 	TokenGenerator domain.TokenGenerator
 }
 

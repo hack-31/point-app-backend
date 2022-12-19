@@ -17,7 +17,7 @@ import (
 type RegisterTemporaryUser struct {
 	DB    repository.Queryer
 	Cache domain.Cache
-	Repo  domain.RegisterTemporaryUserRep
+	Repo  domain.UserRepo
 }
 
 // ユーザ仮登録サービス
