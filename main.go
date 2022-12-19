@@ -37,7 +37,7 @@ func run(ctx context.Context) error {
 	router := gin.Default()
 	// ミドルウェアの設定
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"http://localhost", "https://*.dkjrwfcbom7qp.amplifyapp.com"},
+		AllowOrigins:  []string{"http://localhost", "https://*.dkjrwfcbom7qp.amplifyapp.com", "https://hack-31.github.io"},
 		AllowMethods:  []string{"*"},
 		AllowHeaders:  []string{"*"},
 		AllowWildcard: true,
