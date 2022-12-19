@@ -13,10 +13,10 @@ import (
 
 type Email struct {
 	value      string
-	repository domain.RegisterTemporaryUserRep
+	repository domain.UserRepo
 }
 
-func NewEmail(mail string, rep domain.RegisterTemporaryUserRep) (*Email, error) {
+func NewEmail(mail string, rep domain.UserRepo) (*Email, error) {
 	if 256 < utf8.RuneCountInString(mail) {
 		return nil, fmt.Errorf("cannot use email over 257 char")
 	}

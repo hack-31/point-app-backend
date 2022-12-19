@@ -13,6 +13,7 @@ type Password struct {
 }
 
 // パスワードオブジェクト作成
+// ハッシュ化されてない値を扱う
 // コンストラクタ
 //
 // @params pwd パスワード
@@ -23,6 +24,17 @@ func NewPasswrod(pwd string) (*Password, error) {
 		return nil, fmt.Errorf("cannot use password over 51 char")
 	}
 	return &Password{value: pwd}, nil
+}
+
+// ハッシュ化されたパスワードと一致するか
+// @params 
+// hashPwd ハッシュ化されたパスワード
+func (pwd *Password) IsMatch(hashPwd string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword([]byte(hashPwd), []byte(pwd.value))
+	if err != nil {
+		return false, err
+	}
+	return true, err
 }
 
 func (pwd *Password) CreateHash() (string, error) {
