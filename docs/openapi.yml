@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 0.0.0
+  version: 1.0.0
   title: point-app-backend RESTful API
   description: >-
     ハッカソン2022で作成するポイントアプリのバックエンドAPI
@@ -13,88 +13,6 @@ servers:
         enum:
           - localhost
 paths:
-  /register:
-    post:
-      tags:
-        - サンプル
-      summary: ユーザ登録
-      description: |
-        クライアントが入力する情報をもとにユーザ情報を登録する
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: 山田太郎
-                email:
-                  type: string
-                  format: email
-                  example: yamada@hoge.hoge
-                password:
-                  type: string
-                  format: password
-                  example: qwerty123456789
-              required:
-                - name
-                - email
-                - password
-      responses:
-        '201':
-          description: ユーザ情報登録成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  statusCode:
-                    type: integer
-                    format: number
-                    example: 200
-                  method:
-                    type: string
-                    example: "POST"
-                  message:
-                    type: string
-                    example: "ユーザ登録に成功しました。"
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                required:
-                  - statusCode
-                  - method
-                  - message
-                  - data
-        '409':
-          description: |
-            登録済みのメールアドレス
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  statusCode:
-                    type: integer
-                    format: number
-                    example: 409
-                  method:
-                    type: string
-                    example: "POST"
-                  message:
-                    type: string
-                    example: "登録済みのメールアドレスです。"
-                  data: 
-                    type: object
-                    example: null
-        '500':
-          $ref: '#/components/responses/500Error'
-
   /temporary_users:
     post:
       tags:
@@ -149,9 +67,6 @@ paths:
                     type: integer
                     format: number
                     example: 201
-                  method:
-                    type: string
-                    example: "POST"
                   message:
                     type: string
                     example: "本登録メールを送信しました。"
@@ -179,15 +94,12 @@ paths:
                     type: integer
                     format: number
                     example: 409
-                  method:
+                  title: 
                     type: string
-                    example: "POST"
+                    example: "ユーザ仮登録エラー"
                   message:
                     type: string
                     example: "登録済みのメールアドレスは登録できません。"
-                  data: 
-                    type: object
-                    example: null
         '500':
           $ref: '#/components/responses/500Error'
 
@@ -225,9 +137,6 @@ paths:
                     type: integer
                     format: number
                     example: 201
-                  method:
-                    type: string
-                    example: "POST"
                   message:
                     type: string
                     example: "本登録が完了しました。"
@@ -254,15 +163,12 @@ paths:
                     type: integer
                     format: number
                     example: 401
-                  method:
+                  title: 
                     type: string
-                    example: "POST"
+                    example: "ユーザ本登録エラー"
                   message:
                     type: string
                     example: "確認コードまたは、トークンが無効です。"
-                  data: 
-                    type: object
-                    example: null
 
         '409':
           description: |
@@ -276,15 +182,12 @@ paths:
                     type: integer
                     format: number
                     example: 409
-                  method:
+                  title: 
                     type: string
-                    example: "POST"
+                    example: "ユーザ本登録エラー"
                   message:
                     type: string
                     example: "登録済みのメールアドレスは登録できません。"
-                  data: 
-                    type: object
-                    example: null
 
         '500':
           $ref: '#/components/responses/500Error'    
@@ -309,9 +212,6 @@ paths:
                     type: integer
                     format: number
                     example: 200
-                  method:
-                    type: string
-                    example: GET
                   message:
                     type: string
                     example: "取得成功しました。"
@@ -360,6 +260,386 @@ paths:
           $ref: '#/components/responses/401UnauthorizedError'
         '500':
           $ref: '#/components/responses/500Error'    
+  
+  /account:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - アカウント
+      summary: アカウント情報取得
+      description: |
+        - セッションキーのユーザ情報を返却する
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "アカウント情報の取得に成功しました。"
+                  data:
+                    type: object
+                    properties:
+                      familyName:
+                        type: string
+                      familyNameKana:
+                        type: string
+                      firstName:
+                        type: string
+                      firstNameKana:
+                        type: string
+                      email:
+                        type: string
+                      acquisitionPoint:
+                        type: integer
+                        description: 保有ポイント
+                      sendablePoint:
+                        type: integer
+                        description: 送信可能ポイント
+                    example:
+                      familytName: 山田
+                      familyNameKana: ヤマダ
+                      firstName: 太郎
+                      firstNameKana: タロウ
+                      email: yamada@sample.com
+                      acquisitionPoint: 30000
+                      sendablePoint: 1000           
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/500Error'    
+
+    put:
+      tags:
+        - アカウント
+      summary: アカウント情報更新
+      description: |
+        - セッションキーのユーザ情報を更新する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                familyName:
+                  type: string
+                  example: 葛飾
+                familyNameKana:
+                  type: string
+                  example: カツシカ
+                firstName:
+                  type: string
+                  example: 北斎
+                firstNameKana:
+                  type: string
+                  example: ホクサイ
+              required:
+                - firstName
+                - firstNameKana
+                - familyName
+                - familyNameKana
+                - email
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "アカウント情報の更新に成功しました。"           
+                  data:
+                    type: object
+                    example: null
+        '400':
+           $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /point_trancsactions:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - ポイント
+      summary: ポイントの取引
+      description: |
+        - 指定したユーザーにポイントを送付する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                toUserId:
+                  type: string
+                  example: 12345
+                sendPoint:
+                  type: integer
+                  example: 100
+              required:
+                - toUserId
+                - sendPoint
+      responses:
+        '201':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "ポイントの送信に成功しました。"
+                  data:
+                    type: object
+                    example: null
+
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /random_password:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - ユーザ情報変更
+      summary: パスワードリセット
+      description: |
+        - リクエストのメールアドレスに対し、ランダムにパスワードを生成し、更新する
+          - ただし、リクエストされたメールアドレスがデータベースに存在しなければ、更新しない
+        - リクエストのメールアドレスに保存したパスワードを送信する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: yamada@sample.hoge
+              required:
+                - email
+      responses:
+        '200':
+          description: パスワード際発行メール送信
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "パスワード再発行メールを送信しました。"
+                  data:
+                    type: object
+                    example: null
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+        '404':
+          description: |
+            メールアドレスが存在しない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 409
+                  title: 
+                    type: string
+                    example: "パスワードリセットエラー"
+                  message:
+                    type: string
+                    example: "メールアドレスが存在しません。"
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /temporary_email_and_password:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - ユーザ情報変更
+      summary: メール・パスワード仮変更
+      description: |
+        - メールまたはパスワードの仮登録をする
+        - リクエストされたメールアドレスに確認コードを送信する
+        - メールアドレスが指定されていたら指定されてメールアドレスに対して確認コードを送る
+        - パスワードのみの場合は、現行のメールアドレスに対して確認コードを送る
+      requestBody:
+        content:
+          multipart/form-date:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: yamada@sample.hoge
+                old_password:
+                  type: string
+                  format: password
+                  example: query12345678
+                new_password:
+                  type: string
+                  format: password
+                  example: query12345678
+      responses:
+        '201':
+          description: メールアドレスとパスワード仮登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "仮登録成功しました。"
+                  data:
+                    type: object
+                    example: null
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+        '400':
+            $ref: '#/components/responses/400Error'
+        '409':
+          description: |
+            登録済みのメールアドレス
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 409
+                  title: 
+                    type: string
+                    example: "メール・パスワード仮登録エラー"
+                  message:
+                    type: string
+                    example: "登録済みのメールアドレスは登録できません。"
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /email_and_password:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - ユーザ情報変更
+      summary: メールアドレスとパスワードを本変更
+      description: |
+        - 仮変更されたメールアドレスとパスワードを本更新する
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temporaryId:
+                  type: string
+                  example: 8e8d0f82-89a1-4cc6-ba25-13c864ad09db
+                confirmCode:
+                  type: string
+                  example: 7821
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "更新が完了しました。"
+                  data:
+                    type: object
+                    example: null
+        '401':
+          description: |
+            確認コードまたはトークンが無効
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 401
+                  title: 
+                    type: string
+                    example: "メール・パスワード更新エラー"
+                  message:
+                    type: string
+                    example: "確認コードまたは、トークンが無効です。"
+        '400':
+           $ref: '#/components/responses/400Error'
+        '409':
+          description: |
+            登録済みのメールアドレス
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 409
+                  title: 
+                    type: string
+                    example: "メール・パスワード更新エラー"
+                  message:
+                    type: string
+                    example: "登録済みのメールアドレスは登録できません。"
+        '500':
+          $ref: '#/components/responses/500Error'
 
   /tokens:
     post:
@@ -368,7 +648,7 @@ paths:
       summary: サインイン
       description: |
         - メールアドレスとパスワードで認証する
-        - トークン(トークン)を生成し、返却
+        - トークンを生成し、返却
         - 保護されたエンドポイントのリクエストヘッダーにトークンを付与する必要がある
       requestBody:
         required: true
@@ -380,7 +660,7 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: yamada@hoge.hoge
+                  example: yamada@sample.com
                 password:
                   type: string
                   format: password
@@ -400,9 +680,6 @@ paths:
                     type: integer
                     format: number
                     example: 200
-                  method:
-                    type: string
-                    example: POST
                   message:
                     type: string
                     example: "サインイン成功しました。"
@@ -423,15 +700,12 @@ paths:
                     type: integer
                     format: number
                     example: 401
-                  method:
+                  title:
                     type: string
-                    example: POST
+                    example: "サインインエラー"
                   message:
                     type: string
                     example: "メールアドレスまたはパスワードが異なります。"
-                  data: 
-                    type: object
-                    example: null
         '500':
           $ref: '#/components/responses/500Error'    
 
@@ -462,9 +736,6 @@ paths:
                     type: integer
                     format: number
                     example: 200
-                  method:
-                    type: string
-                    example: DELETE
                   message:
                     type: string
                     example: "サインアウトが成功しました。"
@@ -482,26 +753,22 @@ paths:
                     type: integer
                     format: number
                     example: 404
-                  method:
+                  title:
                     type: string
-                    example: DELETE
+                    example: "サインアウト"
                   message:
                     type: string
                     example: "トークンが無効です。"
-                  data: 
-                    type: object
-                    example: null
         '500':
           $ref: '#/components/responses/500Error'    
 
-
-
 components:
   securitySchemes:
-    bearerAuth:            # arbitrary name for the security scheme
-        type: http
-        scheme: bearer
-        bearerFormat: JWT 
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+      description: 認証トークン
 
   responses:
     400Error:
@@ -516,15 +783,12 @@ components:
                 type: integer
                 format: int64
                 example: "400"
-              method:
+              title:
                 type: string
-                example: "POST"
+                example: "パラメータエラー"
               message: 
                 type: string
                 example: "name: cannot be blank."
-              data:
-                type: object
-                example: null
 
     401UnauthorizedError:
       description: |
@@ -538,19 +802,16 @@ components:
                 type: integer
                 format: int64
                 example: "401"
-              method:
+              title: 
                 type: string
-                example: "GET"
+                example: "認証エラー"
               message: 
                 type: string
                 example: "認証が失敗しました。再ログインしてください。"
-              data:
-                type: object
-                example: null
 
     500Error:
       description: |
-        サーバー上のエラー
+        サーバーエラー
       content:
         application/json:
           schema:
@@ -560,12 +821,9 @@ components:
                 type: integer
                 format: int64
                 example: "500"
-              method:
+              title:
                 type: string
-                example: "POST"
+                example: "サーバーエラー"
               message: 
                 type: string
-                example: "サーバー側で何らかのエラーが発生しました。"
-              data:
-                type: object
-                example: null
+                example: "サーバー側で何らかのエラーが発生しました。時間をおいて再度アクセスしてください。"
