@@ -28,8 +28,10 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+
+	const errTitle = "サインインエラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
 	err := validation.ValidateStruct(&input,
@@ -48,7 +50,7 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
 
@@ -56,10 +58,10 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 	jwt, err := ru.Service.Signin(ctx, input.Email, input.Password)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotMatchLogInfo) {
-			APIResponse(ctx, repository.ErrNotMatchLogInfo.Error(), http.StatusUnauthorized, http.MethodPost, nil)
+			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotMatchLogInfo.Error())
 			return
 		}
-		APIResponse(ctx, err.Error(), http.StatusInternalServerError, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
 		return
 	}
 
@@ -67,5 +69,5 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 	rsp := struct {
 		Token string `json:"accessToken"`
 	}{Token: jwt}
-	APIResponse(ctx, "サインイン成功しました。", http.StatusCreated, http.MethodPost, rsp)
+	APIResponse(ctx, http.StatusCreated, "サインイン成功しました。", rsp)
 }

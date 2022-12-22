@@ -36,10 +36,27 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	// TODO: 一旦仮の値を返す
 	groupRoute.GET("/users", func(ctx *gin.Context) {
 		email, _ := ctx.Get(auth.Email)
+		type user struct {
+			AcquisitionPoint int    `json:"acquisitionPoint"`
+			Email            string `json:"email"`
+			FirstName        string `json:"firstName"`
+			FirstNameKana    string `json:"firstNameKana"`
+			FamilyName       string `json:"familyName"`
+			FamilyNameKana   string `json:"familyNameKana"`
+		}
+		u := []user{}
+		u = append(u, user{
+			AcquisitionPoint: 2000,
+			Email:            email.(string),
+			FirstName:        "田中",
+			FirstNameKana:    "タナカ",
+			FamilyName:       "和樹",
+			FamilyNameKana:   "カズキ"},
+		)
 		rsp := struct {
-			Email string `json:"email"`
-		}{Email: email.(string)}
-		handler.APIResponse(ctx, "認証成功", http.StatusCreated, http.MethodPost, rsp)
+			Users []user `json:"users"`
+		}{Users: u}
+		handler.APIResponse(ctx, http.StatusCreated, "認証成功", rsp)
 	})
 	return nil
 }

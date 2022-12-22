@@ -26,8 +26,9 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 		TemporaryUserId string `json:"temporaryUserId"`
 		ConfirmCode     string `json:"confirmCode"`
 	}
+	const errTitle = "ユーザ登録エラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
 
@@ -43,21 +44,21 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
 
 	u, jwt, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
-			APIResponse(ctx, repository.ErrNotFoundSession.Error(), http.StatusUnauthorized, http.MethodPost, nil)
+			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error())
 			return
 		}
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			APIResponse(ctx, repository.ErrAlreadyEntry.Error(), http.StatusConflict, http.MethodPost, nil)
+			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error())
 			return
 		}
-		APIResponse(ctx, err.Error(), http.StatusInternalServerError, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
 		return
 	}
 
@@ -65,5 +66,5 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 		ID    entity.UserID `json:"userId"`
 		Token string        `json:"accessToken"`
 	}{ID: u.ID, Token: jwt}
-	APIResponse(ctx, "本登録が完了しました。", http.StatusCreated, http.MethodPost, rsp)
+	APIResponse(ctx, http.StatusCreated, "本登録が完了しました。", rsp)
 }
