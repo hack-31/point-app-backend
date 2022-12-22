@@ -16,7 +16,7 @@ paths:
   /temporary_users:
     post:
       tags:
-        - ユーザ登録
+        - ユーザ登録・認証
       summary: サインアップ(ユーザ仮登録)
       description: |
         - ユーザが入力した情報をもとにユーザ情報を仮登録する
@@ -106,7 +106,7 @@ paths:
   /users:
     post:
       tags:
-        - ユーザ登録
+        - ユーザ登録・認証
       summary: サインアップ(ユーザ本登録)
       description: |
         - ユーザーの本登録を行う
@@ -428,7 +428,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - ユーザ情報変更
+        - アカウント
       summary: パスワードリセット
       description: |
         - リクエストのメールアドレスに対し、ランダムにパスワードを生成し、更新する
@@ -489,11 +489,11 @@ paths:
           $ref: '#/components/responses/500Error'
 
   /temporary_email_and_password:
-    post:
+    patch:
       security:
         - bearerAuth: []
       tags:
-        - ユーザ情報変更
+        - アカウント
       summary: メール・パスワード仮変更
       description: |
         - メールまたはパスワードの仮登録をする
@@ -566,7 +566,7 @@ paths:
       security:
         - bearerAuth: []
       tags:
-        - ユーザ情報変更
+        - アカウント
       summary: メールアドレスとパスワードを本変更
       description: |
         - 仮変更されたメールアドレスとパスワードを本更新する
@@ -644,7 +644,7 @@ paths:
   /tokens:
     post:
       tags:
-        - 認証
+        - ユーザ登録・認証
       summary: サインイン
       description: |
         - メールアドレスとパスワードで認証する
@@ -712,7 +712,7 @@ paths:
   /tokens/{accessToken}:
     delete:
       tags:
-        - 認証
+        - ユーザ登録・認証
       summary: サインアウト
       description: |
         - トークンを削除し、サインアウト処理を行う
