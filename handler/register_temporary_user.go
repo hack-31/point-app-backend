@@ -22,6 +22,8 @@ func NewRegisterTemporaryUserHandler(s RegisterTemporaryUserService) *RegisterTe
 //
 // @param ctx ginContext
 func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
+	const errTitle = "ユーザ仮登録エラー"
+
 	var input struct {
 		FirstName      string `json:"firstName"`
 		FirstNameKana  string `json:"firstNameKana"`
@@ -32,7 +34,7 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 	}
 	// ユーザから正しいパラメータでポストデータが送られていない
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
 
@@ -70,7 +72,7 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 			validation.Length(1, 50),
 		))
 	if err != nil {
-		APIResponse(ctx, err.Error(), http.StatusBadRequest, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
 	// サービスにユーザ仮登録処理を依頼
@@ -79,11 +81,10 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 	// エラーレスポンスを返す
 	if err != nil {
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			APIResponse(ctx, repository.ErrAlreadyEntry.Error(), http.StatusConflict, http.MethodPost, nil)
+			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error())
 			return
 		}
-
-		APIResponse(ctx, err.Error(), http.StatusInternalServerError, http.MethodPost, nil)
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
 		return
 	}
 
@@ -91,5 +92,5 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 	rsp := struct {
 		ID string `json:"temporaryUserId"`
 	}{ID: sessionID}
-	APIResponse(ctx, "本登録メールを送信しました。", http.StatusOK, http.MethodPost, rsp)
+	APIResponse(ctx, http.StatusCreated, "本登録メールを送信しました。", rsp)
 }

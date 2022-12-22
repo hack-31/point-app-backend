@@ -15,7 +15,8 @@ func AuthMiddleware(j *auth.JWTer) gin.HandlerFunc {
 
 		if err := j.FillContext(ctx); err != nil {
 			log.Print(err.Error())
-			APIResponse(ctx, "アクセストークンが無効です。再ログインしてください。", http.StatusUnauthorized, http.MethodPost, nil)
+			ErrResponse(ctx, http.StatusUnauthorized, "認証エラー", "アクセストークンが無効です。再ログインしてください。")
+
 			return
 		}
 		ctx.Next()
