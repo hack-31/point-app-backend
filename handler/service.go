@@ -21,3 +21,7 @@ type SigninService interface {
 type SignoutService interface {
 	Signout(ctx context.Context, userId string) error
 }
+
+type ResetPasswordService interface {
+	ResetPassword(ctx context.Context, email string) error
+}

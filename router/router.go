@@ -54,5 +54,8 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	signout := handler.NewSignoutHandler(&service.Signout{Cache: tokenCache})
 	groupRoute.DELETE("/tokens/:userId", signout.ServeHTTP)
 
+	resetPassword := handler.NewResetPasswordHandler(&service.ResetPassword{ExecerDB: db, QueryerDB: db, Repo: &rep})
+	groupRoute.PATCH("/random_password", resetPassword.ServeHTTP)
+
 	return nil
 }

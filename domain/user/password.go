@@ -2,8 +2,11 @@ package user
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 	"unicode/utf8"
 
+	"github.com/hack-31/point-app-backend/constant"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,7 +30,7 @@ func NewPasswrod(pwd string) (*Password, error) {
 }
 
 // ハッシュ化されたパスワードと一致するか
-// @params 
+// @params
 // hashPwd ハッシュ化されたパスワード
 func (pwd *Password) IsMatch(hashPwd string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashPwd), []byte(pwd.value))
@@ -40,4 +43,18 @@ func (pwd *Password) IsMatch(hashPwd string) (bool, error) {
 func (pwd *Password) CreateHash() (string, error) {
 	pw, err := bcrypt.GenerateFromPassword([]byte(pwd.value), bcrypt.DefaultCost)
 	return string(pw), err
+}
+
+// ラムダム文字列のパスワードを作成
+func (pwd *Password) CreateRandomPassword() *Password {
+	// どの文字列からランダム文字列を生成するか
+	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+	rand.Seed(time.Now().UnixNano())
+	value := make([]byte, constant.RandomPasswordLength)
+	for i := range value {
+		r := rand.Int63() % int64(len(letters))
+		value[i] = letters[int(r)]
+	}
+	return &Password{value: string(value)}
 }
