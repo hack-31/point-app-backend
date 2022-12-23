@@ -18,6 +18,10 @@ type SigninService interface {
 	Signin(ctx context.Context, email, password string) (string, error)
 }
 
+type GetUsersService interface {
+	GetUsers(ctx context.Context) (entity.Users, error)
+}
+
 type SignoutService interface {
 	Signout(ctx context.Context, userId string) error
 }

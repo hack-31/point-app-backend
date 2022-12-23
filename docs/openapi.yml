@@ -237,19 +237,19 @@ paths:
                             acquisitionPoint:
                               type: number
                         example:
-                          - familytName: 山田
+                          - familyName: 山田
                             familyNameKana: ヤマダ
                             firstName: 太郎
                             firstNameKana: タロウ
                             email: yamada@sample.com
                             acquisitionPoint: 200
-                          - familytName: 本郷
+                          - familyName: 本郷
                             familyNameKana: ホンゴウ
                             firstName: 奏
                             firstNameKana: カナタ
                             email: hongo@sample.com
                             acquisitionPoint: 1000000
-                          - familytName: 本田
+                          - familyName: 本田
                             familyNameKana: ホンダ
                             firstName: 美優
                             firstNameKana: ミユ
@@ -305,7 +305,7 @@ paths:
                         type: integer
                         description: 送信可能ポイント
                     example:
-                      familytName: 山田
+                      familyName: 山田
                       familyNameKana: ヤマダ
                       firstName: 太郎
                       firstNameKana: タロウ
