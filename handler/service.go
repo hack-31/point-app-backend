@@ -17,3 +17,7 @@ type RegisterTemporaryUserService interface {
 type SigninService interface {
 	Signin(ctx context.Context, email, password string) (string, error)
 }
+
+type SignoutService interface {
+	Signout(ctx context.Context, userId string) error
+}

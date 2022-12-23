@@ -51,5 +51,8 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	signin := handler.NewSigninHandler(&service.Signin{DB: db, Cache: cache, Repo: &rep, TokenGenerator: jwter})
 	groupRoute.POST("/tokens", signin.ServeHTTP)
 
+	signout := handler.NewSignoutHandler(&service.Signout{Cache: tokenCache})
+	groupRoute.DELETE("/tokens/:userId", signout.ServeHTTP)
+
 	return nil
 }
