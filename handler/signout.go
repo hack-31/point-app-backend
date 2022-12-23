@@ -21,7 +21,7 @@ func NewSignoutHandler(s SignoutService) *Signout {
 // サインアウトハンドラー
 //
 // @param ctx ginContext
-func (ru *Signout) ServeHTTP(ctx *gin.Context) {
+func (s *Signout) ServeHTTP(ctx *gin.Context) {
 	// ユーザのパラメータ検証
 	uid := ctx.Param("userId")
 
@@ -41,7 +41,7 @@ func (ru *Signout) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サインアウト処理依頼
-	if err := ru.Service.Signout(ctx, uid); err != nil {
+	if err := s.Service.Signout(ctx, uid); err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
 			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error())
 			return
