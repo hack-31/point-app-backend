@@ -21,3 +21,7 @@ type SigninService interface {
 type GetUsersService interface {
 	GetUsers(ctx context.Context) (entity.Users, error)
 }
+
+type SignoutService interface {
+	Signout(ctx context.Context, userId string) error
+}
