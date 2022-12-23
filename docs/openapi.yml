@@ -709,20 +709,22 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'    
 
-  /tokens/{accessToken}:
+  /tokens/{userId}:
     delete:
+      security:
+        - bearerAuth: []
       tags:
         - ユーザ登録・認証
       summary: サインアウト
       description: |
-        - トークンを削除し、サインアウト処理を行う
+        - 対象userIdのAccessTokenを削除し、ログアウト処理とする
       parameters:
         - in: path
-          name: accessToken
+          name: userId
           schema: 
             type: string
           description: |
-            - トークンを削除し、ログアウト処理とする
+            - 対象userIdのAccessTokenを削除し、ログアウト処理とする
           required: true
       responses:
         '200':
