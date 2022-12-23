@@ -36,7 +36,7 @@ func (rp *ResetPassword) ResetPassword(ctx context.Context, email string) error 
 		return err
 	}
 	if !existMail {
-		return fmt.Errorf("not exist email address: %w", repository.ErrAlreadyEntry)
+		return fmt.Errorf("not exist email address: %w", repository.ErrNotExistEmail)
 	}
 
 	pass, err := user.NewPasswrod("")

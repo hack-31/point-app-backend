@@ -27,7 +27,7 @@ func (s *ResetPassword) ServeHTTP(ctx *gin.Context) {
 		Email string `json:"email"`
 	}
 
-	const errTitle = "パスワード再発行エラー"
+	const errTitle = "パスワードリセットエラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
@@ -48,6 +48,10 @@ func (s *ResetPassword) ServeHTTP(ctx *gin.Context) {
 	if err := s.Service.ResetPassword(ctx, input.Email); err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
 			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error())
+			return
+		}
+		if errors.Is(err, repository.ErrNotExistEmail) {
+			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotExistEmail.Error())
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
