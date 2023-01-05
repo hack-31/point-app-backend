@@ -47,5 +47,5 @@ func (gu *GetAccount) ServeHTTP(ctx *gin.Context) {
 		SendablePoint:    user.SendingPoint,
 	}
 
-	APIResponse(ctx, http.StatusCreated, "アカウント情報の取得に成功しました。", rsp)
+	APIResponse(ctx, http.StatusOK, "アカウント情報の取得に成功しました。", rsp)
 }
