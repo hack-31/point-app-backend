@@ -290,6 +290,8 @@ paths:
                     properties:
                       familyName:
                         type: string
+                      userId:
+                        type: number
                       familyNameKana:
                         type: string
                       firstName:
@@ -305,6 +307,7 @@ paths:
                         type: integer
                         description: 送信可能ポイント
                     example:
+                      userId: 200
                       familyName: 山田
                       familyNameKana: ヤマダ
                       firstName: 太郎
