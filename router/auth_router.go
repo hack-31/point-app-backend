@@ -39,5 +39,8 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	getUsersHandler := handler.NewGetUsers(&service.GetUsers{DB: db, Repo: &rep})
 	groupRoute.GET("/users", getUsersHandler.ServeHTTP)
 
+	getUserHandler := handler.NewGetAccount(&service.GetAccount{DB: db, Repo: &rep})
+	groupRoute.GET("/account", getUserHandler.ServeHTTP)
+
 	return nil
 }
