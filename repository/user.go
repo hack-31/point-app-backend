@@ -56,6 +56,7 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *str
 			u.family_name, 
 			u.family_name_kana, 
 			u.email,
+			u.password,
 			u.created_at,
 			u.update_at,
 			u.sending_point,

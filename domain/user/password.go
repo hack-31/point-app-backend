@@ -27,7 +27,7 @@ func NewPasswrod(pwd string) (*Password, error) {
 }
 
 // ハッシュ化されたパスワードと一致するか
-// @params 
+// @params
 // hashPwd ハッシュ化されたパスワード
 func (pwd *Password) IsMatch(hashPwd string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashPwd), []byte(pwd.value))
