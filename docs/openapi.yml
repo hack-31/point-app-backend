@@ -236,6 +236,8 @@ paths:
                               format: email
                             acquisitionPoint:
                               type: number
+                            id:
+                              type: number
                         example:
                           - familyName: 山田
                             familyNameKana: ヤマダ
@@ -243,18 +245,21 @@ paths:
                             firstNameKana: タロウ
                             email: yamada@sample.com
                             acquisitionPoint: 200
+                            id: 1
                           - familyName: 本郷
                             familyNameKana: ホンゴウ
                             firstName: 奏
                             firstNameKana: カナタ
                             email: hongo@sample.com
                             acquisitionPoint: 1000000
+                            id: 2
                           - familyName: 本田
                             familyNameKana: ホンダ
                             firstName: 美優
                             firstNameKana: ミユ
                             email: honda@sample.com
                             acquisitionPoint: 11100
+                            id: 3
 
         '401':
           $ref: '#/components/responses/401UnauthorizedError'
