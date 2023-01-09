@@ -23,6 +23,7 @@ type user struct {
 	FirstNameKana    string `json:"firstNameKana"`
 	FamilyName       string `json:"familyName"`
 	FamilyNameKana   string `json:"familyNameKana"`
+	ID               int    `json:"id"`
 }
 
 // ユーザ一覧取得ハンドラー
@@ -53,8 +54,9 @@ func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 			FirstName:        u.FirstName,
 			FirstNameKana:    u.FirstNameKana,
 			FamilyName:       u.FamilyName,
-			FamilyNameKana:   u.FamilyNameKana},
-		)
+			FamilyNameKana:   u.FamilyNameKana,
+			ID:               int(u.ID),
+		})
 	}
 
 	rsp := struct {
