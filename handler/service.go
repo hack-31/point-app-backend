@@ -28,5 +28,6 @@ type GetAccountService interface {
 }
 
 type SignoutService interface {
-	Signout(ctx context.Context, userId string) error
+	Signout(ctx *gin.Context) error
 }
+

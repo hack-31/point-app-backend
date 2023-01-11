@@ -1,9 +1,10 @@
 package service
 
 import (
-	"context"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
+	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 )
 
@@ -19,14 +20,12 @@ type Signout struct {
 //
 // @return
 // err
-func (s *Signout) Signout(ctx context.Context, uid string) error {
-	// ユーザーIDの存在確認
-	_, err := s.Cache.Load(ctx, uid)
-	if err != nil {
-		return fmt.Errorf("cannot delete in cache: %w", err)
-	}
+func (s *Signout) Signout(ctx *gin.Context) error {
+	// ユーザIDの取得
+	userId, _ := ctx.Get(auth.UserID)
+	uid := userId.(string)
 
-	// キャッシュ削除実行
+	// ユーザIDをキャッシュから削除
 	if err := s.Cache.Delete(ctx, uid); err != nil {
 		return fmt.Errorf("cannot delete in cache: %w", err)
 	}
