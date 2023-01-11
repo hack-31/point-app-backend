@@ -25,5 +25,5 @@ func (s *Signout) ServeHTTP(ctx *gin.Context) {
 		return
 	}
 
-	APIResponse(ctx, http.StatusCreated, "サインアウトに成功しました。", nil)
+	APIResponse(ctx, http.StatusOK, "サインアウトに成功しました。", nil)
 }
