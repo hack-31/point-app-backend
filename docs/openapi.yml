@@ -717,7 +717,7 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'    
 
-  /tokens/{userId}:
+  /signout:
     delete:
       security:
         - bearerAuth: []
@@ -726,14 +726,6 @@ paths:
       summary: サインアウト
       description: |
         - 対象userIdのAccessTokenを削除し、ログアウト処理とする
-      parameters:
-        - in: path
-          name: userId
-          schema: 
-            type: string
-          description: |
-            - 対象userIdのAccessTokenを削除し、ログアウト処理とする
-          required: true
       responses:
         '200':
           description: サインアウトが成功

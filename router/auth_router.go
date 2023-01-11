@@ -42,5 +42,8 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	getUserHandler := handler.NewGetAccount(&service.GetAccount{DB: db, Repo: &rep})
 	groupRoute.GET("/account", getUserHandler.ServeHTTP)
 
+	signout := handler.NewSignoutHandler(&service.Signout{Cache: tokenCache})
+	groupRoute.DELETE("/signout", signout.ServeHTTP)
+
 	return nil
 }
