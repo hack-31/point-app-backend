@@ -49,7 +49,7 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	groupRoute.POST("/temporary_users", registerTempUser.ServeHTTP)
 
 	signin := handler.NewSigninHandler(&service.Signin{DB: db, Cache: cache, Repo: &rep, TokenGenerator: jwter})
-	groupRoute.POST("/tokens", signin.ServeHTTP)
+	groupRoute.POST("/signin", signin.ServeHTTP)
 
 	return nil
 }
