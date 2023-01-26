@@ -32,6 +32,8 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	if err != nil {
 		return err
 	}
+	// トランザクション
+	appConnection := repository.NewAppConnection(db)
 
 	// ルーティング設定
 	groupRoute := router.Group("/api/v1").Use(handler.AuthMiddleware(jwter))
