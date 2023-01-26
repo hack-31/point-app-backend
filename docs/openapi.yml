@@ -399,7 +399,7 @@ paths:
               type: object
               properties:
                 toUserId:
-                  type: string
+                  type: integer
                   example: 12345
                 sendPoint:
                   type: integer
@@ -426,8 +426,47 @@ paths:
                     type: object
                     example: null
 
+        '400':
+          description: |
+            送付可能ポイントの不足
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 400
+                  title: 
+                    type: string
+                    example: "送付エラー"
+                  message:
+                    type: string
+                    example: "送付可能ポイントが不足しています。"
+
         '401':
           $ref: '#/components/responses/401UnauthorizedError'
+
+        '404':
+          description: |
+            送付先ユーザが存在しない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 404
+                  title: 
+                    type: string
+                    example: "送付エラー"
+                  message:
+                    type: string
+                    example: "ユーザが存在しません。"
+
         '500':
           $ref: '#/components/responses/500Error'
 

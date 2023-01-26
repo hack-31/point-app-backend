@@ -32,6 +32,8 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	if err != nil {
 		return err
 	}
+	// トランザクション
+	appConnection := repository.NewAppConnection(db)
 
 	// ルーティング設定
 	groupRoute := router.Group("/api/v1").Use(handler.AuthMiddleware(jwter))
@@ -44,6 +46,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 
 	signout := handler.NewSignoutHandler(&service.Signout{Cache: tokenCache})
 	groupRoute.DELETE("/signout", signout.ServeHTTP)
+
+	sendPointHandler := handler.NewSendPoint(&service.SendPoint{PointRepo: &rep, UserRepo: &rep, Connection: appConnection, DB: db})
+	groupRoute.POST("/point_transactions", sendPointHandler.ServeHTTP)
 
 	return nil
 }

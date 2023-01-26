@@ -31,3 +31,6 @@ type SignoutService interface {
 	Signout(ctx *gin.Context) error
 }
 
+type SendPointService interface {
+	SendPoint(ctx *gin.Context, toUserId, sendPoint int) error
+}

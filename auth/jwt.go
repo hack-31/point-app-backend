@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -145,7 +146,8 @@ func (j *JWTer) FillContext(ctx *gin.Context) error {
 	j.Store.Expire(ctx, uid, time.Duration(constant.TokenExpiration_m))
 
 	// コンテキストにユーザ情報追加
-	ctx.Set(UserID, uid)
+	intUid, _ := strconv.ParseInt(uid, 10, 64)
+	ctx.Set(UserID, entity.UserID(intUid))
 	SetEmail(ctx, token)
 
 	return nil
