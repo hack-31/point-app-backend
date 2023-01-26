@@ -60,7 +60,8 @@ type Preparer interface {
 // 書き込み系メソッド類
 type Execer interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
-	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
+	// NOTE: トランザクション系で利用できないから一旦コメントアウト
+	// NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
 }
 
 // 読み取り系メソッド類

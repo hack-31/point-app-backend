@@ -15,6 +15,11 @@ type UserRepo interface {
 	FindUsers(ctx context.Context, db repository.Queryer) (entity.Users, error)
 }
 
+type PointRepo interface {
+	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId entity.UserID, sendPoint int) error
+	UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error
+}
+
 // トークンに対するインターフェース
 type TokenGenerator interface {
 	GenerateToken(ctx context.Context, u entity.User) ([]byte, error)
