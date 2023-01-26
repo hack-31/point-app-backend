@@ -47,5 +47,8 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	signout := handler.NewSignoutHandler(&service.Signout{Cache: tokenCache})
 	groupRoute.DELETE("/signout", signout.ServeHTTP)
 
+	sendPointHandler := handler.NewSendPoint(&service.SendPoint{PointRepo: &rep, UserRepo: &rep, Connection: appConnection, DB: db})
+	groupRoute.POST("/point_transactions", sendPointHandler.ServeHTTP)
+
 	return nil
 }
