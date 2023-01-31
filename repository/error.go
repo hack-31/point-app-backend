@@ -13,6 +13,7 @@ const (
 )
 
 var (
+	ErrNotExistEmail       = errors.New("メールアドレスが存在しません。")
 	ErrAlreadyEntry        = errors.New("登録済みのメールアドレスは登録できません。")
 	ErrNotFoundSession     = errors.New("確認コードまたは、セッションキーが無効です。")
 	ErrNotMatchLogInfo     = errors.New("メールアドレスまたは、パスワードが異なります。")

@@ -80,6 +80,25 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *str
 	return user, nil
 }
 
+// パスワードを上書き
+// @params
+// ctx context
+// db dbインスタンス
+// email email
+// pass password
+//
+// @returns
+// error
+func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass *string) error {
+	sql := `UPDATE users SET password = ? WHERE email = ?`
+
+	_, err := db.ExecContext(ctx, sql, pass, email)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
 // ユーザ一覧
 //
 // @params

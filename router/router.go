@@ -51,5 +51,8 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	signin := handler.NewSigninHandler(&service.Signin{DB: db, Cache: cache, Repo: &rep, TokenGenerator: jwter})
 	groupRoute.POST("/signin", signin.ServeHTTP)
 
+	resetPassword := handler.NewResetPasswordHandler(&service.ResetPassword{ExecerDB: db, QueryerDB: db, Repo: &rep})
+	groupRoute.PATCH("/random_password", resetPassword.ServeHTTP)
+
 	return nil
 }
