@@ -60,7 +60,7 @@ func (rp *ResetPassword) ResetPassword(ctx context.Context, email string) error 
 
 	// メール送信
 	subject := "【ポイントアプリ】パスワード再発行完了のお知らせ"
-	body := fmt.Sprintf("ポイントアプリをご利用いただきありがとうございます。\n\nポイントアプリのパスワード再設定が完了しました。\n新しいパスワードは %s です。", randomPass)
+	body := fmt.Sprintf("ポイントアプリをご利用いただきありがとうございます。\n\nポイントアプリのパスワード再設定が完了しました。\n新しいパスワードは %s です。", randomPass.String())
 	_, err = utils.SendMail(email, subject, body)
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)

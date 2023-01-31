@@ -58,3 +58,10 @@ func (pwd *Password) CreateRandomPassword() *Password {
 	}
 	return &Password{value: string(value)}
 }
+
+// 文字列
+// @return
+// パスワード
+func (pwd *Password) String() string {
+	return string(pwd.value)
+}
