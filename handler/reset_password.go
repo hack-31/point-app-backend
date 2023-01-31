@@ -46,10 +46,6 @@ func (s *ResetPassword) ServeHTTP(ctx *gin.Context) {
 
 	// パスワード再発行処理依頼
 	if err := s.Service.ResetPassword(ctx, input.Email); err != nil {
-		if errors.Is(err, repository.ErrNotFoundSession) {
-			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error())
-			return
-		}
 		if errors.Is(err, repository.ErrNotExistEmail) {
 			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotExistEmail.Error())
 			return
