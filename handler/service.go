@@ -34,3 +34,7 @@ type SignoutService interface {
 type SendPointService interface {
 	SendPoint(ctx *gin.Context, toUserId, sendPoint int) error
 }
+
+type ResetPasswordService interface {
+	ResetPassword(ctx context.Context, email string) error
+}
