@@ -1,4 +1,4 @@
-package function
+package utils
 
 import "reflect"
 
