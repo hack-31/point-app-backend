@@ -64,8 +64,8 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *str
 		from users AS u
 		LEFT JOIN transactions AS t
 		ON u.id = t.receiving_user_id
+		WHERE u.email = ?
 		GROUP BY u.id
-		HAVING u.email = ? 
 		LIMIT 1`
 
 	var user entity.User
