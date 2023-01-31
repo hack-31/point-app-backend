@@ -48,7 +48,26 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 // @returns
 // entity.User ユーザ情報
 func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *string) (entity.User, error) {
-	sql := `SELECT * FROM users WHERE email = ? LIMIT 1`
+	sql := `
+		SELECT 
+			u.id,
+			u.first_name, 
+			u.first_name_kana, 
+			u.family_name, 
+			u.family_name_kana, 
+			u.email,
+			u.password,
+			u.created_at,
+			u.update_at,
+			u.sending_point,
+			SUM(IFNULL(t.transaction_point, 0)) AS acquisition_point 
+		from users AS u
+		LEFT JOIN transactions AS t
+		ON u.id = t.receiving_user_id
+		GROUP BY u.id
+		HAVING u.email = ? 
+		LIMIT 1`
+
 	var user entity.User
 
 	if err := db.GetContext(ctx, &user, sql, email); err != nil {
@@ -78,4 +97,34 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 		return err
 	}
 	return err
+}
+
+// ユーザ一覧
+//
+// @params
+// ctx context
+// db db
+//
+// @returns
+// Users ユーザ一覧
+func (r *Repository) FindUsers(ctx context.Context, db Queryer) (entity.Users, error) {
+	sql := `
+		SELECT 
+			u.id, 
+			u.first_name, 
+			u.first_name_kana, 
+			u.family_name, 
+			u.family_name_kana, 
+			u.email, 
+			SUM(IFNULL(t.transaction_point, 0)) AS acquisition_point 
+		from users AS u
+		LEFT JOIN transactions AS t
+		ON u.id = t.receiving_user_id
+		GROUP BY u.id`
+
+	var users entity.Users
+	if err := db.SelectContext(ctx, &users, sql); err != nil {
+		return users, err
+	}
+	return users, nil
 }

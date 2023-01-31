@@ -13,6 +13,12 @@ type UserRepo interface {
 	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (entity.User, error)
 	RegisterUser(ctx context.Context, db repository.Execer, u *entity.User) error
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
+	FindUsers(ctx context.Context, db repository.Queryer) (entity.Users, error)
+}
+
+type PointRepo interface {
+	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId entity.UserID, sendPoint int) error
+	UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error
 }
 
 // トークンに対するインターフェース

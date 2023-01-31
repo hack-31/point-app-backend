@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 
+	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/entity"
 )
 
@@ -18,8 +19,20 @@ type SigninService interface {
 	Signin(ctx context.Context, email, password string) (string, error)
 }
 
+type GetUsersService interface {
+	GetUsers(ctx context.Context) (entity.Users, error)
+}
+
+type GetAccountService interface {
+	GetAccount(ctx *gin.Context) (entity.User, error)
+}
+
 type SignoutService interface {
-	Signout(ctx context.Context, userId string) error
+	Signout(ctx *gin.Context) error
+}
+
+type SendPointService interface {
+	SendPoint(ctx *gin.Context, toUserId, sendPoint int) error
 }
 
 type ResetPasswordService interface {
