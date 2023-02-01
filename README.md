@@ -12,6 +12,8 @@ $ cd ./point-app-backend
 $ make create-key
 # ビルド、コンテナ起動
 $ make build-up
+# マイグレーション適用
+$ maae migrate
 # サーバー起動
 $ make serve
 ```
@@ -89,8 +91,6 @@ $ make seed
 - `/repository`
   - リポジトリ層
   - DBやキャッシュサーバーにアクセスする
-- `/entity`
-  - DBエンティティをGoで医療するための構造体の定義
 - `/_tools`
   - 各ツールを利用するためのディレクトリ
   - `/_tools/mysql/schema.sql`にテーブル作成のためのDDL定義
