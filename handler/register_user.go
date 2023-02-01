@@ -66,5 +66,5 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 		ID    entity.UserID `json:"userId"`
 		Token string        `json:"accessToken"`
 	}{ID: u.ID, Token: jwt}
-	APIResponse(ctx, http.StatusCreated, "本登録が完了しました。", rsp)
+	APIResponse(ctx, http.StatusOK, "本登録が完了しました。", rsp)
 }
