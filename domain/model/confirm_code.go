@@ -1,4 +1,4 @@
-package token
+package model
 
 import (
 	"math/rand"

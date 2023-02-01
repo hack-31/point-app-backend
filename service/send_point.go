@@ -6,8 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/user"
-	"github.com/hack-31/point-app-backend/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 )
 
@@ -27,7 +26,7 @@ type SendPoint struct {
 func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error {
 	// コンテキストよりUserIDを取得
 	uid, _ := ctx.Get(auth.UserID)
-	fromUserID := uid.(entity.UserID)
+	fromUserID := uid.(model.UserID)
 
 	// トランザクション開始
 	if err := sp.Connection.Begin(ctx); err != nil {
@@ -44,7 +43,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 		}
 		return err
 	}
-	sendablePoint := user.NewSendablePoint(u.SendingPoint)
+	sendablePoint := model.NewSendablePoint(u.SendingPoint)
 	if !sendablePoint.CanSendPoint(sendPoint) {
 		if err := sp.Connection.Rollback(); err != nil {
 			return fmt.Errorf("cannot trasanction: %w ", err)
@@ -53,7 +52,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 
 	// ポイント登録
-	if err := sp.PointRepo.RegisterPointTransaction(ctx, sp.Connection.Tx, fromUserID, entity.UserID(toUserId), sendPoint); err != nil {
+	if err := sp.PointRepo.RegisterPointTransaction(ctx, sp.Connection.Tx, fromUserID, model.UserID(toUserId), sendPoint); err != nil {
 		if err := sp.Connection.Rollback(); err != nil {
 			return fmt.Errorf("cannot trasanction: %w ", err)
 		}

@@ -4,26 +4,26 @@ import (
 	"context"
 	"time"
 
-	"github.com/hack-31/point-app-backend/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 )
 
 // Userに対するインターフェース
 type UserRepo interface {
-	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (entity.User, error)
-	RegisterUser(ctx context.Context, db repository.Execer, u *entity.User) error
+	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
+	RegisterUser(ctx context.Context, db repository.Execer, u *model.User) error
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
-	FindUsers(ctx context.Context, db repository.Queryer) (entity.Users, error)
+	FindUsers(ctx context.Context, db repository.Queryer) (model.Users, error)
 }
 
 type PointRepo interface {
-	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId entity.UserID, sendPoint int) error
-	UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error
+	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId model.UserID, sendPoint int) error
+	UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error
 }
 
 // トークンに対するインターフェース
 type TokenGenerator interface {
-	GenerateToken(ctx context.Context, u entity.User) ([]byte, error)
+	GenerateToken(ctx context.Context, u model.User) ([]byte, error)
 }
 
 // キャッシュに対するインターフェース

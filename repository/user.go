@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/hack-31/point-app-backend/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 )
 
 // ユーザ情報永続化
@@ -15,7 +15,7 @@ import (
 // ctx コンテキスト
 // db dbの値(インスタンス)
 // u ユーザエンティティ
-func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User) error {
+func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *model.User) error {
 	u.CreatedAt = r.Clocker.Now()
 	u.UpdateAt = r.Clocker.Now()
 
@@ -35,7 +35,7 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 	if err != nil {
 		return err
 	}
-	u.ID = entity.UserID(id)
+	u.ID = model.UserID(id)
 	return nil
 }
 
@@ -46,8 +46,8 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 // email email
 //
 // @returns
-// entity.User ユーザ情報
-func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *string) (entity.User, error) {
+// model.User ユーザ情報
+func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *string) (model.User, error) {
 	sql := `
 		SELECT 
 			u.id,
@@ -68,7 +68,7 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *str
 		HAVING u.email = ? 
 		LIMIT 1`
 
-	var user entity.User
+	var user model.User
 
 	if err := db.GetContext(ctx, &user, sql, email); err != nil {
 		// 見つけられない時(その他のエラーも含む)
@@ -107,7 +107,7 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 //
 // @returns
 // Users ユーザ一覧
-func (r *Repository) FindUsers(ctx context.Context, db Queryer) (entity.Users, error) {
+func (r *Repository) FindUsers(ctx context.Context, db Queryer) (model.Users, error) {
 	sql := `
 		SELECT 
 			u.id, 
@@ -122,7 +122,7 @@ func (r *Repository) FindUsers(ctx context.Context, db Queryer) (entity.Users, e
 		ON u.id = t.receiving_user_id
 		GROUP BY u.id`
 
-	var users entity.Users
+	var users model.Users
 	if err := db.SelectContext(ctx, &users, sql); err != nil {
 		return users, err
 	}

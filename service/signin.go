@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/user"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 )
 
@@ -33,7 +33,7 @@ func (s *Signin) Signin(ctx context.Context, email, password string) (string, er
 	}
 
 	// パスワードが一致するか確認
-	pwd, err := user.NewPasswrod(password)
+	pwd, err := model.NewPasswrod(password)
 	if err != nil {
 		return "", fmt.Errorf("cannot create password object: %w", err)
 	}

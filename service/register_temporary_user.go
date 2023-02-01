@@ -8,9 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/domain/service"
-	"github.com/hack-31/point-app-backend/domain/token"
-	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/repository"
 	utils "github.com/hack-31/point-app-backend/utils/email"
 )
@@ -48,7 +47,7 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	}
 
 	// パスワードハッシュ化
-	pass, err := user.NewPasswrod(password)
+	pass, err := model.NewPasswrod(password)
 	if err != nil {
 		return "", fmt.Errorf("cannot create passwrod object: %w", err)
 	}
@@ -58,10 +57,10 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	}
 
 	// ユーザ情報をキャッシュに保存
-	tempUserInfo := user.NewTemporaryUserString("")
+	tempUserInfo := model.NewTemporaryUserString("")
 	// キャッシュサーバーに保存するkeyの作成
 	uid := uuid.New().String()
-	confirmCode := token.NewConfirmCode().String()
+	confirmCode := model.NewConfirmCode().String()
 	key := fmt.Sprintf("%s:%s", confirmCode, uid)
 	// キャッシュのサーバーに保存するvalueを作成
 	userString := tempUserInfo.Join(firstName, firstNameKana, familyName, familyNameKana, email, hashPass)

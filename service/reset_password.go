@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/domain/service"
-	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/repository"
 	utils "github.com/hack-31/point-app-backend/utils/email"
 )
@@ -37,7 +37,7 @@ func (rp *ResetPassword) ResetPassword(ctx context.Context, email string) error 
 		return fmt.Errorf("not exist email address: %w", repository.ErrNotExistEmail)
 	}
 
-	pass, err := user.NewPasswrod("")
+	pass, err := model.NewPasswrod("")
 	if err != nil {
 		return fmt.Errorf("cannot create passwrod object: %w", err)
 	}
