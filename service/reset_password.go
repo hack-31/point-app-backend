@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/repository"
 	utils "github.com/hack-31/point-app-backend/utils/email"
@@ -24,14 +25,11 @@ type ResetPassword struct {
 // @returns
 // error
 func (rp *ResetPassword) ResetPassword(ctx context.Context, email string) error {
-	// メール値オブジェクト作成
-	mail, err := user.NewEmail(email, rp.Repo)
-	if err != nil {
-		return fmt.Errorf("cannot create mail object: %w", err)
-	}
+	// ユーザドメインサービス
+	userService := service.NewUserService(rp.Repo)
 
 	// 登録可能なメールか確認
-	existMail, err := mail.Exist(ctx, &rp.QueryerDB)
+	existMail, err := userService.ExistByEmail(ctx, &rp.QueryerDB, email)
 	if err != nil {
 		return err
 	}

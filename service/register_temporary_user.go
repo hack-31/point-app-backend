@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/domain/token"
 	"github.com/hack-31/point-app-backend/domain/user"
 	"github.com/hack-31/point-app-backend/repository"
@@ -34,14 +35,11 @@ type RegisterTemporaryUser struct {
 // @returns
 // temporaryUserId 一時保存したユーザを識別するID
 func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, firstName, firstNameKana, familyName, familyNameKana, email, password string) (string, error) {
-	// メール値オブジェクト作成
-	mail, err := user.NewEmail(email, r.Repo)
-	if err != nil {
-		return "", fmt.Errorf("cannot create mail object: %w", err)
-	}
+	// ユーザドメインサービス
+	userService := service.NewUserService(r.Repo)
 
 	// 登録可能なメールか確認
-	existMail, err := mail.Exist(ctx, &r.DB)
+	existMail, err := userService.ExistByEmail(ctx, &r.DB, email)
 	if err != nil {
 		return "", err
 	}
