@@ -24,6 +24,9 @@ push: ## push to ECR
 serve: ## serve with air 
 	docker compose exec app air
 
+in: ## Appのコンテナに入る
+	docker compose exec app sh
+
 up: ## Do docker compose up with hot reload
 	docker compose up -d
 

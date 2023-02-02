@@ -12,10 +12,20 @@ $ cd ./point-app-backend
 $ make create-key
 # ビルド、コンテナ起動
 $ make build-up
+# コンテナの中に入る
+$ make in
 # マイグレーション適用
 $ maae migrate
 # サーバー起動
+$ air
+
+# ２回目位以降
+$ make up
 $ make serve
+# or
+$ make up
+$ make in 
+$ air
 ```
 
 詳しくは、makeコマンドを実行
