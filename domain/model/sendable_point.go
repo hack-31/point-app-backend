@@ -1,4 +1,4 @@
-package user
+package model
 
 // 送信可能ポイントオブジェクト
 type SendablePoint struct {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/hack-31/point-app-backend/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 )
 
 // ポイントの取引履歴の保存
@@ -17,7 +17,7 @@ import (
 // fromUserID 送信元ユーザ
 // toUserId 送信先ユーザ
 // sendPoint 送付ポイント
-func (r *Repository) RegisterPointTransaction(ctx context.Context, db Execer, fromUserID, toUserId entity.UserID, sendPoint int) error {
+func (r *Repository) RegisterPointTransaction(ctx context.Context, db Execer, fromUserID, toUserId model.UserID, sendPoint int) error {
 	sql := `INSERT INTO transactions (
 		sending_user_id, receiving_user_id, transaction_point, transaction_at
 	) VALUES (?, ?, ?, ?)`
@@ -40,7 +40,7 @@ func (r *Repository) RegisterPointTransaction(ctx context.Context, db Execer, fr
 // db db_instanc
 // fromUserID 送付者ユーザのID
 // point ポイント残高
-func (r *Repository) UpdateSendablePoint(ctx context.Context, db Execer, fromUserID entity.UserID, point int) error {
+func (r *Repository) UpdateSendablePoint(ctx context.Context, db Execer, fromUserID model.UserID, point int) error {
 	sql := `
 	  UPDATE users
 		SET sending_point = ?

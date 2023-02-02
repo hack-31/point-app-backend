@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/hack-31/point-app-backend/config"
-	"github.com/hack-31/point-app-backend/utils/function"
+	"github.com/hack-31/point-app-backend/utils"
 )
 
 const (
@@ -54,7 +54,7 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 	}
 
 	// 検証メール一覧に送信元メールアドレスが含まれていない場合の検証メール送信
-	shouldValite := !function.Contains(mailList, cfg.SenderMailAddress)
+	shouldValite := !utils.Contains(mailList, cfg.SenderMailAddress)
 	if shouldValite {
 		_, err = svc.VerifyEmailIdentity(&ses.VerifyEmailIdentityInput{EmailAddress: aws.String(cfg.SenderMailAddress)})
 		if err != nil {

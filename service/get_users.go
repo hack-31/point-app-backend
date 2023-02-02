@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 )
 
@@ -20,7 +20,7 @@ type GetUsers struct {
 //
 // @return
 // ユーザ一覧
-func (r *GetUsers) GetUsers(ctx context.Context) (entity.Users, error) {
+func (r *GetUsers) GetUsers(ctx context.Context) (model.Users, error) {
 	// ユーザ一覧を取得する
 	users, err := r.Repo.FindUsers(ctx, r.DB)
 	if err != nil {

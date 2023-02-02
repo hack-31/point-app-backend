@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 )
 
 type RegisterUserService interface {
-	RegisterUser(ctx context.Context, temporaryUserId, confirmCode string) (*entity.User, string, error)
+	RegisterUser(ctx context.Context, temporaryUserId, confirmCode string) (*model.User, string, error)
 }
 
 type RegisterTemporaryUserService interface {
@@ -20,11 +20,11 @@ type SigninService interface {
 }
 
 type GetUsersService interface {
-	GetUsers(ctx context.Context) (entity.Users, error)
+	GetUsers(ctx context.Context) (model.Users, error)
 }
 
 type GetAccountService interface {
-	GetAccount(ctx *gin.Context) (entity.User, error)
+	GetAccount(ctx *gin.Context) (model.User, error)
 }
 
 type SignoutService interface {

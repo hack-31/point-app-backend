@@ -24,6 +24,9 @@ push: ## push to ECR
 serve: ## serve with air 
 	docker compose exec app air
 
+in: ## Appのコンテナに入る
+	docker compose exec app sh
+
 up: ## Do docker compose up with hot reload
 	docker compose up -d
 
@@ -46,10 +49,10 @@ seed: ## seed data to db
 	mysql ${DB_NAME} -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} < ./_tools/mysql/seed.sql 
 
 read-mail-h: ## 送信メールを見る(ホスト側)
-	curl -v http://localhost:4566/_localstack/ses/ | jq .
+	curl -v http://localhost:4566/_localstack/ses/ | jq . | tail -n 18 | head -n 16
 
 read-mail-c: ## 送信メールを見る(コンテナ側)
-	curl -v http://aws:4566/_localstack/ses/ | jq .
+	curl -v http://aws:4566/_localstack/ses/ | jq . | tail -n 18 | head -n 16
 
 create-key: ## JWTに必要なkeyを作成する
 	openssl genrsa 4096 > ./auth/certificate/secret.pem
