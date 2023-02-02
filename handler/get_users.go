@@ -63,5 +63,5 @@ func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 		Users []user `json:"users"`
 	}{Users: usersResponse}
 
-	APIResponse(ctx, http.StatusCreated, "取得成功しました。", rsp)
+	APIResponse(ctx, http.StatusOK, "取得成功しました。", rsp)
 }

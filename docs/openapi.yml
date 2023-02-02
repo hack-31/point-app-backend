@@ -126,7 +126,7 @@ paths:
                   type: string
                   example: 7821
       responses:
-        '200':
+        '201':
           description: 本登録完了
           content:
             application/json:
@@ -136,7 +136,7 @@ paths:
                   statusCode:
                     type: integer
                     format: number
-                    example: 200
+                    example: 201
                   message:
                     type: string
                     example: "本登録が完了しました。"
