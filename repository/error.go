@@ -19,4 +19,5 @@ var (
 	ErrNotMatchLogInfo     = errors.New("メールアドレスまたは、パスワードが異なります。")
 	ErrNotUser             = errors.New("ユーザが存在しません。")
 	ErrHasNotSendablePoint = errors.New("送付可能ポイントが不足しています。")
+	ErrDifferentPassword   = errors.New("パスワードが異なります。")
 )

@@ -38,3 +38,7 @@ type SendPointService interface {
 type ResetPasswordService interface {
 	ResetPassword(ctx context.Context, email string) error
 }
+
+type UpdatePasswordService interface {
+	UpdatePassword(ctx *gin.Context, oldPassword, newPassword string) error
+}

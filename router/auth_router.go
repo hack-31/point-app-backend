@@ -23,6 +23,7 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	// レポジトリ
 	clocker := clock.RealClocker{}
 	rep := repository.Repository{Clocker: clocker}
+
 	// トークン
 	tokenCache, err := repository.NewKVS(ctx, cfg, repository.TemporaryUserRegister)
 	if err != nil {
@@ -49,6 +50,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 
 	sendPointHandler := handler.NewSendPoint(&service.SendPoint{PointRepo: &rep, UserRepo: &rep, Connection: appConnection, DB: db})
 	groupRoute.POST("/point_transactions", sendPointHandler.ServeHTTP)
+
+	updatePasswordHandler := handler.NewUpdatePasswordHandler(&service.UpdatePassword{QueryerDB: db, ExecerDB: db, UserRepo: &rep})
+	groupRoute.PATCH("/password", updatePasswordHandler.ServeHTTP)
 
 	return nil
 }
