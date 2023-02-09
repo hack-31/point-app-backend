@@ -535,39 +535,29 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'
 
-  /temporary_email_and_password:
-    patch:
+  /temporary_email:
+    post:
       security:
         - bearerAuth: []
       tags:
         - アカウント
-      summary: メール・パスワード仮変更
+      summary: メール仮変更
       description: |
-        - メールまたはパスワードの仮登録をする
+        - メールを仮登録をする
         - リクエストされたメールアドレスに確認コードを送信する
-        - メールアドレスが指定されていたら指定されてメールアドレスに対して確認コードを送る
-        - パスワードのみの場合は、現行のメールアドレスに対して確認コードを送る
       requestBody:
         content:
-          multipart/form-date:
+          application/json:
             schema:
               type: object
               properties:
                 email:
                   type: string
                   format: email
-                  example: yamada@sample.hoge
-                old_password:
-                  type: string
-                  format: password
-                  example: query12345678
-                new_password:
-                  type: string
-                  format: password
-                  example: query12345678
+                  example: yamada.taro@sample.com
       responses:
         '201':
-          description: メールアドレスとパスワード仮登録成功
+          description: メールアドレス仮登録成功
           content:
             application/json:
               schema:
@@ -576,10 +566,10 @@ paths:
                   statusCode:
                     type: integer
                     format: number
-                    example: 200
+                    example: 201
                   message:
                     type: string
-                    example: "仮登録成功しました。"
+                    example: "指定のメールアドレスに確認コードを送信しました。"
                   data:
                     type: object
                     example: null
@@ -601,22 +591,22 @@ paths:
                     example: 409
                   title: 
                     type: string
-                    example: "メール・パスワード仮登録エラー"
+                    example: "メールアドレス仮登録エラー"
                   message:
                     type: string
                     example: "登録済みのメールアドレスは登録できません。"
         '500':
           $ref: '#/components/responses/500Error'
 
-  /email_and_password:
-    post:
+  /email:
+    patch:
       security:
         - bearerAuth: []
       tags:
         - アカウント
-      summary: メールアドレスとパスワードを本変更
+      summary: メール本変更
       description: |
-        - 仮変更されたメールアドレスとパスワードを本更新する
+        - 仮変更されたメールアドレスを本更新する
       requestBody:
         content:
           application/json:
@@ -630,7 +620,7 @@ paths:
                   type: string
                   example: 7821
       responses:
-        '200':
+        '204':
           description: 更新成功
           content:
             application/json:
@@ -640,13 +630,15 @@ paths:
                   statusCode:
                     type: integer
                     format: number
-                    example: 200
+                    example: 204
                   message:
                     type: string
                     example: "更新が完了しました。"
                   data:
                     type: object
                     example: null
+        '400':
+           $ref: '#/components/responses/400Error'
         '401':
           description: |
             確認コードまたはトークンが無効
@@ -661,12 +653,10 @@ paths:
                     example: 401
                   title: 
                     type: string
-                    example: "メール・パスワード更新エラー"
+                    example: "メールアドレス本更新エラー"
                   message:
                     type: string
-                    example: "確認コードまたは、トークンが無効です。"
-        '400':
-           $ref: '#/components/responses/400Error'
+                    example: "確認コードが無効です。"
         '409':
           description: |
             登録済みのメールアドレス
@@ -681,10 +671,59 @@ paths:
                     example: 409
                   title: 
                     type: string
-                    example: "メール・パスワード更新エラー"
+                    example: "メールアドレス本更新エラー"
                   message:
                     type: string
                     example: "登録済みのメールアドレスは登録できません。"
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /password:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - アカウント
+      summary: パスワード変更
+      description: |
+        - パスワードを変更する
+        - 現行パスワードと新しいパスワードを入力して、現行パスワードが正しければ更新する
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                oldPassword:
+                  type: string
+                  format: password
+                  example: query12345678
+                newPassword:
+                  type: string
+                  format: password
+                  example: hogehoge
+      responses:
+        '204':
+          description: パスワードの更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 204
+                  message:
+                    type: string
+                    example: "パスワードを更新しました。"
+                  data:
+                    type: object
+                    example: null
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
         '500':
           $ref: '#/components/responses/500Error'
 
