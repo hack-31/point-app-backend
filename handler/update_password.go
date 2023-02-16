@@ -66,5 +66,5 @@ func (rt *UpdatePassword) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// 成功レスポンス
-	APIResponse(ctx, http.StatusNoContent, "パスワードを更新しました。", nil)
+	APIResponse(ctx, http.StatusCreated, "パスワードを更新しました。", nil)
 }
