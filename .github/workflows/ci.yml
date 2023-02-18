@@ -22,6 +22,16 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
 
+    - name: generate secret key in JWT
+      run: | 
+        echo "${{ secrets.JWT_SECRET_KEY }}" > ./auth/certificate/secret.pem
+        chmod 444 ./auth/certificate/secret.pem
+        
+    - name: generate public key in JWT
+      run: |
+        echo "${{ secrets.JWT_PUBLIC_KEY }}" > ./auth/certificate/public.pem
+        chmod 444 ./auth/certificate/public.pem
+
     - name: Run lint staticcheck
       uses: dominikh/staticcheck-action@v1.3.0
       with:
