@@ -58,6 +58,12 @@ create-key: ## JWTに必要なkeyを作成する
 	openssl genrsa 4096 > ./auth/certificate/secret.pem
 	openssl rsa -pubout < ./auth/certificate/secret.pem > ./auth/certificate/public.pem
 
+format: ## フォーマット
+	go fmt ./...
+
+linter: ## リンター(static-check)
+	staticcheck ./...
+
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
