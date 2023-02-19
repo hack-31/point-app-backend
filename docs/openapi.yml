@@ -326,6 +326,8 @@ paths:
           $ref: '#/components/responses/500Error'    
 
     put:
+      security:
+        - bearerAuth: []
       tags:
         - アカウント
       summary: アカウント情報更新
