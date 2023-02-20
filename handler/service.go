@@ -42,3 +42,7 @@ type ResetPasswordService interface {
 type UpdatePasswordService interface {
 	UpdatePassword(ctx *gin.Context, oldPassword, newPassword string) error
 }
+
+type UpdateAccountService interface {
+	UpdateAccount(ctx *gin.Context, familyName, familyNameKana, firstName, firstNameKana string) error
+}
