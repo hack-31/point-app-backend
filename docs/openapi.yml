@@ -705,7 +705,7 @@ paths:
                   format: password
                   example: hogehoge
       responses:
-        '204':
+        '201':
           description: パスワードの更新成功
           content:
             application/json:
@@ -715,7 +715,7 @@ paths:
                   statusCode:
                     type: integer
                     format: number
-                    example: 204
+                    example: 201
                   message:
                     type: string
                     example: "パスワードを更新しました。"

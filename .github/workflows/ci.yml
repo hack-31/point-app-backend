@@ -1,0 +1,39 @@
+name: "CI"
+
+on:
+  pull_request:
+    branches:
+      - main
+env:
+  GO_VERSION: 1.19
+
+jobs:
+  ci:
+    name: "Run format and linter"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        go-version: ${{ env.GO_VERSION}}
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: generate secret key in JWT
+      run: | 
+        echo "${{ secrets.JWT_SECRET_KEY }}" > ./auth/certificate/secret.pem
+        chmod 444 ./auth/certificate/secret.pem
+        
+    - name: generate public key in JWT
+      run: |
+        echo "${{ secrets.JWT_PUBLIC_KEY }}" > ./auth/certificate/public.pem
+        chmod 444 ./auth/certificate/public.pem
+
+    - name: Run lint staticcheck
+      uses: dominikh/staticcheck-action@v1.3.0
+      with:
+        version: "2023.1.2"
+        install-go: false
