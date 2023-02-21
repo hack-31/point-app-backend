@@ -68,8 +68,8 @@ func (ua *UpdateAccount) ServeHTTP(ctx *gin.Context) {
 	err = ua.Service.UpdateAccount(ctx, input.FamilyName, input.FamilyNameKana, input.FirstName, input.FirstNameKana)
 
 	if err != nil {
-		if errors.Is(err, repository.ErrDifferentPassword) {
-			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrDifferentPassword.Error())
+		if errors.Is(err, repository.ErrNotUser) {
+			ErrResponse(ctx, http.StatusBadRequest, "ユーザが存在しません。", repository.ErrNotUser.Error())
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error())
