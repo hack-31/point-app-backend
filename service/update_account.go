@@ -28,12 +28,6 @@ func (ua *UpdateAccount) UpdateAccount(ctx *gin.Context, familyName, familyNameK
 	email, _ := ctx.Get(auth.Email)
 	stringMail := email.(string)
 
-	// Emailよりユーザ情報を取得する
-	_, err := ua.UserRepo.FindUserByEmail(ctx, ua.QueryerDB, &stringMail)
-	if err != nil {
-		return err
-	}
-
 	// アカウント情報更新
 	if err := ua.UserRepo.UpdateAccount(ctx, ua.ExecerDB, &stringMail, &familyName, &familyNameKana, &firstName, &firstNameKana); err != nil {
 		return fmt.Errorf("failed to update account: %w", err)
