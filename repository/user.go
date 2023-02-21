@@ -120,8 +120,6 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 		WHERE email = ?`
 
 	_, err := db.ExecContext(ctx, sql, familyName, familyNameKana, firstName, firstNameKana, email)
-	println(err)
-	println(*email)
 	if err != nil {
 		return err
 	}
