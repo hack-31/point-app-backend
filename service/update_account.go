@@ -35,7 +35,7 @@ func (ua *UpdateAccount) UpdateAccount(ctx *gin.Context, familyName, familyNameK
 	}
 
 	// アカウント情報更新
-	if err := ua.UserRepo.UpdateAccount(ctx, ua.ExecerDB, &stringMail, &familyName, &familyNameKana, &firstName, &firstNameKana); err != nil {
+	if err := ua.UserRepo.UpdateAccount(ctx, ua.ExecerDB, &stringMail, &familyName, &familyNameKana, &firstName, &firstNameKana, nil); err != nil {
 		return fmt.Errorf("failed to update account: %w", err)
 	}
 

@@ -108,18 +108,52 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 // familyNameKana familyNameKana
 // firstName firstName
 // firstNameKana firstNameKana
+// pass password
 //
 // @returns
 // error
-func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error {
+func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, familyName, familyNameKana, firstName, firstNameKana, pass *string) error {
 	sql := `UPDATE users
-		SET family_name = ?,
-		family_name_kana = ?,
-		first_name = ?,
-		first_name_kana = ?
+		SET family_name =
+			CASE
+				WHEN ? IS NULL THEN family_name
+				ELSE ?
+			END,
+		family_name_kana =
+			CASE
+				WHEN ? IS NULL THEN family_name_kana
+				ELSE ?
+			END,
+		first_name =
+			CASE
+				WHEN ? IS NULL THEN first_name
+				ELSE ?
+			END,
+		first_name_kana =
+			CASE
+				WHEN ? IS NULL THEN first_name_kana
+				ELSE ?
+			END,
+		password =
+			CASE
+				WHEN ? IS NULL THEN password
+				ELSE ?
+			END
 		WHERE email = ?`
-
-	_, err := db.ExecContext(ctx, sql, familyName, familyNameKana, firstName, firstNameKana, email)
+	_, err := db.ExecContext(
+		ctx,
+		sql,
+		familyName,
+		familyName,
+		familyNameKana,
+		familyNameKana,
+		firstName,
+		firstName,
+		firstNameKana,
+		firstNameKana,
+		pass,
+		pass,
+		email)
 	if err != nil {
 		return fmt.Errorf("failed to update account: %w", err)
 	}
