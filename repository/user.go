@@ -121,7 +121,7 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 
 	_, err := db.ExecContext(ctx, sql, familyName, familyNameKana, firstName, firstNameKana, email)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update account: %w", err)
 	}
 	return err
 }
