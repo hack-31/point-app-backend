@@ -7,6 +7,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type Signin struct {
@@ -14,6 +15,10 @@ type Signin struct {
 	Cache          domain.Cache
 	Repo           domain.UserRepo
 	TokenGenerator domain.TokenGenerator
+}
+
+func NewSignin(db *sqlx.DB, rep domain.UserRepo, cache domain.Cache, jwter domain.TokenGenerator) *Signin {
+	return &Signin{DB: db, Cache: cache, Repo: rep, TokenGenerator: jwter}
 }
 
 // サインインサービス
