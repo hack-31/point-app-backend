@@ -22,9 +22,9 @@ import (
 func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *config.Config) error {
 	// レポジトリ
 	clocker := clock.RealClocker{}
-	rep := repository.Repository{Clocker: clocker}
+	rep := repository.NewRepository(clocker)
 
-	// トークン
+	// トークン保存をするキャッシュ
 	tokenCache, err := repository.NewKVS(ctx, cfg, repository.TemporaryUserRegister)
 	if err != nil {
 		return err
@@ -39,20 +39,25 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	// ルーティング設定
 	groupRoute := router.Group("/api/v1").Use(handler.AuthMiddleware(jwter))
 
-	getUsersHandler := handler.NewGetUsers(&service.GetUsers{DB: db, Repo: &rep})
+	getUsersService := service.NewGetUsers(db, rep, jwter)
+	getUsersHandler := handler.NewGetUsers(getUsersService)
 	groupRoute.GET("/users", getUsersHandler.ServeHTTP)
 
-	getUserHandler := handler.NewGetAccount(&service.GetAccount{DB: db, Repo: &rep})
+	getAccountService := service.NewGetAccount(db, rep)
+	getUserHandler := handler.NewGetAccount(getAccountService)
 	groupRoute.GET("/account", getUserHandler.ServeHTTP)
 
-	signout := handler.NewSignoutHandler(&service.Signout{Cache: tokenCache})
-	groupRoute.DELETE("/signout", signout.ServeHTTP)
+	signoutService := service.NewSignout(tokenCache)
+	signoutHandler := handler.NewSignoutHandler(signoutService)
+	groupRoute.DELETE("/signout", signoutHandler.ServeHTTP)
 
-	sendPointHandler := handler.NewSendPoint(&service.SendPoint{PointRepo: &rep, UserRepo: &rep, Connection: appConnection, DB: db})
+	sendPointService := service.NewSendPoint(rep, appConnection, db)
+	sendPointHandler := handler.NewSendPoint(sendPointService)
 	groupRoute.POST("/point_transactions", sendPointHandler.ServeHTTP)
 
-	updatePasswordHandler := handler.NewUpdatePasswordHandler(&service.UpdatePassword{QueryerDB: db, ExecerDB: db, UserRepo: &rep})
-	groupRoute.PATCH("/password", updatePasswordHandler.ServeHTTP)
+	updatePassService := service.NewUpdatePassword(db, rep)
+	updatePassHandler := handler.NewUpdatePasswordHandler(updatePassService)
+	groupRoute.PATCH("/password", updatePassHandler.ServeHTTP)
 
 	return nil
 }
