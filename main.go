@@ -44,7 +44,7 @@ func run(ctx context.Context) error {
 	}))
 
 	// DB関係初期化
-	db, cleanup, err := repository.New(ctx, cfg)
+	db, cleanup, err := repository.NewDB(ctx, cfg)
 	if err != nil {
 		return err
 	}

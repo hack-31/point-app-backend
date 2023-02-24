@@ -21,7 +21,7 @@ import (
 func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *config.Config) error {
 	// レポジトリ
 	clocker := clock.RealClocker{}
-	rep := repository.Repository{Clocker: clocker}
+	rep := repository.NewRepository(clocker)
 	// キャッシュ
 	cache, err := repository.NewKVS(ctx, cfg, repository.JWT)
 	if err != nil {
