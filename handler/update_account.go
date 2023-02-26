@@ -1,12 +1,10 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
 )
 
 type UpdateAccount struct {
@@ -68,10 +66,6 @@ func (ua *UpdateAccount) ServeHTTP(ctx *gin.Context) {
 	err = ua.Service.UpdateAccount(ctx, input.FamilyName, input.FamilyNameKana, input.FirstName, input.FirstNameKana)
 
 	if err != nil {
-		if errors.Is(err, repository.ErrNotUser) {
-			ErrResponse(ctx, http.StatusBadRequest, "ユーザが存在しません。", repository.ErrNotUser.Error())
-			return
-		}
 		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error())
 		return
 	}
