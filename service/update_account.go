@@ -7,6 +7,7 @@ import (
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type UpdateAccount struct {
@@ -15,12 +16,16 @@ type UpdateAccount struct {
 	UserRepo  domain.UserRepo
 }
 
+func NewUpdateAccount(db *sqlx.DB, repo domain.UserRepo) *UpdateAccount {
+	return &UpdateAccount{ExecerDB: db, QueryerDB: db, UserRepo: repo}
+}
+
 // アカウント情報更新サービス
 //
 // @params
 // ctx コンテキスト
 // familyName 苗字
-// familNameKana 苗字カナ
+// familyNameKana 苗字カナ
 // firstName 名前
 // firstNameKana 名前カナ
 func (ua *UpdateAccount) UpdateAccount(ctx *gin.Context, familyName, familyNameKana, firstName, firstNameKana string) error {

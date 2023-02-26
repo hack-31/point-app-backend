@@ -55,6 +55,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	groupRoute.PATCH("/password", updatePasswordHandler.ServeHTTP)
 
 	updateAccountHandler := handler.NewUpdateAccountHandler(&service.UpdateAccount{QueryerDB: db, ExecerDB: db, UserRepo: &rep})
+	// updateAccountService := service.NewUpdateAccount(db, rep)
+	// updateAccountHandler := handler.NewUpdateAccountHandler(updateAccountService)
+	// groupRoute.PUT("/account", updateAccountHandler.ServeHTTP)
 	groupRoute.PUT("/account", updateAccountHandler.ServeHTTP)
 
 	return nil
