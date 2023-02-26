@@ -21,7 +21,7 @@ import (
 func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *config.Config) error {
 	// レポジトリ
 	clocker := clock.RealClocker{}
-	rep := repository.Repository{Clocker: clocker}
+	rep := repository.NewRepository(clocker)
 	// キャッシュ
 	cache, err := repository.NewKVS(ctx, cfg, repository.JWT)
 	if err != nil {
@@ -42,17 +42,21 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	router.GET("/healthcheck", healthCheckhandler.ServeHTTP)
 
 	groupRoute := router.Group("/api/v1")
-	registerHandler := handler.NewRegisterUserHandler(&service.RegisterUser{DB: db, Cache: cache, TokenGenerator: jwter, Repo: &rep})
-	groupRoute.POST("/users", registerHandler.ServeHTTP)
+	registerUserService := service.NewRegisterUser(db, rep, cache, jwter)
+	registerUserHandler := handler.NewRegisterUserHandler(registerUserService)
+	groupRoute.POST("/users", registerUserHandler.ServeHTTP)
 
-	registerTempUser := handler.NewRegisterTemporaryUserHandler(&service.RegisterTemporaryUser{DB: db, Cache: cache, Repo: &rep})
-	groupRoute.POST("/temporary_users", registerTempUser.ServeHTTP)
+	registerTempUserService := service.NewRegisterTemporaryUser(db, rep, cache)
+	registerTempUserHandler := handler.NewRegisterTemporaryUserHandler(registerTempUserService)
+	groupRoute.POST("/temporary_users", registerTempUserHandler.ServeHTTP)
 
-	signin := handler.NewSigninHandler(&service.Signin{DB: db, Cache: cache, Repo: &rep, TokenGenerator: jwter})
-	groupRoute.POST("/signin", signin.ServeHTTP)
+	signinService := service.NewSignin(db, rep, cache, jwter)
+	signinHandler := handler.NewSigninHandler(signinService)
+	groupRoute.POST("/signin", signinHandler.ServeHTTP)
 
-	resetPassword := handler.NewResetPasswordHandler(&service.ResetPassword{ExecerDB: db, QueryerDB: db, Repo: &rep})
-	groupRoute.PATCH("/random_password", resetPassword.ServeHTTP)
+	resetPassService := service.NewResetPassword(db, rep)
+	resetPassHandler := handler.NewResetPasswordHandler(resetPassService)
+	groupRoute.PATCH("/random_password", resetPassHandler.ServeHTTP)
 
 	return nil
 }

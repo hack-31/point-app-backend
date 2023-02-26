@@ -8,6 +8,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type RegisterUser struct {
@@ -15,6 +16,10 @@ type RegisterUser struct {
 	Cache          domain.Cache
 	Repo           domain.UserRepo
 	TokenGenerator domain.TokenGenerator
+}
+
+func NewRegisterUser(db *sqlx.DB, rep domain.UserRepo, cache domain.Cache, jwter domain.TokenGenerator) *RegisterUser {
+	return &RegisterUser{DB: db, Cache: cache, Repo: rep, TokenGenerator: jwter}
 }
 
 // ユーザ登録サービス

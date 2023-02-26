@@ -6,11 +6,16 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type GetAccount struct {
 	DB   repository.Queryer
 	Repo domain.UserRepo
+}
+
+func NewGetAccount(db *sqlx.DB, repo domain.UserRepo) *GetAccount {
+	return &GetAccount{DB: db, Repo: repo}
 }
 
 // ユーザ一覧取得サービス

@@ -8,6 +8,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type SendPoint struct {
@@ -15,6 +16,10 @@ type SendPoint struct {
 	UserRepo   domain.UserRepo
 	Connection *repository.AppConnection
 	DB         repository.Queryer
+}
+
+func NewSendPoint(repo *repository.Repository, connection *repository.AppConnection, db *sqlx.DB) *SendPoint {
+	return &SendPoint{PointRepo: repo, UserRepo: repo, Connection: connection, DB: db}
 }
 
 // ポイント送信サービス
