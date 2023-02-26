@@ -51,7 +51,7 @@ func (up *UpdatePassword) UpdatePassword(ctx *gin.Context, oldPassword, newPassw
 	if err != nil {
 		return fmt.Errorf("cannot create hash passwrod: %w", err)
 	}
-	if err := up.UserRepo.UpdateAccount(ctx, up.ExecerDB, &stringMail, nil, nil, nil, nil, &hashNewPass); err != nil {
+	if err := up.UserRepo.UpdatePassword(ctx, up.ExecerDB, &stringMail, &hashNewPass); err != nil {
 		return fmt.Errorf("failed to update password: %w", err)
 	}
 
