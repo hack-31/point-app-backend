@@ -44,20 +44,22 @@ func run(ctx context.Context) error {
 	}))
 
 	// DB関係初期化
-	db, cleanup, err := repository.New(ctx, cfg)
+	db, cleanup, err := repository.NewDB(ctx, cfg)
 	if err != nil {
 		return err
 	}
 	defer cleanup()
 
-	err = routers.SetRouting(ctx, db, router, cfg)
-	if err != nil {
+	// ルーティング初期化
+	if err = routers.SetRouting(ctx, db, router, cfg); err != nil {
 		return err
 	}
-	err = routers.SetAuthRouting(ctx, db, router, cfg)
-	if err != nil {
+	if err = routers.SetAuthRouting(ctx, db, router, cfg); err != nil {
 		return err
 	}
 
-	return router.Run(fmt.Sprintf(":%d", cfg.Port))
+	// サーバー起動
+	log.Printf("Listening and serving HTTP on :%v", cfg.Port)
+	server := NewServer(router, fmt.Sprintf(":%d", cfg.Port))
+	return server.Run(ctx)
 }

@@ -8,12 +8,17 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/jmoiron/sqlx"
 )
 
 type UpdatePassword struct {
 	ExecerDB  repository.Execer
 	QueryerDB repository.Queryer
 	UserRepo  domain.UserRepo
+}
+
+func NewUpdatePassword(db *sqlx.DB, repo domain.UserRepo) *UpdatePassword {
+	return &UpdatePassword{ExecerDB: db, QueryerDB: db, UserRepo: repo}
 }
 
 // パスワード更新サービス

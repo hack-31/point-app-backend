@@ -13,6 +13,7 @@ type AppConnection struct {
 	Tx *sql.Tx
 }
 
+// トランザクション
 func NewAppConnection(db Beginner) *AppConnection {
 	return &AppConnection{db: db}
 }

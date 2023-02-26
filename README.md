@@ -59,6 +59,13 @@ $ make format
 $ make linter
 ```
 
+
+# テスト
+
+```sh
+$ maek test
+```
+
 # DB
 開発用データベース情報
 

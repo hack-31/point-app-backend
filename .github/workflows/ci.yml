@@ -2,10 +2,11 @@ name: "CI"
 
 on:
   pull_request:
+    paths:
+      - "**.go"
+      - .github/workflows/ci.yml
     branches:
       - main
-env:
-  GO_VERSION: 1.19
 
 jobs:
   ci:
@@ -13,14 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        go-version: ${{ env.GO_VERSION}}
-
-    - name: Setup Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: ${{ env.GO_VERSION }}
+      uses: actions/checkout@v3
 
     - name: generate secret key in JWT
       run: | 
@@ -32,8 +26,10 @@ jobs:
         echo "${{ secrets.JWT_PUBLIC_KEY }}" > ./auth/certificate/public.pem
         chmod 444 ./auth/certificate/public.pem
 
-    - name: Run lint staticcheck
-      uses: dominikh/staticcheck-action@v1.3.0
+    - name: golangci-lint
+      uses: reviewdog/action-golangci-lint@v2
       with:
-        version: "2023.1.2"
-        install-go: false
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        golangci_lint_flags: "--config=./.golangci.yml ./..."
+        fail_on_error: true
+        reporter: "github-pr-review"

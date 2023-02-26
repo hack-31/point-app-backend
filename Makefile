@@ -59,10 +59,14 @@ create-key: ## JWTに必要なkeyを作成する
 	openssl rsa -pubout < ./auth/certificate/secret.pem > ./auth/certificate/public.pem
 
 format: ## フォーマット
-	go fmt ./...
+	gofmt -l -s -w .
+	goimports -w -l .
 
 linter: ## リンター(static-check)
 	staticcheck ./...
+
+test: ## テスト
+	go test -v ./...
 
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

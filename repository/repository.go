@@ -20,7 +20,7 @@ import (
 // @return
 // *sqlx.DB DBインスタンス,
 // func() DBクローズ関数(予備先素でdeferで呼ぶ必要あり)
-func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
+func NewDB(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	// sqlx.Connectを使うと内部でpingする
 	db, err := sql.Open("mysql",
 		fmt.Sprintf(
@@ -45,6 +45,10 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 
 type Repository struct {
 	Clocker clock.Clocker
+}
+
+func NewRepository(clocker clock.Clocker) *Repository {
+	return &Repository{Clocker: clocker}
 }
 
 // トランザクションメソッド系類

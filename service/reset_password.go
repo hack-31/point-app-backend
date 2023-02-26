@@ -9,12 +9,17 @@ import (
 	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/repository"
 	utils "github.com/hack-31/point-app-backend/utils/email"
+	"github.com/jmoiron/sqlx"
 )
 
 type ResetPassword struct {
 	ExecerDB  repository.Execer
 	QueryerDB repository.Queryer
 	Repo      domain.UserRepo
+}
+
+func NewResetPassword(db *sqlx.DB, rep domain.UserRepo) *ResetPassword {
+	return &ResetPassword{ExecerDB: db, QueryerDB: db, Repo: rep}
 }
 
 // パスワードリセットサービス

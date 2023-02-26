@@ -13,6 +13,10 @@ type Signout struct {
 	Cache domain.Cache
 }
 
+func NewSignout(cache domain.Cache) *Signout {
+	return &Signout{Cache: cache}
+}
+
 // サインアウトサービス
 //
 // @params

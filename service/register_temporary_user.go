@@ -12,12 +12,17 @@ import (
 	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/repository"
 	utils "github.com/hack-31/point-app-backend/utils/email"
+	"github.com/jmoiron/sqlx"
 )
 
 type RegisterTemporaryUser struct {
 	DB    repository.Queryer
 	Cache domain.Cache
 	Repo  domain.UserRepo
+}
+
+func NewRegisterTemporaryUser(db *sqlx.DB, rep domain.UserRepo, cache domain.Cache) *RegisterTemporaryUser {
+	return &RegisterTemporaryUser{DB: db, Cache: cache, Repo: rep}
 }
 
 // ユーザ仮登録サービス
