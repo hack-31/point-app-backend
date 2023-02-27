@@ -113,11 +113,11 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 // error
 func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error {
 	sql := `UPDATE users
-		SET family_name = ?,
-		family_name_kana = ?,
-		first_name = ?,
-		first_name_kana = ?
-		WHERE email = ?`
+						SET family_name = ?,
+								family_name_kana = ?,
+								first_name = ?,
+								first_name_kana = ?
+						WHERE email = ?`
 	_, err := db.ExecContext(
 		ctx,
 		sql,
