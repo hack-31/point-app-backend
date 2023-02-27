@@ -129,7 +129,7 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 	if err != nil {
 		return fmt.Errorf("failed to update account: %w", err)
 	}
-	return err
+	return nil
 }
 
 // ユーザ一覧
