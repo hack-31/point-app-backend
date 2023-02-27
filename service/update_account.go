@@ -11,13 +11,12 @@ import (
 )
 
 type UpdateAccount struct {
-	ExecerDB  repository.Execer
-	QueryerDB repository.Queryer
-	UserRepo  domain.UserRepo
+	ExecerDB repository.Execer
+	UserRepo domain.UserRepo
 }
 
 func NewUpdateAccount(db *sqlx.DB, repo domain.UserRepo) *UpdateAccount {
-	return &UpdateAccount{ExecerDB: db, QueryerDB: db, UserRepo: repo}
+	return &UpdateAccount{ExecerDB: db, UserRepo: repo}
 }
 
 // アカウント情報更新サービス
