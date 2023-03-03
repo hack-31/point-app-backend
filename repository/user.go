@@ -99,6 +99,39 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 	return err
 }
 
+// アカウント情報を上書きする
+// @params
+// ctx context
+// db dbインスタンス
+// email email
+// familyName familyName
+// familyNameKana familyNameKana
+// firstName firstName
+// firstNameKana firstNameKana
+//
+// @returns
+// error
+func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error {
+	sql := `UPDATE users
+						SET family_name = ?,
+								family_name_kana = ?,
+								first_name = ?,
+								first_name_kana = ?
+						WHERE email = ?`
+	_, err := db.ExecContext(
+		ctx,
+		sql,
+		familyName,
+		familyNameKana,
+		firstName,
+		firstNameKana,
+		email)
+	if err != nil {
+		return fmt.Errorf("failed to update DB: %w", err)
+	}
+	return nil
+}
+
 // ユーザ一覧
 //
 // @params
