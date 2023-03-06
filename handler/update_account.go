@@ -71,5 +71,5 @@ func (ua *UpdateAccount) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// 成功レスポンス
-	APIResponse(ctx, http.StatusOK, "アカウント情報の更新に成功しました。", nil)
+	APIResponse(ctx, http.StatusCreated, "アカウント情報の更新に成功しました。", nil)
 }
