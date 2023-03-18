@@ -359,7 +359,7 @@ paths:
                 - familyNameKana
                 - email
       responses:
-        '200':
+        '201':
           description: 成功
           content:
             application/json:
@@ -369,7 +369,7 @@ paths:
                   statusCode:
                     type: integer
                     format: number
-                    example: 200
+                    example: 201
                   message:
                     type: string
                     example: "アカウント情報の更新に成功しました。"           
