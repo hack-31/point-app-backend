@@ -166,7 +166,6 @@ func TestRegisterUser(t *testing.T) {
 					t.Fatalf("not want user %v", u)
 				}
 				return tt.gtmprm.rsp, tt.gtmprm.err
-
 			}
 			moqRepo.RegisterUserFunc = func(pctx context.Context, db repository.Execer, user *model.User) error {
 				if ctx != pctx {
