@@ -39,6 +39,14 @@ jobs:
     - run: |
         go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
         mysqldef -u admin -p password -h 127.0.0.1 -P 3306 point_app < ./_tools/mysql/schema.sql
+    - name: generate secret key in JWT
+      run: | 
+        echo "${{ secrets.JWT_SECRET_KEY }}" > ./auth/certificate/secret.pem
+        chmod 444 ./auth/certificate/secret.pem        
+    - name: generate public key in JWT
+      run: |
+        echo "${{ secrets.JWT_PUBLIC_KEY }}" > ./auth/certificate/public.pem
+        chmod 444 ./auth/certificate/public.pem
     - run: go test ./... -coverprofile=coverage.out
     - name: report coverage
       uses: k1LoW/octocov-action@v0
