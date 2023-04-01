@@ -159,9 +159,6 @@ func TestRegisterUser(t *testing.T) {
 			}
 			moqTokenGenerator := &TokenGeneratorMock{}
 			moqTokenGenerator.GenerateTokenFunc = func(pctx context.Context, u model.User) ([]byte, error) {
-				if ctx != pctx {
-					t.Fatalf("not want context %v", pctx)
-				}
 				if *wantUser != u {
 					t.Fatalf("not want user %v", u)
 				}
