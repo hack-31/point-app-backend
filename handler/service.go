@@ -46,3 +46,5 @@ type UpdatePasswordService interface {
 type UpdateAccountService interface {
 	UpdateAccount(ctx *gin.Context, familyName, familyNameKana, firstName, firstNameKana string) error
 }
+
+type RegisterTemporaryEmailService interface{}
