@@ -44,4 +44,10 @@ func (ru *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
+
+	// 成功時のレスポンスを返す
+	rsp := struct {
+		Email string `json:"temporaryEmailId"`
+	}{Email: "testEmailId"}
+	APIResponse(ctx, http.StatusCreated, "指定のメールアドレスに確認コードを送信しました。", rsp)
 }
