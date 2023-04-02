@@ -9,11 +9,11 @@ import (
 )
 
 type RegisterTemporaryEmail struct {
-	// Service RegisterTemporaryEmailService
+	Service RegisterTemporaryEmailService
 }
 
-func NewRegisterTemporaryEmailHandler() *RegisterTemporaryEmail {
-	return &RegisterTemporaryEmail{}
+func NewRegisterTemporaryEmailHandler(s RegisterTemporaryEmailService) *RegisterTemporaryEmail {
+	return &RegisterTemporaryEmail{Service: s}
 }
 
 // メール仮登録ハンドラー
@@ -44,6 +44,9 @@ func (ru *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
 		return
 	}
+
+	// サービス層にメール仮登録処理を依頼
+	ru.Service.RegisterTemporaryEmail()
 
 	// 成功時のレスポンスを返す
 	rsp := struct {
