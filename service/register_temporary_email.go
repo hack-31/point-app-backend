@@ -11,6 +11,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/repository"
+	utils "github.com/hack-31/point-app-backend/utils/email"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -54,6 +55,14 @@ func (r *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, email 
 	err = r.Cache.Save(ctx, key, email, time.Duration(constant.ConfirmationCodeExpiration_m))
 	if err != nil {
 		return "", fmt.Errorf("failed to save in cache: %w", err)
+	}
+
+	// メール送信
+	subject := "【ポイントアプリ】本登録を完了してください"
+	body := fmt.Sprintf("ポイントアプリをご利用いただきありがとうございます。\n\n確認コードは %s です。\n\nこの確認コードの有効期限は1時間です。", confirmCode)
+	_, err = utils.SendMail(email, subject, body)
+	if err != nil {
+		return "", fmt.Errorf("failed to send email: %w", err)
 	}
 
 	return uid, nil
