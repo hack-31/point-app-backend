@@ -48,5 +48,5 @@ type UpdateAccountService interface {
 }
 
 type RegisterTemporaryEmailService interface {
-	RegisterTemporaryEmail()
+	RegisterTemporaryEmail(ctx *gin.Context, email string) (string, error)
 }
