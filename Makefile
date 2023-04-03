@@ -62,11 +62,27 @@ format: ## フォーマット
 	gofmt -l -s -w .
 	goimports -w -l .
 
-linter: ## リンター(static-check)
-	staticcheck ./...
+linter: ## リンター(golangci-lint)
+	golangci-lint run
+
+moq: ## Generate mock
+	# サービスのモック生成
+	moq -out ./handler/moq_test.go ./handler RegisterUserService RegisterTemporaryUserService SigninService GetUsersService UpdatePasswordService UpdateAccountService ResetPasswordService SendPointService SignoutService GetAccountService
+	# リポジトリのモック生成
+	moq -out ./service/moq_test.go -skip-ensure -pkg service ./domain UserRepo PointRepo TokenGenerator Cache
+	moq -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer
+
 
 test: ## テスト
-	go test -v ./...
+	go test -cover -race -shuffle=on ./...
+
+mc: ## make coverage カバレッジファイル作成（コンテナ側）
+	go test -cover ./... -coverprofile=cover.out
+	go tool cover -html=cover.out -o tmp/cover.html
+	rm cover.out
+
+wc: ## watch coverage カバレッジを見る（ホスト側）
+	open ./tmp/cover.html
 
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
