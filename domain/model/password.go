@@ -22,7 +22,7 @@ type Password struct {
 // @params pwd パスワード
 //
 // @return パスワードオブジェクト
-func NewPasswrod(pwd string) (*Password, error) {
+func NewPassword(pwd string) (*Password, error) {
 	if 50 < utf8.RuneCountInString(pwd) {
 		return nil, fmt.Errorf("cannot use password over 51 char")
 	}

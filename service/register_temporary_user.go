@@ -52,13 +52,13 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	}
 
 	// パスワードハッシュ化
-	pass, err := model.NewPasswrod(password)
+	pass, err := model.NewPassword(password)
 	if err != nil {
-		return "", fmt.Errorf("cannot create passwrod object: %w", err)
+		return "", fmt.Errorf("cannot create password object: %w", err)
 	}
 	hashPass, err := pass.CreateHash()
 	if err != nil {
-		return "", fmt.Errorf("cannot create hash passwrod: %w", err)
+		return "", fmt.Errorf("cannot create hash password: %w", err)
 	}
 
 	// ユーザ情報をキャッシュに保存
