@@ -40,10 +40,10 @@ func (rte *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, emai
 	// 現在利用中のメールアドレスか確認
 	existMail, err := userService.ExistByEmail(ctx, &rte.DB, email)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to find user by mail in db: %w", err)
 	}
 	if existMail {
-		return "", fmt.Errorf("failed to register: %w", repository.ErrAlreadyEntry)
+		return "", fmt.Errorf("failed to change mail address: %w", repository.ErrAlreadyEntry)
 	}
 
 	// キャッシュサーバーに保存するkeyの作成
