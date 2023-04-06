@@ -51,7 +51,6 @@ func (r *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, email 
 	confirmCode := model.NewConfirmCode().String()
 	key := fmt.Sprintf("%s:%s", confirmCode, uid)
 	// キャッシュサーバーへ保存
-	println(key)
 	err = r.Cache.Save(ctx, key, email, time.Duration(constant.ConfirmationCodeExpiration_m))
 	if err != nil {
 		return "", fmt.Errorf("failed to save in cache: %w", err)
