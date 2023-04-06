@@ -47,12 +47,11 @@ func (rte *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, emai
 	}
 
 	// キャッシュサーバーに保存するkeyの作成
-	uid := uuid.New().String()
+	temporaryEmailID := uuid.New().String()
 	confirmCode := model.NewConfirmCode().String()
-	key := fmt.Sprintf("%s:%s", confirmCode, uid)
+	key := fmt.Sprintf("%s:%s", confirmCode, temporaryEmailID)
 	// キャッシュサーバーへ保存
-	err = rte.Cache.Save(ctx, key, email, time.Duration(constant.ConfirmationCodeExpiration_m))
-	if err != nil {
+	if err = rte.Cache.Save(ctx, key, email, time.Duration(constant.ConfirmationCodeExpiration_m)); err != nil {
 		return "", fmt.Errorf("failed to save in cache: %w", err)
 	}
 
@@ -64,5 +63,5 @@ func (rte *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, emai
 		return "", fmt.Errorf("failed to send email: %w", err)
 	}
 
-	return uid, nil
+	return temporaryEmailID, nil
 }
