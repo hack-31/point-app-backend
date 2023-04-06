@@ -21,7 +21,7 @@ func NewRegisterTemporaryEmailHandler(s RegisterTemporaryEmailService) *Register
 // メール仮登録ハンドラー
 //
 // @param ctx ginContext
-func (ru *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
+func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	const errTitle = "メールアドレス仮登録エラー"
 
 	var input struct {
@@ -48,7 +48,7 @@ func (ru *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サービス層にメール仮登録処理を依頼
-	sessionID, err := ru.Service.RegisterTemporaryEmail(ctx, input.Email)
+	sessionID, err := rte.Service.RegisterTemporaryEmail(ctx, input.Email)
 
 	// エラーレスポンスを返す
 	if err != nil {
