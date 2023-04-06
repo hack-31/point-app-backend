@@ -22,7 +22,8 @@ func NewRegisterTemporaryEmailHandler(s RegisterTemporaryEmailService) *Register
 //
 // @param ctx ginContext
 func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
-	const errTitle = "メールアドレス仮登録エラー"
+	const mailErrTitle = "メールアドレス仮登録エラー"
+	const paramErrTitle = "パラメータエラー"
 
 	var input struct {
 		Email string `json:"email"`
@@ -30,7 +31,7 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 
 	// ユーザーから正しいパラメータでポストデータが送られていない
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, "パラメータエラー", err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
 		return
 	}
 
@@ -43,7 +44,7 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 			is.Email,
 		))
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, "パラメータエラー", err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
 		return
 	}
 
@@ -53,7 +54,7 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	// エラーレスポンスを返す
 	if err != nil {
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error())
+			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error())
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error())
