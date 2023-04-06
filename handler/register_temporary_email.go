@@ -49,7 +49,7 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サービス層にメール仮登録処理を依頼
-	sessionID, err := rte.Service.RegisterTemporaryEmail(ctx, input.Email)
+	temporaryEmailID, err := rte.Service.RegisterTemporaryEmail(ctx, input.Email)
 
 	// エラーレスポンスを返す
 	if err != nil {
@@ -64,6 +64,6 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	// 成功時のレスポンスを返す
 	rsp := struct {
 		Email string `json:"temporaryEmailId"`
-	}{Email: sessionID}
+	}{Email: temporaryEmailID}
 	APIResponse(ctx, http.StatusCreated, "指定のメールアドレスに確認コードを送信しました。", rsp)
 }
