@@ -3,3 +3,4 @@
 .vscode
 .devcontainer
 tmp
+cover.out

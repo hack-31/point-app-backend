@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -24,6 +25,11 @@ func TestServer_Run(t *testing.T) {
 		s := NewServer(mux, fmt.Sprintf(":%d", port))
 		return s.Run(ctx)
 	})
+
+	// HACK: サーバーが起動してから、リクエストを送らないたとエラーになるた50ms待つ
+	// 一時的な処理
+	timer1 := time.NewTimer(50 * time.Millisecond)
+	<-timer1.C
 
 	// GETAPIをリクエスト
 	in := "healthcheck"

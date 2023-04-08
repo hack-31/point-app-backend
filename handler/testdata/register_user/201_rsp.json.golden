@@ -1,0 +1,8 @@
+{
+  "statusCode": 201,
+  "message": "本登録が完了しました。",
+  "data": {
+    "userId": 24,
+    "accessToken": "json-web-token"
+  }
+}

@@ -143,7 +143,9 @@ func (j *JWTer) FillContext(ctx *gin.Context) error {
 	}
 
 	// 有効期限延長
-	j.Store.Expire(ctx, uid, time.Duration(constant.TokenExpiration_m))
+	if err = j.Store.Expire(ctx, uid, time.Duration(constant.TokenExpiration_m)); err != nil {
+		return fmt.Errorf("can not be extended : %w", err)
+	}
 
 	// コンテキストにユーザ情報追加
 	intUid, _ := strconv.ParseInt(uid, 10, 64)
