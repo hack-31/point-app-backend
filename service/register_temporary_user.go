@@ -66,7 +66,7 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	// キャッシュサーバーに保存するkeyの作成
 	uid := uuid.New().String()
 	confirmCode := model.NewConfirmCode().String()
-	key := fmt.Sprintf("%s:%s", confirmCode, uid)
+	key := fmt.Sprintf("%s:%s:user", confirmCode, uid)
 	// キャッシュのサーバーに保存するvalueを作成
 	userString := tempUserInfo.Join(firstName, firstNameKana, familyName, familyNameKana, email, hashPass)
 	// 保存
