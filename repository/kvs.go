@@ -12,9 +12,8 @@ import (
 type CacheType int
 
 const (
-	JWT                    CacheType = 0
-	TemporaryUserRegister  CacheType = 1
-	TemporaryEmailRegister CacheType = 2
+	JWT               CacheType = 0
+	TemporaryRegister CacheType = 1
 )
 
 func NewKVS(ctx context.Context, cfg *config.Config, t CacheType) (*KVS, error) {
