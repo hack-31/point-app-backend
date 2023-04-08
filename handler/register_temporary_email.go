@@ -63,7 +63,7 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 
 	// 成功時のレスポンスを返す
 	rsp := struct {
-		Email string `json:"temporaryEmailId"`
-	}{Email: temporaryEmailID}
+		TemporaryEmailID string `json:"temporaryEmailId"`
+	}{TemporaryEmailID: temporaryEmailID}
 	APIResponse(ctx, http.StatusCreated, "指定のメールアドレスに確認コードを送信しました。", rsp)
 }
