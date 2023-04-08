@@ -62,8 +62,19 @@ $ make linter
 
 # テスト
 
+テストを実行するのみであれば以下のコマンドで行う
+
 ```sh
 $ maek test
+```
+
+より詳細なテストのカバレッジを表示したい場合は以下のコマンドを実行
+
+```sh
+# coverage.htmlの作成(コンテナ内)
+$ make mc
+# ブラウザで表示(ホスト側)
+$ make wc
 ```
 
 # DB
@@ -128,6 +139,23 @@ $ make seed
   - サービス全体として定数などを定義
 - `/utils`
   - ユーティリティパッケージ
+
+# モック
+
+以下のコマンドでモックを作成する
+
+```sh
+$ make moq
+```
+
+各層でモックを作成する。
+モックを追加する際は、`./Makefile`の`go moq`に記載された`moq`コマンドのオプションにIF名を追加する
+
+```sh
+$ moq -out ./handler/moq_test.go ./handler RegisterUserService [ここにIF名を追加する]
+```
+
+今後モックファイルを追加する際は`*_moq_test.go`と命名にすること
 
 # デプロイ
 GitHub Action, Codepipelineによる自動デプロイになります。mainブランチにマージされると自動でデプロイされます。
