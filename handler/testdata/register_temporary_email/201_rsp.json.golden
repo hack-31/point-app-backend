@@ -1,0 +1,7 @@
+{
+  "statusCode": 201,
+  "message": "指定のメールアドレスに確認コードを送信しました",
+  "data": {
+  "temporaryEmailId": "8e8d0f82-89a1-4cc6-ba25-13c864ad09db",
+  }
+}
