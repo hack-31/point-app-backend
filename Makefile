@@ -67,7 +67,7 @@ linter: ## リンター(golangci-lint)
 
 moq: ## Generate mock
 	# サービスのモック生成
-	moq -out ./handler/moq_test.go ./handler RegisterUserService RegisterTemporaryUserService SigninService GetUsersService UpdatePasswordService UpdateAccountService ResetPasswordService SendPointService SignoutService GetAccountService
+	moq -out ./handler/moq_test.go ./handler RegisterUserService RegisterTemporaryUserService SigninService GetUsersService UpdatePasswordService UpdateAccountService ResetPasswordService SendPointService SignoutService GetAccountService RegisterTemporaryEmailService
 	# リポジトリのモック生成
 	moq -out ./service/moq_test.go -skip-ensure -pkg service ./domain UserRepo PointRepo TokenGenerator Cache
 	moq -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer
