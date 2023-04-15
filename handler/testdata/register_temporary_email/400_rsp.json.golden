@@ -1,5 +1,5 @@
 {
   "statusCode": 400,
   "title": "パラメータエラー",
-  "message": ""
+  "message": "email: must be a valid email address."
 }
