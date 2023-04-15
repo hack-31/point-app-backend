@@ -54,10 +54,8 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 			// サービス層のモック定義
 			moq := &RegisterTemporaryEmailServiceMock{}
 			moq.RegisterTemporaryEmailFunc = func(ctx *gin.Context, email string) (string, error) {
-
 				if tt.want.status == http.StatusCreated {
 					return "8e8d0f82-89a1-4cc6-ba25-13c864ad09db", nil
-
 				}
 
 				if tt.want.status == http.StatusConflict {
