@@ -15,11 +15,8 @@ import (
 )
 
 func TestRegisterTemporaryEmail(t *testing.T) {
-	// t.Parallel()
-
 	inputEmail := "yamada.tarotestetst@sample.com"
 	inputExistEmail := "yamada@sample.com"
-	// wantTemporaryEmailID := ""
 	wantUserID := model.UserID(10)
 	wantUser := &model.User{
 		ID:             wantUserID,
@@ -46,15 +43,6 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 		wants want
 		input input
 	}{
-		// "登録されていないメールアドレスであり、Cacheに一時保存できた場合はTemporaryEmailIDを返す": {
-		// 	input: input{
-		// 		email: inputEmail,
-		// 	},
-		// 	wants: want{
-		// 		temporaryEmailId: wantTemporaryEmailID,
-		// 		err:              nil,
-		// 	},
-		// },
 		"すでに登録されているメールアドレスである場合は、エラーを返す": {
 			input: input{
 				email: inputExistEmail,
@@ -64,15 +52,6 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 				err:              repository.ErrAlreadyEntry,
 			},
 		},
-		// "cacheに一時保存できない場合は、エラーを返す": {
-		// 	input: input{
-		// 		email: "",
-		// 	},
-		// 	wants: want{
-		// 		temporaryEmailId: "",
-		// 		err:              repository.ErrAlreadyEntry,
-		// 	},
-		// },
 	}
 
 	for n, tt := range tests {
@@ -92,7 +71,7 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 			}
 			moqRepo.FindUserByEmailFunc = func(ctx context.Context, db repository.Queryer, email *string) (model.User, error) {
 				if tt.input.email == inputEmail {
-					return *wantUser, sql.ErrNoRows
+					return model.User{}, sql.ErrNoRows
 				}
 				if tt.input.email == inputExistEmail {
 					return *wantUser, nil
