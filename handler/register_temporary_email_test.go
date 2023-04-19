@@ -73,9 +73,7 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			c.Request, _ = http.NewRequest("POST", "/temporary_email", bytes.NewReader(testutil.LoadFile(t, tt.reqFile)))
-			rte := RegisterTemporaryEmail{
-				Service: moq,
-			}
+			rte := NewRegisterTemporaryEmailHandler(moq)
 
 			// リクエスト送信
 			rte.ServeHTTP(c)
