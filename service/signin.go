@@ -38,12 +38,12 @@ func (s *Signin) Signin(ctx context.Context, email, password string) (string, er
 	}
 
 	// パスワードが一致するか確認
-	pwd, err := model.NewPasswrod(password)
+	pwd, err := model.NewPassword(password)
 	if err != nil {
 		return "", fmt.Errorf("cannot create password object: %w", err)
 	}
 	if isMatch, _ := pwd.IsMatch(u.Password); !isMatch {
-		return "", fmt.Errorf("no match passwrod:  %w", repository.ErrNotMatchLogInfo)
+		return "", fmt.Errorf("no match password:  %w", repository.ErrNotMatchLogInfo)
 	}
 
 	// JWTを作成

@@ -39,22 +39,22 @@ func (up *UpdatePassword) UpdatePassword(ctx *gin.Context, oldPassword, newPassw
 	}
 
 	// パスワードが一致するか確認
-	oldPwd, err := model.NewPasswrod(oldPassword)
+	oldPwd, err := model.NewPassword(oldPassword)
 	if err != nil {
 		return fmt.Errorf("cannot create password object: %w", err)
 	}
 	if isMatch, _ := oldPwd.IsMatch(u.Password); !isMatch {
-		return fmt.Errorf("no match passwrod:  %w", repository.ErrDifferentPassword)
+		return fmt.Errorf("no match password:  %w", repository.ErrDifferentPassword)
 	}
 
 	// パスワード更新
-	newPwd, err := model.NewPasswrod(newPassword)
+	newPwd, err := model.NewPassword(newPassword)
 	if err != nil {
 		return fmt.Errorf("cannot create password object: %w", err)
 	}
 	hashNewPass, err := newPwd.CreateHash()
 	if err != nil {
-		return fmt.Errorf("cannot create hash passwrod: %w", err)
+		return fmt.Errorf("cannot create hash password: %w", err)
 	}
 	if err := up.UserRepo.UpdatePassword(ctx, up.ExecerDB, &stringMail, &hashNewPass); err != nil {
 		return fmt.Errorf("failed to update password: %w", err)

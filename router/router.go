@@ -22,13 +22,14 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	// レポジトリ
 	clocker := clock.RealClocker{}
 	rep := repository.NewRepository(clocker)
-	// キャッシュ
-	cache, err := repository.NewKVS(ctx, cfg, repository.JWT)
+	// 一時保存をするキャッシュ
+	cache, err := repository.NewKVS(ctx, cfg, repository.TemporaryRegister)
 	if err != nil {
 		return err
 	}
-	// トークン
-	tokenCache, err := repository.NewKVS(ctx, cfg, repository.TemporaryUserRegister)
+
+	// トークン保存をするキャッシュ
+	tokenCache, err := repository.NewKVS(ctx, cfg, repository.JWT)
 	if err != nil {
 		return err
 	}

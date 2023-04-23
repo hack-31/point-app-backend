@@ -24,8 +24,14 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	clocker := clock.RealClocker{}
 	rep := repository.NewRepository(clocker)
 
+	// 一時保存をするキャッシュ
+	cache, err := repository.NewKVS(ctx, cfg, repository.TemporaryRegister)
+	if err != nil {
+		return err
+	}
+
 	// トークン保存をするキャッシュ
-	tokenCache, err := repository.NewKVS(ctx, cfg, repository.TemporaryUserRegister)
+	tokenCache, err := repository.NewKVS(ctx, cfg, repository.JWT)
 	if err != nil {
 		return err
 	}
@@ -62,6 +68,10 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	updateAccountService := service.NewUpdateAccount(db, rep)
 	updateAccountHandler := handler.NewUpdateAccountHandler(updateAccountService)
 	groupRoute.PUT("/account", updateAccountHandler.ServeHTTP)
+
+	registerTemporaryEmailService := service.NewRegisterTemporaryEmail(db, cache, rep)
+	registerTemporaryEmailHandler := handler.NewRegisterTemporaryEmailHandler(registerTemporaryEmailService)
+	groupRoute.POST("/temporary_email", registerTemporaryEmailHandler.ServeHTTP)
 
 	return nil
 }

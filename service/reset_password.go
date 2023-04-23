@@ -42,9 +42,9 @@ func (rp *ResetPassword) ResetPassword(ctx context.Context, email string) error 
 		return fmt.Errorf("not exist email address: %w", repository.ErrNotExistEmail)
 	}
 
-	pass, err := model.NewPasswrod("")
+	pass, err := model.NewPassword("")
 	if err != nil {
-		return fmt.Errorf("cannot create passwrod object: %w", err)
+		return fmt.Errorf("cannot create password object: %w", err)
 	}
 
 	// ランダムパスワードを生成
@@ -53,7 +53,7 @@ func (rp *ResetPassword) ResetPassword(ctx context.Context, email string) error 
 	// パスワードハッシュ化
 	hashPass, err := randomPass.CreateHash()
 	if err != nil {
-		return fmt.Errorf("cannot create hash passwrod: %w", err)
+		return fmt.Errorf("cannot create hash password: %w", err)
 	}
 
 	// パスワードを上書き

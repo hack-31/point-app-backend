@@ -574,7 +574,10 @@ paths:
                     example: "指定のメールアドレスに確認コードを送信しました。"
                   data:
                     type: object
-                    example: null
+                    properties:
+                      temporaryEmailId:
+                        type: string
+                        example: testString
         '401':
           $ref: '#/components/responses/401UnauthorizedError'
         '400':

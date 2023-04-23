@@ -29,7 +29,7 @@ func NewRegisterUser(db *sqlx.DB, rep domain.UserRepo, cache domain.Cache, jwter
 // @return ユーザ情報
 func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId, confirmCode string) (*model.User, string, error) {
 	// 一時ユーザ情報を復元
-	key := fmt.Sprintf("%s:%s", confirmCode, temporaryUserId)
+	key := fmt.Sprintf("user:%s:%s", confirmCode, temporaryUserId)
 	u, err := r.Cache.Load(ctx, key)
 	if err != nil {
 		return nil, "", fmt.Errorf("cannot load user in cache: %w", err)
