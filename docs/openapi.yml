@@ -618,7 +618,7 @@ paths:
             schema:
               type: object
               properties:
-                temporaryId:
+                temporaryEmailId:
                   type: string
                   example: 8e8d0f82-89a1-4cc6-ba25-13c864ad09db
                 confirmCode:
