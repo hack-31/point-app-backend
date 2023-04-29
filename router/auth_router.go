@@ -73,5 +73,8 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	registerTemporaryEmailHandler := handler.NewRegisterTemporaryEmailHandler(registerTemporaryEmailService)
 	groupRoute.POST("/temporary_email", registerTemporaryEmailHandler.ServeHTTP)
 
+	updateEmailHandler := handler.NewUpdateEmailHandler()
+	groupRoute.PATCH("/email", updateEmailHandler.ServeHTTP)
+
 	return nil
 }
