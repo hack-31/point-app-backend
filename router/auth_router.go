@@ -69,9 +69,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	updateAccountHandler := handler.NewUpdateAccountHandler(updateAccountService)
 	groupRoute.PUT("/account", updateAccountHandler.ServeHTTP)
 
-	registerTemporaryEmailService := service.NewRegisterTemporaryEmail(db, cache, rep)
-	registerTemporaryEmailHandler := handler.NewRegisterTemporaryEmailHandler(registerTemporaryEmailService)
-	groupRoute.POST("/temporary_email", registerTemporaryEmailHandler.ServeHTTP)
+	updateTemporaryEmailService := service.NewUpdateTemporaryEmail(db, cache, rep)
+	updateTemporaryEmailHandler := handler.NewUpdateTemporaryEmailHandler(updateTemporaryEmailService)
+	groupRoute.POST("/temporary_email", updateTemporaryEmailHandler.ServeHTTP)
 
 	updateEmailHandler := handler.NewUpdateEmailHandler()
 	groupRoute.PATCH("/email", updateEmailHandler.ServeHTTP)

@@ -12,7 +12,7 @@ import (
 	"github.com/hack-31/point-app-backend/testutil"
 )
 
-func TestRegisterTemporaryEmail(t *testing.T) {
+func TestUpdateTemporaryEmail(t *testing.T) {
 	type want struct {
 		status  int
 		rspFile string
@@ -23,24 +23,24 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 		want    want
 	}{
 		"正しいリクエストの時は201となる": {
-			reqFile: "testdata/register_temporary_email/201_req.json.golden",
+			reqFile: "testdata/update_temporary_email/201_req.json.golden",
 			want: want{
 				status:  http.StatusCreated,
-				rspFile: "testdata/register_temporary_email/201_rsp.json.golden",
+				rspFile: "testdata/update_temporary_email/201_rsp.json.golden",
 			},
 		},
 		"リクエストデータが正しくない場合は400エラーを返す": {
-			reqFile: "testdata/register_temporary_email/400_req.json.golden",
+			reqFile: "testdata/update_temporary_email/400_req.json.golden",
 			want: want{
 				status:  http.StatusBadRequest,
-				rspFile: "testdata/register_temporary_email/400_rsp.json.golden",
+				rspFile: "testdata/update_temporary_email/400_rsp.json.golden",
 			},
 		},
 		"登録済みのメールアドレスは409エラーを返す": {
-			reqFile: "testdata/register_temporary_email/409_req.json.golden",
+			reqFile: "testdata/update_temporary_email/409_req.json.golden",
 			want: want{
 				status:  http.StatusConflict,
-				rspFile: "testdata/register_temporary_email/409_rsp.json.golden",
+				rspFile: "testdata/update_temporary_email/409_rsp.json.golden",
 			},
 		},
 	}
@@ -52,8 +52,8 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 			t.Parallel()
 
 			// サービス層のモック定義
-			moq := &RegisterTemporaryEmailServiceMock{}
-			moq.RegisterTemporaryEmailFunc = func(ctx *gin.Context, email string) (string, error) {
+			moq := &UpdateTemporaryEmailServiceMock{}
+			moq.UpdateTemporaryEmailFunc = func(ctx *gin.Context, email string) (string, error) {
 				if tt.want.status == http.StatusCreated {
 					return "8e8d0f82-89a1-4cc6-ba25-13c864ad09db", nil
 				}
@@ -73,10 +73,10 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			c.Request, _ = http.NewRequest("POST", "/temporary_email", bytes.NewReader(testutil.LoadFile(t, tt.reqFile)))
-			rte := NewRegisterTemporaryEmailHandler(moq)
+			ute := NewUpdateTemporaryEmailHandler(moq)
 
 			// リクエスト送信
-			rte.ServeHTTP(c)
+			ute.ServeHTTP(c)
 
 			// レスポンス
 			resp := w.Result()

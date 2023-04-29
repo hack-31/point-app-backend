@@ -784,46 +784,46 @@ func (mock *GetAccountServiceMock) GetAccountCalls() []struct {
 	return calls
 }
 
-// Ensure, that RegisterTemporaryEmailServiceMock does implement RegisterTemporaryEmailService.
+// Ensure, that UpdateTemporaryEmailServiceMock does implement UpdateTemporaryEmailService.
 // If this is not the case, regenerate this file with moq.
-var _ RegisterTemporaryEmailService = &RegisterTemporaryEmailServiceMock{}
+var _ UpdateTemporaryEmailService = &UpdateTemporaryEmailServiceMock{}
 
-// RegisterTemporaryEmailServiceMock is a mock implementation of RegisterTemporaryEmailService.
+// UpdateTemporaryEmailServiceMock is a mock implementation of UpdateTemporaryEmailService.
 //
-//	func TestSomethingThatUsesRegisterTemporaryEmailService(t *testing.T) {
+//	func TestSomethingThatUsesUpdateTemporaryEmailService(t *testing.T) {
 //
-//		// make and configure a mocked RegisterTemporaryEmailService
-//		mockedRegisterTemporaryEmailService := &RegisterTemporaryEmailServiceMock{
-//			RegisterTemporaryEmailFunc: func(ctx *gin.Context, email string) (string, error) {
-//				panic("mock out the RegisterTemporaryEmail method")
+//		// make and configure a mocked UpdateTemporaryEmailService
+//		mockedUpdateTemporaryEmailService := &UpdateTemporaryEmailServiceMock{
+//			UpdateTemporaryEmailFunc: func(ctx *gin.Context, email string) (string, error) {
+//				panic("mock out the UpdateTemporaryEmail method")
 //			},
 //		}
 //
-//		// use mockedRegisterTemporaryEmailService in code that requires RegisterTemporaryEmailService
+//		// use mockedUpdateTemporaryEmailService in code that requires UpdateTemporaryEmailService
 //		// and then make assertions.
 //
 //	}
-type RegisterTemporaryEmailServiceMock struct {
-	// RegisterTemporaryEmailFunc mocks the RegisterTemporaryEmail method.
-	RegisterTemporaryEmailFunc func(ctx *gin.Context, email string) (string, error)
+type UpdateTemporaryEmailServiceMock struct {
+	// UpdateTemporaryEmailFunc mocks the UpdateTemporaryEmail method.
+	UpdateTemporaryEmailFunc func(ctx *gin.Context, email string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// RegisterTemporaryEmail holds details about calls to the RegisterTemporaryEmail method.
-		RegisterTemporaryEmail []struct {
+		// UpdateTemporaryEmail holds details about calls to the UpdateTemporaryEmail method.
+		UpdateTemporaryEmail []struct {
 			// Ctx is the ctx argument value.
 			Ctx *gin.Context
 			// Email is the email argument value.
 			Email string
 		}
 	}
-	lockRegisterTemporaryEmail sync.RWMutex
+	lockUpdateTemporaryEmail sync.RWMutex
 }
 
-// RegisterTemporaryEmail calls RegisterTemporaryEmailFunc.
-func (mock *RegisterTemporaryEmailServiceMock) RegisterTemporaryEmail(ctx *gin.Context, email string) (string, error) {
-	if mock.RegisterTemporaryEmailFunc == nil {
-		panic("RegisterTemporaryEmailServiceMock.RegisterTemporaryEmailFunc: method is nil but RegisterTemporaryEmailService.RegisterTemporaryEmail was just called")
+// UpdateTemporaryEmail calls UpdateTemporaryEmailFunc.
+func (mock *UpdateTemporaryEmailServiceMock) UpdateTemporaryEmail(ctx *gin.Context, email string) (string, error) {
+	if mock.UpdateTemporaryEmailFunc == nil {
+		panic("UpdateTemporaryEmailServiceMock.UpdateTemporaryEmailFunc: method is nil but UpdateTemporaryEmailService.UpdateTemporaryEmail was just called")
 	}
 	callInfo := struct {
 		Ctx   *gin.Context
@@ -832,17 +832,17 @@ func (mock *RegisterTemporaryEmailServiceMock) RegisterTemporaryEmail(ctx *gin.C
 		Ctx:   ctx,
 		Email: email,
 	}
-	mock.lockRegisterTemporaryEmail.Lock()
-	mock.calls.RegisterTemporaryEmail = append(mock.calls.RegisterTemporaryEmail, callInfo)
-	mock.lockRegisterTemporaryEmail.Unlock()
-	return mock.RegisterTemporaryEmailFunc(ctx, email)
+	mock.lockUpdateTemporaryEmail.Lock()
+	mock.calls.UpdateTemporaryEmail = append(mock.calls.UpdateTemporaryEmail, callInfo)
+	mock.lockUpdateTemporaryEmail.Unlock()
+	return mock.UpdateTemporaryEmailFunc(ctx, email)
 }
 
-// RegisterTemporaryEmailCalls gets all the calls that were made to RegisterTemporaryEmail.
+// UpdateTemporaryEmailCalls gets all the calls that were made to UpdateTemporaryEmail.
 // Check the length with:
 //
-//	len(mockedRegisterTemporaryEmailService.RegisterTemporaryEmailCalls())
-func (mock *RegisterTemporaryEmailServiceMock) RegisterTemporaryEmailCalls() []struct {
+//	len(mockedUpdateTemporaryEmailService.UpdateTemporaryEmailCalls())
+func (mock *UpdateTemporaryEmailServiceMock) UpdateTemporaryEmailCalls() []struct {
 	Ctx   *gin.Context
 	Email string
 } {
@@ -850,8 +850,8 @@ func (mock *RegisterTemporaryEmailServiceMock) RegisterTemporaryEmailCalls() []s
 		Ctx   *gin.Context
 		Email string
 	}
-	mock.lockRegisterTemporaryEmail.RLock()
-	calls = mock.calls.RegisterTemporaryEmail
-	mock.lockRegisterTemporaryEmail.RUnlock()
+	mock.lockUpdateTemporaryEmail.RLock()
+	calls = mock.calls.UpdateTemporaryEmail
+	mock.lockUpdateTemporaryEmail.RUnlock()
 	return calls
 }

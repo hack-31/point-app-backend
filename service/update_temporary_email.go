@@ -15,14 +15,14 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type RegisterTemporaryEmail struct {
+type UpdateTemporaryEmail struct {
 	DB    repository.Queryer
 	Cache domain.Cache
 	Repo  domain.UserRepo
 }
 
-func NewRegisterTemporaryEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *RegisterTemporaryEmail {
-	return &RegisterTemporaryEmail{DB: db, Cache: cache, Repo: rep}
+func NewUpdateTemporaryEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *UpdateTemporaryEmail {
+	return &UpdateTemporaryEmail{DB: db, Cache: cache, Repo: rep}
 }
 
 // メール仮登録サービス
@@ -33,12 +33,12 @@ func NewRegisterTemporaryEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserR
 //
 // @returns
 // temporaryEmailId 一時保存したメールを識別するID
-func (rte *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, email string) (string, error) {
+func (ute *UpdateTemporaryEmail) UpdateTemporaryEmail(ctx *gin.Context, email string) (string, error) {
 	// ユーザードメインサービス
-	userService := service.NewUserService(rte.Repo)
+	userService := service.NewUserService(ute.Repo)
 
 	// 現在利用中のメールアドレスか確認
-	existMail, err := userService.ExistByEmail(ctx, &rte.DB, email)
+	existMail, err := userService.ExistByEmail(ctx, &ute.DB, email)
 	if err != nil {
 		return "", fmt.Errorf("failed to find user by mail in db: %w", err)
 	}
@@ -51,7 +51,7 @@ func (rte *RegisterTemporaryEmail) RegisterTemporaryEmail(ctx *gin.Context, emai
 	confirmCode := model.NewConfirmCode().String()
 	key := fmt.Sprintf("email:%s:%s", confirmCode, temporaryEmailID)
 	// キャッシュサーバーへ保存
-	if err = rte.Cache.Save(ctx, key, email, time.Duration(constant.ConfirmationCodeExpiration_m)); err != nil {
+	if err = ute.Cache.Save(ctx, key, email, time.Duration(constant.ConfirmationCodeExpiration_m)); err != nil {
 		return "", fmt.Errorf("failed to save in cache: %w", err)
 	}
 

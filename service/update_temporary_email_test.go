@@ -14,7 +14,7 @@ import (
 	"github.com/hack-31/point-app-backend/repository"
 )
 
-func TestRegisterTemporaryEmail(t *testing.T) {
+func TestUpdateTemporaryEmail(t *testing.T) {
 	inputEmail := "yamada.tarotestetst@sample.com"
 	inputExistEmail := "yamada@sample.com"
 	wantUserID := model.UserID(10)
@@ -78,14 +78,14 @@ func TestRegisterTemporaryEmail(t *testing.T) {
 				}
 				return *wantUser, nil
 			}
-			rte := &RegisterTemporaryEmail{
+			ute := &UpdateTemporaryEmail{
 				DB:    moqDB,
 				Cache: moqCache,
 				Repo:  moqRepo,
 			}
 
 			// サービス実行
-			gotTemporaryEmailId, gotErr := rte.RegisterTemporaryEmail(ctx, tt.input.email)
+			gotTemporaryEmailId, gotErr := ute.UpdateTemporaryEmail(ctx, tt.input.email)
 
 			// アサーション
 			if !errors.Is(gotErr, tt.wants.err) {
