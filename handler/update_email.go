@@ -7,10 +7,12 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-type UpdateEmail struct{}
+type UpdateEmail struct {
+	Service UpdateEmailService
+}
 
-func NewUpdateEmailHandler() *UpdateEmail {
-	return &UpdateEmail{}
+func NewUpdateEmailHandler(s UpdateEmailService) *UpdateEmail {
+	return &UpdateEmail{Service: s}
 }
 
 // メール本登録ハンドラー
@@ -47,6 +49,9 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
 		return
 	}
+
+	// サービス層に依頼する
+	ue.Service.UpdateEmail()
 
 	// 成功レスポンス
 	APIResponse(ctx, http.StatusCreated, "更新が完了しました。", nil)

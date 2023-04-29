@@ -50,3 +50,7 @@ type UpdateAccountService interface {
 type UpdateTemporaryEmailService interface {
 	UpdateTemporaryEmail(ctx *gin.Context, email string) (string, error)
 }
+
+type UpdateEmailService interface {
+	UpdateEmail()
+}
