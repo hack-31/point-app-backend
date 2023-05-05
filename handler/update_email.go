@@ -18,6 +18,7 @@ func NewUpdateEmailHandler(s UpdateEmailService) *UpdateEmail {
 // メール本登録ハンドラー
 //
 // @param ctx ginContext
+// @return APIレスポンス結果
 func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	// const mailErrTitle = "メールアドレス更新エラー"
 	const paramErrTitle = "パラメータエラー"
@@ -51,7 +52,7 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サービス層に依頼する
-	ue.Service.UpdateEmail()
+	ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode)
 
 	// 成功レスポンス
 	APIResponse(ctx, http.StatusCreated, "更新が完了しました。", nil)
