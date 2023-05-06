@@ -52,7 +52,12 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サービス層に依頼する
-	ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode)
+	serviceErr := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode)
+	if err != nil {
+		// TODO: サービス層エラーハンドリング
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, serviceErr.Error())
+		return
+	}
 
 	// 成功レスポンス
 	APIResponse(ctx, http.StatusCreated, "更新が完了しました。", nil)

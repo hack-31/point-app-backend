@@ -21,15 +21,25 @@ func NewUpdateEmail(cache domain.Cache) *UpdateEmail {
 // @params confirmCode 認証コード
 //
 //
-func (ue *UpdateEmail) UpdateEmail(ctx context.Context, temporaryEmailID, confirmCode string) {
-	println("サービステスト")
+func (ue *UpdateEmail) UpdateEmail(ctx context.Context, temporaryEmailID, confirmCode string) error {
 	// 一時メールアドレスの復元
 	key := fmt.Sprintf("email:%s:%s", confirmCode, temporaryEmailID)
-	e, err := ue.Cache.Load(ctx, key)
+	temporaryEmail, err := ue.Cache.Load(ctx, key)
 	if err != nil {
-		fmt.Println("エラーですよ！")
-		return
+		// TODO: エラーハンドリング
+		return fmt.Errorf("cannot load user in cache: %w", err)
 	}
-	fmt.Println(e)
 
+	// 復元が成功したら一時メールアドレスを削除する
+	if err := ue.Cache.Delete(ctx, key); err != nil {
+		// TODO: エラーハンドリング
+		return fmt.Errorf("cannot load user in cache: %w", err)
+	}
+
+	println(temporaryEmail)
+
+	// DBに保存する
+
+	// TODO: 成功レスポンス
+	return nil
 }

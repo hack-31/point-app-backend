@@ -52,5 +52,5 @@ type UpdateTemporaryEmailService interface {
 }
 
 type UpdateEmailService interface {
-	UpdateEmail(ctx context.Context, temporaryEmailID, confirmCode string)
+	UpdateEmail(ctx context.Context, temporaryEmailID, confirmCode string) error
 }
