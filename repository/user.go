@@ -99,6 +99,25 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 	return err
 }
 
+// メールアドレスを上書きする
+// @params
+// ctx context
+// db dbインスタンス
+// oldEmail 現在のメールアドレス
+// newEmail 上書きするメールアドレス
+//
+// @returns
+// error
+func (r *Repository) UpdateEmail(ctx context.Context, db Execer, oldEmail, newEmail *string) error {
+	sql := `UPDATE users SET email = ? WHERE email = ?`
+
+	_, err := db.ExecContext(ctx, sql, newEmail, oldEmail)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // アカウント情報を上書きする
 // @params
 // ctx context

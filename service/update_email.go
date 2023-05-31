@@ -52,10 +52,11 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 		return fmt.Errorf("not user: %w", err)
 	}
 
-	println(temporaryEmail)
-	fmt.Printf("%+v", &u)
-
 	// DBに保存する
+	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, &u.Email, &temporaryEmail); err != nil {
+		// TODO: エラーハンドリング
+		return fmt.Errorf("not user: %w", err)
+	}
 
 	// TODO: 成功レスポンス
 	return nil
