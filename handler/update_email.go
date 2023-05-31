@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/hack-31/point-app-backend/repository"
 )
 
 type UpdateEmail struct {
@@ -20,8 +22,9 @@ func NewUpdateEmailHandler(s UpdateEmailService) *UpdateEmail {
 // @param ctx ginContext
 // @return APIレスポンス結果
 func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
-	// const mailErrTitle = "メールアドレス更新エラー"
+	const mailErrTitle = "メールアドレス本更新エラー"
 	const paramErrTitle = "パラメータエラー"
+	const serverErrTitle = "サーバーエラー"
 
 	var input struct {
 		TemporaryEmailID string `json:"temporaryEmailId"`
@@ -54,8 +57,17 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	// サービス層に依頼する
 	serviceErr := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode)
 	if err != nil {
-		// TODO: サービス層エラーハンドリング
-		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, serviceErr.Error())
+		// 確認コードとトークンが無効
+		if errors.Is(err, repository.ErrNotFoundSession) {
+			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, repository.ErrNotFoundSession.Error())
+			return
+		}
+		// 登録済みのメールアドレス
+		if errors.Is(err, repository.ErrAlreadyEntry) {
+			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error())
+			return
+		}
+		ErrResponse(ctx, http.StatusInternalServerError, serverErrTitle, serviceErr.Error())
 		return
 	}
 

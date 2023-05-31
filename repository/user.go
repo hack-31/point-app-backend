@@ -113,7 +113,7 @@ func (r *Repository) UpdateEmail(ctx context.Context, db Execer, oldEmail, newEm
 
 	_, err := db.ExecContext(ctx, sql, newEmail, oldEmail)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update DB: %w", err)
 	}
 	return nil
 }

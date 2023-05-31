@@ -36,28 +36,24 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	key := fmt.Sprintf("email:%s:%s", confirmCode, temporaryEmailID)
 	temporaryEmail, err := ue.Cache.Load(ctx, key)
 	if err != nil {
-		// TODO: エラーハンドリング
-		return fmt.Errorf("cannot load user in cache: %w", err)
+		return fmt.Errorf("cannot load email in cache: %w", err)
 	}
 
 	// 復元が成功したら一時メールアドレスを削除する
 	if err := ue.Cache.Delete(ctx, key); err != nil {
-		// TODO: エラーハンドリング
-		return fmt.Errorf("cannot load user in cache: %w", err)
+		return fmt.Errorf("cannot delete in cache: %w", err)
 	}
 
 	u, err := ue.Repo.FindUserByEmail(ctx, ue.QueryerDB, &stringMail)
 	if err != nil {
-		// TODO: エラーハンドリング
 		return fmt.Errorf("not user: %w", err)
 	}
 
 	// DBに保存する
 	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, &u.Email, &temporaryEmail); err != nil {
-		// TODO: エラーハンドリング
-		return fmt.Errorf("not user: %w", err)
+		return fmt.Errorf("failed to update: %w", err)
 	}
 
-	// TODO: 成功レスポンス
+	// 成功時
 	return nil
 }
