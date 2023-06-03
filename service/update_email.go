@@ -27,7 +27,8 @@ func NewUpdateEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *Updat
 // @params temporaryEmailID 一時保存メールアドレスID
 // @params confirmCode 認証コード
 //
-//
+// @returns
+// error
 func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCode string) error {
 	// ユーザードメインサービス
 	userService := service.NewUserService(ue.Repo)
