@@ -56,14 +56,14 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 
 	// サービス層に依頼する
 	serviceErr := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode)
-	if err != nil {
+	if serviceErr != nil {
 		// 確認コードとトークンが無効
-		if errors.Is(err, repository.ErrNotFoundSession) {
+		if errors.Is(serviceErr, repository.ErrNotFoundSession) {
 			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, repository.ErrNotFoundSession.Error())
 			return
 		}
 		// 登録済みのメールアドレス
-		if errors.Is(err, repository.ErrAlreadyEntry) {
+		if errors.Is(serviceErr, repository.ErrAlreadyEntry) {
 			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error())
 			return
 		}
