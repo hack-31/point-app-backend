@@ -44,13 +44,14 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 		return fmt.Errorf("cannot delete in cache: %w", err)
 	}
 
-	u, err := ue.Repo.FindUserByEmail(ctx, ue.QueryerDB, &stringMail)
-	if err != nil {
-		return fmt.Errorf("not user: %w", err)
+	// すでに登録済みのユーザーがいるか確認する
+	if _, err := ue.Repo.FindUserByEmail(ctx, ue.QueryerDB, &temporaryEmail); err == nil {
+		// ユーザーが取得出来る場合はすでに存在しているためエラーで処理終了する
+		return fmt.Errorf("exist user: %w", repository.ErrAlreadyEntry)
 	}
 
 	// DBに保存する
-	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, &u.Email, &temporaryEmail); err != nil {
+	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, &stringMail, &temporaryEmail); err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 
