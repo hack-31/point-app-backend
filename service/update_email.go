@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/jmoiron/sqlx"
 )
@@ -28,6 +29,9 @@ func NewUpdateEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *Updat
 //
 //
 func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCode string) error {
+	// ユーザードメインサービス
+	userService := service.NewUserService(ue.Repo)
+
 	// コンテキストよりEmailを取得する
 	email, _ := ctx.Get(auth.Email)
 	stringMail := email.(string)
@@ -45,9 +49,12 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	}
 
 	// すでに登録済みのユーザーがいるか確認する
-	if _, err := ue.Repo.FindUserByEmail(ctx, ue.QueryerDB, &temporaryEmail); err == nil {
-		// ユーザーが取得出来る場合はすでに存在しているためエラーで処理終了する
-		return fmt.Errorf("exist user: %w", repository.ErrAlreadyEntry)
+	existMail, err := userService.ExistByEmail(ctx, &ue.QueryerDB, temporaryEmail)
+	if err != nil {
+		return fmt.Errorf("failed to find user by mail in db: %w", err)
+	}
+	if existMail {
+		return fmt.Errorf("exist mail address: %w", repository.ErrAlreadyEntry)
 	}
 
 	// DBに保存する
