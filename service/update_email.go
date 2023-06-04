@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/jmoiron/sqlx"
@@ -33,9 +34,9 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	// ユーザードメインサービス
 	userService := service.NewUserService(ue.Repo)
 
-	// コンテキストよりEmailを取得する
-	email, _ := ctx.Get(auth.Email)
-	stringMail := email.(string)
+	// コンテキストよりUserIDを取得する
+	userID, _ := ctx.Get(auth.UserID)
+	int64UserID := userID.(model.UserID)
 
 	// 一時メールアドレスの復元
 	key := fmt.Sprintf("email:%s:%s", confirmCode, temporaryEmailID)
@@ -59,7 +60,7 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	}
 
 	// DBに保存する
-	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, &stringMail, &temporaryEmail); err != nil {
+	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, int64UserID, temporaryEmail); err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 

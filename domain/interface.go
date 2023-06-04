@@ -13,7 +13,7 @@ type UserRepo interface {
 	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
 	RegisterUser(ctx context.Context, db repository.Execer, u *model.User) error
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
-	UpdateEmail(ctx context.Context, db repository.Execer, oldEmail, newEmail *string) error
+	UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 	UpdateAccount(ctx context.Context, db repository.Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error
 	FindUsers(ctx context.Context, db repository.Queryer) (model.Users, error)
 }

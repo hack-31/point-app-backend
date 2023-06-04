@@ -29,7 +29,7 @@ import (
 //			UpdateAccountFunc: func(ctx context.Context, db repository.Execer, email *string, familyName *string, familyNameKana *string, firstName *string, firstNameKana *string) error {
 //				panic("mock out the UpdateAccount method")
 //			},
-//			UpdateEmailFunc: func(ctx context.Context, db repository.Execer, oldEmail *string, newEmail *string) error {
+//			UpdateEmailFunc: func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 //				panic("mock out the UpdateEmail method")
 //			},
 //			UpdatePasswordFunc: func(ctx context.Context, db repository.Execer, email *string, pass *string) error {
@@ -55,7 +55,7 @@ type UserRepoMock struct {
 	UpdateAccountFunc func(ctx context.Context, db repository.Execer, email *string, familyName *string, familyNameKana *string, firstName *string, firstNameKana *string) error
 
 	// UpdateEmailFunc mocks the UpdateEmail method.
-	UpdateEmailFunc func(ctx context.Context, db repository.Execer, oldEmail *string, newEmail *string) error
+	UpdateEmailFunc func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 
 	// UpdatePasswordFunc mocks the UpdatePassword method.
 	UpdatePasswordFunc func(ctx context.Context, db repository.Execer, email *string, pass *string) error
@@ -110,10 +110,10 @@ type UserRepoMock struct {
 			Ctx context.Context
 			// Db is the db argument value.
 			Db repository.Execer
-			// OldEmail is the oldEmail argument value.
-			OldEmail *string
+			// UserID is the userID argument value.
+			UserID model.UserID
 			// NewEmail is the newEmail argument value.
-			NewEmail *string
+			NewEmail string
 		}
 		// UpdatePassword holds details about calls to the UpdatePassword method.
 		UpdatePassword []struct {
@@ -308,25 +308,25 @@ func (mock *UserRepoMock) UpdateAccountCalls() []struct {
 }
 
 // UpdateEmail calls UpdateEmailFunc.
-func (mock *UserRepoMock) UpdateEmail(ctx context.Context, db repository.Execer, oldEmail *string, newEmail *string) error {
+func (mock *UserRepoMock) UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 	if mock.UpdateEmailFunc == nil {
 		panic("UserRepoMock.UpdateEmailFunc: method is nil but UserRepo.UpdateEmail was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
 		Db       repository.Execer
-		OldEmail *string
-		NewEmail *string
+		UserID   model.UserID
+		NewEmail string
 	}{
 		Ctx:      ctx,
 		Db:       db,
-		OldEmail: oldEmail,
+		UserID:   userID,
 		NewEmail: newEmail,
 	}
 	mock.lockUpdateEmail.Lock()
 	mock.calls.UpdateEmail = append(mock.calls.UpdateEmail, callInfo)
 	mock.lockUpdateEmail.Unlock()
-	return mock.UpdateEmailFunc(ctx, db, oldEmail, newEmail)
+	return mock.UpdateEmailFunc(ctx, db, userID, newEmail)
 }
 
 // UpdateEmailCalls gets all the calls that were made to UpdateEmail.
@@ -336,14 +336,14 @@ func (mock *UserRepoMock) UpdateEmail(ctx context.Context, db repository.Execer,
 func (mock *UserRepoMock) UpdateEmailCalls() []struct {
 	Ctx      context.Context
 	Db       repository.Execer
-	OldEmail *string
-	NewEmail *string
+	UserID   model.UserID
+	NewEmail string
 } {
 	var calls []struct {
 		Ctx      context.Context
 		Db       repository.Execer
-		OldEmail *string
-		NewEmail *string
+		UserID   model.UserID
+		NewEmail string
 	}
 	mock.lockUpdateEmail.RLock()
 	calls = mock.calls.UpdateEmail

@@ -103,15 +103,15 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 // @params
 // ctx context
 // db dbインスタンス
-// oldEmail 現在のメールアドレス
+// userID 更新するユーザーID
 // newEmail 上書きするメールアドレス
 //
 // @returns
 // error
-func (r *Repository) UpdateEmail(ctx context.Context, db Execer, oldEmail, newEmail *string) error {
-	sql := `UPDATE users SET email = ? WHERE email = ?`
+func (r *Repository) UpdateEmail(ctx context.Context, db Execer, userID model.UserID, newEmail string) error {
+	sql := `UPDATE users SET email = ? WHERE id = ?`
 
-	_, err := db.ExecContext(ctx, sql, newEmail, oldEmail)
+	_, err := db.ExecContext(ctx, sql, newEmail, userID)
 	if err != nil {
 		return fmt.Errorf("failed to update DB: %w", err)
 	}
