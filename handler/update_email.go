@@ -55,19 +55,18 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サービス層に依頼する
-	serviceErr := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode)
-	if serviceErr != nil {
+	if err := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode); err != nil {
 		// 確認コードとトークンが無効
-		if errors.Is(serviceErr, repository.ErrNotFoundSession) {
+		if errors.Is(err, repository.ErrNotFoundSession) {
 			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, repository.ErrNotFoundSession.Error())
 			return
 		}
 		// 登録済みのメールアドレス
-		if errors.Is(serviceErr, repository.ErrAlreadyEntry) {
+		if errors.Is(err, repository.ErrAlreadyEntry) {
 			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error())
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, serverErrTitle, serviceErr.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, serverErrTitle, err.Error())
 		return
 	}
 
