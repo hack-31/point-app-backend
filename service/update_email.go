@@ -16,11 +16,11 @@ type UpdateEmail struct {
 	ExecerDB  repository.Execer
 	QueryerDB repository.Queryer
 	Cache     domain.Cache
-	Repo      domain.UserRepo
+	UserRepo  domain.UserRepo
 }
 
 func NewUpdateEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *UpdateEmail {
-	return &UpdateEmail{ExecerDB: db, QueryerDB: db, Cache: cache, Repo: rep}
+	return &UpdateEmail{ExecerDB: db, QueryerDB: db, Cache: cache, UserRepo: rep}
 }
 
 // メール本変更サービス
@@ -32,7 +32,7 @@ func NewUpdateEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *Updat
 // error
 func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCode string) error {
 	// ユーザードメインサービス
-	userService := service.NewUserService(ue.Repo)
+	userService := service.NewUserService(ue.UserRepo)
 
 	// コンテキストよりUserIDを取得する
 	userID, _ := ctx.Get(auth.UserID)
@@ -60,7 +60,7 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	}
 
 	// DBに保存する
-	if err := ue.Repo.UpdateEmail(ctx, ue.ExecerDB, int64UserID, temporaryEmail); err != nil {
+	if err := ue.UserRepo.UpdateEmail(ctx, ue.ExecerDB, int64UserID, temporaryEmail); err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 
