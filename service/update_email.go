@@ -35,8 +35,8 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	userService := service.NewUserService(ue.UserRepo)
 
 	// コンテキストよりUserIDを取得する
-	userID, _ := ctx.Get(auth.UserID)
-	int64UserID := userID.(model.UserID)
+	uid, _ := ctx.Get(auth.UserID)
+	userID := uid.(model.UserID)
 
 	// 一時メールアドレスの復元
 	key := fmt.Sprintf("email:%s:%s", confirmCode, temporaryEmailID)
@@ -60,7 +60,7 @@ func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCo
 	}
 
 	// DBに保存する
-	if err := ue.UserRepo.UpdateEmail(ctx, ue.ExecerDB, int64UserID, temporaryEmail); err != nil {
+	if err := ue.UserRepo.UpdateEmail(ctx, ue.ExecerDB, userID, temporaryEmail); err != nil {
 		return fmt.Errorf("failed to update: %w", err)
 	}
 
