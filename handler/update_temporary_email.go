@@ -10,18 +10,18 @@ import (
 	"github.com/hack-31/point-app-backend/repository"
 )
 
-type RegisterTemporaryEmail struct {
-	Service RegisterTemporaryEmailService
+type UpdateTemporaryEmail struct {
+	Service UpdateTemporaryEmailService
 }
 
-func NewRegisterTemporaryEmailHandler(s RegisterTemporaryEmailService) *RegisterTemporaryEmail {
-	return &RegisterTemporaryEmail{Service: s}
+func NewUpdateTemporaryEmailHandler(s UpdateTemporaryEmailService) *UpdateTemporaryEmail {
+	return &UpdateTemporaryEmail{Service: s}
 }
 
 // メール仮登録ハンドラー
 //
 // @param ctx ginContext
-func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
+func (ute *UpdateTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	const mailErrTitle = "メールアドレス仮登録エラー"
 	const paramErrTitle = "パラメータエラー"
 
@@ -49,7 +49,7 @@ func (rte *RegisterTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	}
 
 	// サービス層にメール仮登録処理を依頼
-	temporaryEmailID, err := rte.Service.RegisterTemporaryEmail(ctx, input.Email)
+	temporaryEmailID, err := ute.Service.UpdateTemporaryEmail(ctx, input.Email)
 
 	// エラーレスポンスを返す
 	if err != nil {

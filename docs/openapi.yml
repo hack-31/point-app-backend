@@ -618,14 +618,14 @@ paths:
             schema:
               type: object
               properties:
-                temporaryId:
+                temporaryEmailId:
                   type: string
                   example: 8e8d0f82-89a1-4cc6-ba25-13c864ad09db
                 confirmCode:
                   type: string
                   example: 7821
       responses:
-        '204':
+        '201':
           description: 更新成功
           content:
             application/json:
@@ -635,7 +635,7 @@ paths:
                   statusCode:
                     type: integer
                     format: number
-                    example: 204
+                    example: 201
                   message:
                     type: string
                     example: "更新が完了しました。"

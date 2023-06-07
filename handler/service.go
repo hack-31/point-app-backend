@@ -47,6 +47,10 @@ type UpdateAccountService interface {
 	UpdateAccount(ctx *gin.Context, familyName, familyNameKana, firstName, firstNameKana string) error
 }
 
-type RegisterTemporaryEmailService interface {
-	RegisterTemporaryEmail(ctx *gin.Context, email string) (string, error)
+type UpdateTemporaryEmailService interface {
+	UpdateTemporaryEmail(ctx *gin.Context, email string) (string, error)
+}
+
+type UpdateEmailService interface {
+	UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCode string) error
 }
