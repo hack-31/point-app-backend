@@ -31,7 +31,7 @@ FROM golang:1.19.2-alpine3.16 AS dev
 
 WORKDIR /app
 
-RUN apk update && apk add alpine-sdk && apk add jq
+RUN apk update && apk add alpine-sdk jq mysql mysql-client
 
 RUN go install github.com/cosmtrek/air@latest \
   && go install github.com/k0kubun/sqldef/cmd/mysqldef@latest \
