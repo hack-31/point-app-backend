@@ -916,17 +916,17 @@ paths:
       description: |
         - クエリに応じた条件でお知らせ一覧を取得
       parameters:
-          - in: query
-            name: nextToken
-            schema:
-              type: integer
-            description: 次にアクセスするためのトークンキー
-          - in: query
-            name: size
-            schema:
-              type: integer
-              example: 5
-            description: 取得件数
+        - in: query
+          name: nextToken
+          schema:
+            type: integer
+          description: 次にアクセスするためのトークンキー
+        - in: query
+          name: size
+          schema:
+            type: integer
+            example: 5
+          description: 取得件数
       responses:
         '200':
           description: 成功
@@ -960,8 +960,8 @@ paths:
                               example: ポイント送付のお知らせ
                             description:
                               type: string
-                              description: 太郎から100ポイント送付されました。
-                              example: 1
+                              description: 説明
+                              example: 太郎から100ポイント送付されました。
                             isChecked:
                               type: boolean
                               description: チェックフラグ
@@ -1014,21 +1014,8 @@ paths:
           content:
             text/event-stream:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: string
-                    format: json
-                    example: "{\"count\":1}"
-                  event:
-                    type: string
-                    example: "message"
-                  retry:
-                    type: integer
-                    example: 2
-                  id:
-                    type: string
-                    example: "1"
+                type: string
+                example: "data: {\"count\":1}\n\nevent message\n\nretry: 1\n\nid: 2"
         '401':
           description: 認証失敗
           headers:
@@ -1043,19 +1030,9 @@ paths:
           content:
             text/event-stream:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: string
-                  event:
-                    type: string
-                    example: "error"
-                  retry:
-                    type: integer
-                    example: 2
-                  id:
-                    type: string
-                    example: ""
+                type: string
+                example: "data: {\"count\":1}\n\nevent error\n\nretry: 1\n\nid: 2"
+
         '500':
           description: 内部エラー
           headers:
@@ -1070,19 +1047,9 @@ paths:
           content:
             text/event-stream:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: string
-                  event:
-                    type: string
-                    example: "error"
-                  retry:
-                    type: integer
-                    example: 2
-                  id:
-                    type: string
-                    example: ""
+                type: string
+                example: "data: {\"count\":1}\n\nevent error\n\nretry: 1\n\nid: 2"
+
 
 components:
   securitySchemes:
