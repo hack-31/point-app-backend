@@ -80,6 +80,33 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *str
 	return user, nil
 }
 
+// ユーザIDでユーザが存在するか検索する
+// @params
+// ctx context
+// db dbインスタンス
+// ID ユーザID
+//
+// @returns
+// model.User ユーザ情報
+func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID model.UserID) (model.User, error) {
+	sql := `
+		SELECT *
+		FROM users
+		WHERE id = ?
+		LIMIT 1
+	`
+
+	var user model.User
+	if err := db.GetContext(ctx, &user, sql, ID); err != nil {
+		// 見つけられない時(その他のエラーも含む)
+		// 見つけられない時のエラーは利用側で
+		// errors.Is(err, sql.ErrNoRows)
+		// で判断する
+		return user, err
+	}
+	return user, nil
+}
+
 // パスワードを上書き
 // @params
 // ctx context
@@ -145,6 +172,34 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 		firstName,
 		firstNameKana,
 		email)
+	if err != nil {
+		return fmt.Errorf("failed to update DB: %w", err)
+	}
+	return nil
+}
+
+// 最新のお知らせIDを更新
+// @params
+// ctx context
+// db dbインスタンス
+// notificationID お知らせID
+//
+// @returns
+// error
+func (r *Repository) UpdateNotificationLatestIDByID(ctx context.Context, db Execer, uid model.UserID, nid model.NotificationID) error {
+	sql := `
+		UPDATE users
+		SET notification_latest_id = ?
+		WHERE id = ?
+	`
+	fmt.Println(nid, uid)
+	_, err := db.ExecContext(
+		ctx,
+		sql,
+		nid,
+		uid,
+	)
+
 	if err != nil {
 		return fmt.Errorf("failed to update DB: %w", err)
 	}
