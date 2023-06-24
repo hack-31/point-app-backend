@@ -20,4 +20,7 @@ var (
 	ErrNotUser             = errors.New("ユーザが存在しません。")
 	ErrHasNotSendablePoint = errors.New("送付可能ポイントが不足しています。")
 	ErrDifferentPassword   = errors.New("パスワードが異なります。")
+	ErrNotFound            = errors.New("データが存在しません。")
+	ErrDBException         = errors.New("データベースで予期せぬエラーが起きました。")
+	ErrCacheException      = errors.New("キャッシュで予期せぬエラーが起きました。")
 )

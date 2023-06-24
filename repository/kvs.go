@@ -86,7 +86,7 @@ func (k *KVS) Expire(ctx context.Context, key string, minitue time.Duration) err
 // payload 送信するデータ
 func (k *KVS) Publish(ctx context.Context, channel, palyload string) error {
 	if err := k.Cli.Publish(ctx, channel, palyload).Err(); err != nil {
-		return NewDBError(fmt.Errorf("failed to publish by %q: %w", channel, ErrCacheException)).WithOrign(err)
+		return fmt.Errorf("failed to publish by %q: %w", channel, err)
 	}
 	return nil
 }

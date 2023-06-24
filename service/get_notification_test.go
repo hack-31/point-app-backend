@@ -76,7 +76,7 @@ func TestGetNotification(t *testing.T) {
 				notificationID: 1,
 			},
 			checkNotification: checkNotification{
-				err: repository.NewDBError(repository.ErrDBException).WithOrign(sql.ErrConnDone),
+				err: sql.ErrConnDone,
 			},
 			getNotificationByID: getNotificationID{
 				err:          nil,
@@ -84,7 +84,7 @@ func TestGetNotification(t *testing.T) {
 			},
 			want: want{
 				notification: GetNotificationResponse{},
-				err:          repository.ErrDBException,
+				err:          sql.ErrConnDone,
 			},
 		},
 		"リポジトリに対してお知らせ詳細を取得する際、予期せぬエラーが発生した場合は、DB予期せぬエラーを返す": {
@@ -95,12 +95,12 @@ func TestGetNotification(t *testing.T) {
 				err: nil,
 			},
 			getNotificationByID: getNotificationID{
-				err:          repository.NewDBError(repository.ErrDBException).WithOrign(sql.ErrConnDone),
+				err:          sql.ErrConnDone,
 				notification: model.Notification{},
 			},
 			want: want{
 				notification: GetNotificationResponse{},
-				err:          repository.ErrDBException,
+				err:          sql.ErrConnDone,
 			},
 		},
 		"チャネルに対するpublishが失敗すると、キャッシュ予期せぬエラーとユーザ情報を返す": {
