@@ -16,6 +16,10 @@ import (
 
 func prepareUsers(ctx context.Context, t *testing.T, con Execer) model.Users {
 	t.Helper()
+	// 外部キー制約を一時的ににする
+	if _, err := con.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS=0;`); err != nil {
+		t.Logf("%v", err)
+	}
 	// 一旦データを全て削除
 	if _, err := con.ExecContext(ctx, `DELETE FROM transactions;`); err != nil {
 		t.Logf("%v", err)
@@ -112,7 +116,11 @@ func TestRepository_FindUsers(t *testing.T) {
 		// そのため、トランザクションをはることでこのテストケースの中だけのテーブル状態にする。
 		tx, err := testutil.OpenDBForTest(t).BeginTxx(ctx, nil)
 		// このテストケースが完了したらもとに戻す
-		t.Cleanup(func() { _ = tx.Rollback() })
+		t.Cleanup(func() {
+			_ = tx.Rollback()
+			// 外部キー制約を有効にする
+			_, _ = tx.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS=1`)
+		})
 		if err != nil {
 			t.Fatal(err)
 		}
