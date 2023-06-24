@@ -59,4 +59,3 @@ type UpdateEmailService interface {
 type GetNotificationService interface {
 	GetNotification(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error)
 }
-
