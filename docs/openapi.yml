@@ -1015,7 +1015,7 @@ paths:
             text/event-stream:
               schema:
                 type: string
-                example: "data: {\"count\":1}\n\nevent message\n\nretry: 1\n\nid: 2"
+                example: "data: {\"count\":1}\n\nevent message\n\n"
         '401':
           description: 認証失敗
           headers:
