@@ -8,18 +8,18 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/jmoiron/sqlx"
 )
 
 type SendPoint struct {
-	PointRepo  domain.PointRepo
-	UserRepo   domain.UserRepo
-	Connection *repository.AppConnection
-	DB         repository.Queryer
+	PointRepo        domain.PointRepo
+	UserRepo         domain.UserRepo
+	NotificationRepo domain.NotificationRepo
+	Connection       *repository.AppConnection
+	Cache            domain.Cache
 }
 
-func NewSendPoint(repo *repository.Repository, connection *repository.AppConnection, db *sqlx.DB) *SendPoint {
-	return &SendPoint{PointRepo: repo, UserRepo: repo, Connection: connection, DB: db}
+func NewSendPoint(repo *repository.Repository, connection *repository.AppConnection, cache domain.Cache) *SendPoint {
+	return &SendPoint{PointRepo: repo, UserRepo: repo, NotificationRepo: repo, Connection: connection, Cache: cache}
 }
 
 // ポイント送信サービス
@@ -41,7 +41,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	// 送付可能か残高を調べる
 	email, _ := ctx.Get(auth.Email)
 	stringMail := email.(string)
-	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.DB, &stringMail)
+	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.Connection.DB(), &stringMail)
 	if err != nil {
 		if err := sp.Connection.Rollback(); err != nil {
 			return fmt.Errorf("cannot trasanction: %w ", err)
@@ -57,7 +57,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 
 	// ポイント登録
-	if err := sp.PointRepo.RegisterPointTransaction(ctx, sp.Connection.Tx, fromUserID, model.UserID(toUserId), sendPoint); err != nil {
+	if err := sp.PointRepo.RegisterPointTransaction(ctx, sp.Connection.DB(), fromUserID, model.UserID(toUserId), sendPoint); err != nil {
 		if err := sp.Connection.Rollback(); err != nil {
 			return fmt.Errorf("cannot trasanction: %w ", err)
 		}

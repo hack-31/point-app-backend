@@ -53,7 +53,7 @@ func NewRepository(clocker clock.Clocker) *Repository {
 
 // トランザクションメソッド系類
 type Beginner interface {
-	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	BeginTxx(ctx context.Context, opts *sql.TxOptions) (*sqlx.Tx, error)
 }
 
 // 比較系メソッド類
@@ -64,8 +64,7 @@ type Preparer interface {
 // 書き込み系メソッド類
 type Execer interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
-	// NOTE: トランザクション系で利用できないから一旦コメントアウト
-	// NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
+	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
 }
 
 // 読み取り系メソッド類

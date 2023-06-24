@@ -2,15 +2,16 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type AppConnection struct {
 	// DBインスタンス
 	db Beginner
 	// トランザクションで利用するインスタンス
-	Tx *sql.Tx
+	tx *sqlx.Tx
 }
 
 // トランザクション
@@ -20,22 +21,33 @@ func NewAppConnection(db Beginner) *AppConnection {
 
 // トラザクション開始
 func (ac *AppConnection) Begin(ctx context.Context) error {
-	tx, err := ac.db.BeginTx(ctx, nil)
+	tx, err := ac.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("cannet connect transaction: %w", err)
 	}
-	ac.Tx = tx
+	ac.tx = tx
 	return nil
 }
 
 // コミット
 // トランザクションの最後に実行
 func (ac *AppConnection) Commit() error {
-	return ac.Tx.Commit()
+	if err := ac.tx.Commit(); err != nil {
+		return fmt.Errorf("cannot commit: %w ", err)
+	}
+	return nil
 }
 
 // ロールバック
 // トラザクションを開いてから、エラーが起きた時に実行する
 func (ac *AppConnection) Rollback() error {
-	return ac.Tx.Rollback()
+	if err := ac.tx.Rollback(); err != nil {
+		return fmt.Errorf("cannot rollback: %w", err)
+	}
+	return nil
+}
+
+// トランザクション用DBインスタンス
+func (ac *AppConnection) DB() *sqlx.Tx {
+	return ac.tx
 }
