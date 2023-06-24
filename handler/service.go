@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/service"
 )
 
 type RegisterUserService interface {
@@ -54,3 +55,8 @@ type UpdateTemporaryEmailService interface {
 type UpdateEmailService interface {
 	UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCode string) error
 }
+
+type GetNotificationService interface {
+	GetNotification(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error)
+}
+

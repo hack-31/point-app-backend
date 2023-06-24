@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 )
@@ -11,10 +12,12 @@ import (
 // Userに対するインターフェース
 type UserRepo interface {
 	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
+	GetUserByID(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error)
 	RegisterUser(ctx context.Context, db repository.Execer, u *model.User) error
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
 	UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 	UpdateAccount(ctx context.Context, db repository.Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error
+	UpdateNotificationLatestIDByID(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error
 	FindUsers(ctx context.Context, db repository.Queryer) (model.Users, error)
 }
 
@@ -22,6 +25,15 @@ type UserRepo interface {
 type PointRepo interface {
 	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId model.UserID, sendPoint int) error
 	UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error
+}
+
+// お知らせに対するリポジトリインターフェース
+type NotificationRepo interface {
+	CreateNotification(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error)
+	GetNotifications(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error)
+	GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error)
+	GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
+	CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error
 }
 
 // トークンに対するインターフェース
