@@ -5,11 +5,422 @@ package service
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	"sync"
 	"time"
 )
+
+// CacheMock is a mock implementation of domain.Cache.
+//
+//	func TestSomethingThatUsesCache(t *testing.T) {
+//
+//		// make and configure a mocked domain.Cache
+//		mockedCache := &CacheMock{
+//			DeleteFunc: func(ctx context.Context, key string) error {
+//				panic("mock out the Delete method")
+//			},
+//			ExpireFunc: func(ctx context.Context, key string, minitue time.Duration) error {
+//				panic("mock out the Expire method")
+//			},
+//			LoadFunc: func(ctx context.Context, key string) (string, error) {
+//				panic("mock out the Load method")
+//			},
+//			PublishFunc: func(ctx context.Context, channel string, palyload string) error {
+//				panic("mock out the Publish method")
+//			},
+//			SaveFunc: func(ctx context.Context, key string, value string, minute time.Duration) error {
+//				panic("mock out the Save method")
+//			},
+//			SubscribeFunc: func(ctx *gin.Context, channel string) (<-chan string, error) {
+//				panic("mock out the Subscribe method")
+//			},
+//		}
+//
+//		// use mockedCache in code that requires domain.Cache
+//		// and then make assertions.
+//
+//	}
+type CacheMock struct {
+	// DeleteFunc mocks the Delete method.
+	DeleteFunc func(ctx context.Context, key string) error
+
+	// ExpireFunc mocks the Expire method.
+	ExpireFunc func(ctx context.Context, key string, minitue time.Duration) error
+
+	// LoadFunc mocks the Load method.
+	LoadFunc func(ctx context.Context, key string) (string, error)
+
+	// PublishFunc mocks the Publish method.
+	PublishFunc func(ctx context.Context, channel string, palyload string) error
+
+	// SaveFunc mocks the Save method.
+	SaveFunc func(ctx context.Context, key string, value string, minute time.Duration) error
+
+	// SubscribeFunc mocks the Subscribe method.
+	SubscribeFunc func(ctx *gin.Context, channel string) (<-chan string, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// Delete holds details about calls to the Delete method.
+		Delete []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Key is the key argument value.
+			Key string
+		}
+		// Expire holds details about calls to the Expire method.
+		Expire []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Key is the key argument value.
+			Key string
+			// Minitue is the minitue argument value.
+			Minitue time.Duration
+		}
+		// Load holds details about calls to the Load method.
+		Load []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Key is the key argument value.
+			Key string
+		}
+		// Publish holds details about calls to the Publish method.
+		Publish []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Channel is the channel argument value.
+			Channel string
+			// Palyload is the palyload argument value.
+			Palyload string
+		}
+		// Save holds details about calls to the Save method.
+		Save []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Key is the key argument value.
+			Key string
+			// Value is the value argument value.
+			Value string
+			// Minute is the minute argument value.
+			Minute time.Duration
+		}
+		// Subscribe holds details about calls to the Subscribe method.
+		Subscribe []struct {
+			// Ctx is the ctx argument value.
+			Ctx *gin.Context
+			// Channel is the channel argument value.
+			Channel string
+		}
+	}
+	lockDelete    sync.RWMutex
+	lockExpire    sync.RWMutex
+	lockLoad      sync.RWMutex
+	lockPublish   sync.RWMutex
+	lockSave      sync.RWMutex
+	lockSubscribe sync.RWMutex
+}
+
+// Delete calls DeleteFunc.
+func (mock *CacheMock) Delete(ctx context.Context, key string) error {
+	if mock.DeleteFunc == nil {
+		panic("CacheMock.DeleteFunc: method is nil but Cache.Delete was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Key string
+	}{
+		Ctx: ctx,
+		Key: key,
+	}
+	mock.lockDelete.Lock()
+	mock.calls.Delete = append(mock.calls.Delete, callInfo)
+	mock.lockDelete.Unlock()
+	return mock.DeleteFunc(ctx, key)
+}
+
+// DeleteCalls gets all the calls that were made to Delete.
+// Check the length with:
+//
+//	len(mockedCache.DeleteCalls())
+func (mock *CacheMock) DeleteCalls() []struct {
+	Ctx context.Context
+	Key string
+} {
+	var calls []struct {
+		Ctx context.Context
+		Key string
+	}
+	mock.lockDelete.RLock()
+	calls = mock.calls.Delete
+	mock.lockDelete.RUnlock()
+	return calls
+}
+
+// Expire calls ExpireFunc.
+func (mock *CacheMock) Expire(ctx context.Context, key string, minitue time.Duration) error {
+	if mock.ExpireFunc == nil {
+		panic("CacheMock.ExpireFunc: method is nil but Cache.Expire was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		Key     string
+		Minitue time.Duration
+	}{
+		Ctx:     ctx,
+		Key:     key,
+		Minitue: minitue,
+	}
+	mock.lockExpire.Lock()
+	mock.calls.Expire = append(mock.calls.Expire, callInfo)
+	mock.lockExpire.Unlock()
+	return mock.ExpireFunc(ctx, key, minitue)
+}
+
+// ExpireCalls gets all the calls that were made to Expire.
+// Check the length with:
+//
+//	len(mockedCache.ExpireCalls())
+func (mock *CacheMock) ExpireCalls() []struct {
+	Ctx     context.Context
+	Key     string
+	Minitue time.Duration
+} {
+	var calls []struct {
+		Ctx     context.Context
+		Key     string
+		Minitue time.Duration
+	}
+	mock.lockExpire.RLock()
+	calls = mock.calls.Expire
+	mock.lockExpire.RUnlock()
+	return calls
+}
+
+// Load calls LoadFunc.
+func (mock *CacheMock) Load(ctx context.Context, key string) (string, error) {
+	if mock.LoadFunc == nil {
+		panic("CacheMock.LoadFunc: method is nil but Cache.Load was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Key string
+	}{
+		Ctx: ctx,
+		Key: key,
+	}
+	mock.lockLoad.Lock()
+	mock.calls.Load = append(mock.calls.Load, callInfo)
+	mock.lockLoad.Unlock()
+	return mock.LoadFunc(ctx, key)
+}
+
+// LoadCalls gets all the calls that were made to Load.
+// Check the length with:
+//
+//	len(mockedCache.LoadCalls())
+func (mock *CacheMock) LoadCalls() []struct {
+	Ctx context.Context
+	Key string
+} {
+	var calls []struct {
+		Ctx context.Context
+		Key string
+	}
+	mock.lockLoad.RLock()
+	calls = mock.calls.Load
+	mock.lockLoad.RUnlock()
+	return calls
+}
+
+// Publish calls PublishFunc.
+func (mock *CacheMock) Publish(ctx context.Context, channel string, palyload string) error {
+	if mock.PublishFunc == nil {
+		panic("CacheMock.PublishFunc: method is nil but Cache.Publish was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		Channel  string
+		Palyload string
+	}{
+		Ctx:      ctx,
+		Channel:  channel,
+		Palyload: palyload,
+	}
+	mock.lockPublish.Lock()
+	mock.calls.Publish = append(mock.calls.Publish, callInfo)
+	mock.lockPublish.Unlock()
+	return mock.PublishFunc(ctx, channel, palyload)
+}
+
+// PublishCalls gets all the calls that were made to Publish.
+// Check the length with:
+//
+//	len(mockedCache.PublishCalls())
+func (mock *CacheMock) PublishCalls() []struct {
+	Ctx      context.Context
+	Channel  string
+	Palyload string
+} {
+	var calls []struct {
+		Ctx      context.Context
+		Channel  string
+		Palyload string
+	}
+	mock.lockPublish.RLock()
+	calls = mock.calls.Publish
+	mock.lockPublish.RUnlock()
+	return calls
+}
+
+// Save calls SaveFunc.
+func (mock *CacheMock) Save(ctx context.Context, key string, value string, minute time.Duration) error {
+	if mock.SaveFunc == nil {
+		panic("CacheMock.SaveFunc: method is nil but Cache.Save was just called")
+	}
+	callInfo := struct {
+		Ctx    context.Context
+		Key    string
+		Value  string
+		Minute time.Duration
+	}{
+		Ctx:    ctx,
+		Key:    key,
+		Value:  value,
+		Minute: minute,
+	}
+	mock.lockSave.Lock()
+	mock.calls.Save = append(mock.calls.Save, callInfo)
+	mock.lockSave.Unlock()
+	return mock.SaveFunc(ctx, key, value, minute)
+}
+
+// SaveCalls gets all the calls that were made to Save.
+// Check the length with:
+//
+//	len(mockedCache.SaveCalls())
+func (mock *CacheMock) SaveCalls() []struct {
+	Ctx    context.Context
+	Key    string
+	Value  string
+	Minute time.Duration
+} {
+	var calls []struct {
+		Ctx    context.Context
+		Key    string
+		Value  string
+		Minute time.Duration
+	}
+	mock.lockSave.RLock()
+	calls = mock.calls.Save
+	mock.lockSave.RUnlock()
+	return calls
+}
+
+// Subscribe calls SubscribeFunc.
+func (mock *CacheMock) Subscribe(ctx *gin.Context, channel string) (<-chan string, error) {
+	if mock.SubscribeFunc == nil {
+		panic("CacheMock.SubscribeFunc: method is nil but Cache.Subscribe was just called")
+	}
+	callInfo := struct {
+		Ctx     *gin.Context
+		Channel string
+	}{
+		Ctx:     ctx,
+		Channel: channel,
+	}
+	mock.lockSubscribe.Lock()
+	mock.calls.Subscribe = append(mock.calls.Subscribe, callInfo)
+	mock.lockSubscribe.Unlock()
+	return mock.SubscribeFunc(ctx, channel)
+}
+
+// SubscribeCalls gets all the calls that were made to Subscribe.
+// Check the length with:
+//
+//	len(mockedCache.SubscribeCalls())
+func (mock *CacheMock) SubscribeCalls() []struct {
+	Ctx     *gin.Context
+	Channel string
+} {
+	var calls []struct {
+		Ctx     *gin.Context
+		Channel string
+	}
+	mock.lockSubscribe.RLock()
+	calls = mock.calls.Subscribe
+	mock.lockSubscribe.RUnlock()
+	return calls
+}
+
+// TokenGeneratorMock is a mock implementation of domain.TokenGenerator.
+//
+//	func TestSomethingThatUsesTokenGenerator(t *testing.T) {
+//
+//		// make and configure a mocked domain.TokenGenerator
+//		mockedTokenGenerator := &TokenGeneratorMock{
+//			GenerateTokenFunc: func(ctx context.Context, u model.User) ([]byte, error) {
+//				panic("mock out the GenerateToken method")
+//			},
+//		}
+//
+//		// use mockedTokenGenerator in code that requires domain.TokenGenerator
+//		// and then make assertions.
+//
+//	}
+type TokenGeneratorMock struct {
+	// GenerateTokenFunc mocks the GenerateToken method.
+	GenerateTokenFunc func(ctx context.Context, u model.User) ([]byte, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// GenerateToken holds details about calls to the GenerateToken method.
+		GenerateToken []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// U is the u argument value.
+			U model.User
+		}
+	}
+	lockGenerateToken sync.RWMutex
+}
+
+// GenerateToken calls GenerateTokenFunc.
+func (mock *TokenGeneratorMock) GenerateToken(ctx context.Context, u model.User) ([]byte, error) {
+	if mock.GenerateTokenFunc == nil {
+		panic("TokenGeneratorMock.GenerateTokenFunc: method is nil but TokenGenerator.GenerateToken was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		U   model.User
+	}{
+		Ctx: ctx,
+		U:   u,
+	}
+	mock.lockGenerateToken.Lock()
+	mock.calls.GenerateToken = append(mock.calls.GenerateToken, callInfo)
+	mock.lockGenerateToken.Unlock()
+	return mock.GenerateTokenFunc(ctx, u)
+}
+
+// GenerateTokenCalls gets all the calls that were made to GenerateToken.
+// Check the length with:
+//
+//	len(mockedTokenGenerator.GenerateTokenCalls())
+func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
+	Ctx context.Context
+	U   model.User
+} {
+	var calls []struct {
+		Ctx context.Context
+		U   model.User
+	}
+	mock.lockGenerateToken.RLock()
+	calls = mock.calls.GenerateToken
+	mock.lockGenerateToken.RUnlock()
+	return calls
+}
 
 // UserRepoMock is a mock implementation of domain.UserRepo.
 //
@@ -23,6 +434,9 @@ import (
 //			FindUsersFunc: func(ctx context.Context, db repository.Queryer) (model.Users, error) {
 //				panic("mock out the FindUsers method")
 //			},
+//			GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error) {
+//				panic("mock out the GetUserByID method")
+//			},
 //			RegisterUserFunc: func(ctx context.Context, db repository.Execer, u *model.User) error {
 //				panic("mock out the RegisterUser method")
 //			},
@@ -31,6 +445,9 @@ import (
 //			},
 //			UpdateEmailFunc: func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 //				panic("mock out the UpdateEmail method")
+//			},
+//			UpdateNotificationLatestIDByIDFunc: func(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error {
+//				panic("mock out the UpdateNotificationLatestIDByID method")
 //			},
 //			UpdatePasswordFunc: func(ctx context.Context, db repository.Execer, email *string, pass *string) error {
 //				panic("mock out the UpdatePassword method")
@@ -48,6 +465,9 @@ type UserRepoMock struct {
 	// FindUsersFunc mocks the FindUsers method.
 	FindUsersFunc func(ctx context.Context, db repository.Queryer) (model.Users, error)
 
+	// GetUserByIDFunc mocks the GetUserByID method.
+	GetUserByIDFunc func(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error)
+
 	// RegisterUserFunc mocks the RegisterUser method.
 	RegisterUserFunc func(ctx context.Context, db repository.Execer, u *model.User) error
 
@@ -56,6 +476,9 @@ type UserRepoMock struct {
 
 	// UpdateEmailFunc mocks the UpdateEmail method.
 	UpdateEmailFunc func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
+
+	// UpdateNotificationLatestIDByIDFunc mocks the UpdateNotificationLatestIDByID method.
+	UpdateNotificationLatestIDByIDFunc func(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error
 
 	// UpdatePasswordFunc mocks the UpdatePassword method.
 	UpdatePasswordFunc func(ctx context.Context, db repository.Execer, email *string, pass *string) error
@@ -77,6 +500,15 @@ type UserRepoMock struct {
 			Ctx context.Context
 			// Db is the db argument value.
 			Db repository.Queryer
+		}
+		// GetUserByID holds details about calls to the GetUserByID method.
+		GetUserByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// ID is the ID argument value.
+			ID model.UserID
 		}
 		// RegisterUser holds details about calls to the RegisterUser method.
 		RegisterUser []struct {
@@ -115,6 +547,17 @@ type UserRepoMock struct {
 			// NewEmail is the newEmail argument value.
 			NewEmail string
 		}
+		// UpdateNotificationLatestIDByID holds details about calls to the UpdateNotificationLatestIDByID method.
+		UpdateNotificationLatestIDByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Execer
+			// ID is the ID argument value.
+			ID model.UserID
+			// NotificationID is the notificationID argument value.
+			NotificationID model.NotificationID
+		}
 		// UpdatePassword holds details about calls to the UpdatePassword method.
 		UpdatePassword []struct {
 			// Ctx is the ctx argument value.
@@ -127,12 +570,14 @@ type UserRepoMock struct {
 			Pass *string
 		}
 	}
-	lockFindUserByEmail sync.RWMutex
-	lockFindUsers       sync.RWMutex
-	lockRegisterUser    sync.RWMutex
-	lockUpdateAccount   sync.RWMutex
-	lockUpdateEmail     sync.RWMutex
-	lockUpdatePassword  sync.RWMutex
+	lockFindUserByEmail                sync.RWMutex
+	lockFindUsers                      sync.RWMutex
+	lockGetUserByID                    sync.RWMutex
+	lockRegisterUser                   sync.RWMutex
+	lockUpdateAccount                  sync.RWMutex
+	lockUpdateEmail                    sync.RWMutex
+	lockUpdateNotificationLatestIDByID sync.RWMutex
+	lockUpdatePassword                 sync.RWMutex
 }
 
 // FindUserByEmail calls FindUserByEmailFunc.
@@ -208,6 +653,46 @@ func (mock *UserRepoMock) FindUsersCalls() []struct {
 	mock.lockFindUsers.RLock()
 	calls = mock.calls.FindUsers
 	mock.lockFindUsers.RUnlock()
+	return calls
+}
+
+// GetUserByID calls GetUserByIDFunc.
+func (mock *UserRepoMock) GetUserByID(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error) {
+	if mock.GetUserByIDFunc == nil {
+		panic("UserRepoMock.GetUserByIDFunc: method is nil but UserRepo.GetUserByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Db  repository.Queryer
+		ID  model.UserID
+	}{
+		Ctx: ctx,
+		Db:  db,
+		ID:  ID,
+	}
+	mock.lockGetUserByID.Lock()
+	mock.calls.GetUserByID = append(mock.calls.GetUserByID, callInfo)
+	mock.lockGetUserByID.Unlock()
+	return mock.GetUserByIDFunc(ctx, db, ID)
+}
+
+// GetUserByIDCalls gets all the calls that were made to GetUserByID.
+// Check the length with:
+//
+//	len(mockedUserRepo.GetUserByIDCalls())
+func (mock *UserRepoMock) GetUserByIDCalls() []struct {
+	Ctx context.Context
+	Db  repository.Queryer
+	ID  model.UserID
+} {
+	var calls []struct {
+		Ctx context.Context
+		Db  repository.Queryer
+		ID  model.UserID
+	}
+	mock.lockGetUserByID.RLock()
+	calls = mock.calls.GetUserByID
+	mock.lockGetUserByID.RUnlock()
 	return calls
 }
 
@@ -348,6 +833,50 @@ func (mock *UserRepoMock) UpdateEmailCalls() []struct {
 	mock.lockUpdateEmail.RLock()
 	calls = mock.calls.UpdateEmail
 	mock.lockUpdateEmail.RUnlock()
+	return calls
+}
+
+// UpdateNotificationLatestIDByID calls UpdateNotificationLatestIDByIDFunc.
+func (mock *UserRepoMock) UpdateNotificationLatestIDByID(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error {
+	if mock.UpdateNotificationLatestIDByIDFunc == nil {
+		panic("UserRepoMock.UpdateNotificationLatestIDByIDFunc: method is nil but UserRepo.UpdateNotificationLatestIDByID was just called")
+	}
+	callInfo := struct {
+		Ctx            context.Context
+		Db             repository.Execer
+		ID             model.UserID
+		NotificationID model.NotificationID
+	}{
+		Ctx:            ctx,
+		Db:             db,
+		ID:             ID,
+		NotificationID: notificationID,
+	}
+	mock.lockUpdateNotificationLatestIDByID.Lock()
+	mock.calls.UpdateNotificationLatestIDByID = append(mock.calls.UpdateNotificationLatestIDByID, callInfo)
+	mock.lockUpdateNotificationLatestIDByID.Unlock()
+	return mock.UpdateNotificationLatestIDByIDFunc(ctx, db, ID, notificationID)
+}
+
+// UpdateNotificationLatestIDByIDCalls gets all the calls that were made to UpdateNotificationLatestIDByID.
+// Check the length with:
+//
+//	len(mockedUserRepo.UpdateNotificationLatestIDByIDCalls())
+func (mock *UserRepoMock) UpdateNotificationLatestIDByIDCalls() []struct {
+	Ctx            context.Context
+	Db             repository.Execer
+	ID             model.UserID
+	NotificationID model.NotificationID
+} {
+	var calls []struct {
+		Ctx            context.Context
+		Db             repository.Execer
+		ID             model.UserID
+		NotificationID model.NotificationID
+	}
+	mock.lockUpdateNotificationLatestIDByID.RLock()
+	calls = mock.calls.UpdateNotificationLatestIDByID
+	mock.lockUpdateNotificationLatestIDByID.RUnlock()
 	return calls
 }
 
@@ -543,250 +1072,324 @@ func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 	return calls
 }
 
-// TokenGeneratorMock is a mock implementation of domain.TokenGenerator.
+// NotificationRepoMock is a mock implementation of domain.NotificationRepo.
 //
-//	func TestSomethingThatUsesTokenGenerator(t *testing.T) {
+//	func TestSomethingThatUsesNotificationRepo(t *testing.T) {
 //
-//		// make and configure a mocked domain.TokenGenerator
-//		mockedTokenGenerator := &TokenGeneratorMock{
-//			GenerateTokenFunc: func(ctx context.Context, u model.User) ([]byte, error) {
-//				panic("mock out the GenerateToken method")
+//		// make and configure a mocked domain.NotificationRepo
+//		mockedNotificationRepo := &NotificationRepoMock{
+//			CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
+//				panic("mock out the CheckNotification method")
+//			},
+//			CreateNotificationFunc: func(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error) {
+//				panic("mock out the CreateNotification method")
+//			},
+//			GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error) {
+//				panic("mock out the GetNotificationByID method")
+//			},
+//			GetNotificationsFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
+//				panic("mock out the GetNotifications method")
+//			},
+//			GetUncheckedNotificationCountFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
+//				panic("mock out the GetUncheckedNotificationCount method")
 //			},
 //		}
 //
-//		// use mockedTokenGenerator in code that requires domain.TokenGenerator
+//		// use mockedNotificationRepo in code that requires domain.NotificationRepo
 //		// and then make assertions.
 //
 //	}
-type TokenGeneratorMock struct {
-	// GenerateTokenFunc mocks the GenerateToken method.
-	GenerateTokenFunc func(ctx context.Context, u model.User) ([]byte, error)
+type NotificationRepoMock struct {
+	// CheckNotificationFunc mocks the CheckNotification method.
+	CheckNotificationFunc func(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error
+
+	// CreateNotificationFunc mocks the CreateNotification method.
+	CreateNotificationFunc func(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error)
+
+	// GetNotificationByIDFunc mocks the GetNotificationByID method.
+	GetNotificationByIDFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error)
+
+	// GetNotificationsFunc mocks the GetNotifications method.
+	GetNotificationsFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error)
+
+	// GetUncheckedNotificationCountFunc mocks the GetUncheckedNotificationCount method.
+	GetUncheckedNotificationCountFunc func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// GenerateToken holds details about calls to the GenerateToken method.
-		GenerateToken []struct {
+		// CheckNotification holds details about calls to the CheckNotification method.
+		CheckNotification []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
-			// U is the u argument value.
-			U model.User
+			// Db is the db argument value.
+			Db repository.Execer
+			// UID is the uid argument value.
+			UID model.UserID
+			// Nid is the nid argument value.
+			Nid model.NotificationID
+		}
+		// CreateNotification holds details about calls to the CreateNotification method.
+		CreateNotification []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Execer
+			// Notification is the notification argument value.
+			Notification model.Notification
+		}
+		// GetNotificationByID holds details about calls to the GetNotificationByID method.
+		GetNotificationByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// UID is the uid argument value.
+			UID model.UserID
+			// Nid is the nid argument value.
+			Nid model.NotificationID
+		}
+		// GetNotifications holds details about calls to the GetNotifications method.
+		GetNotifications []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// UID is the uid argument value.
+			UID model.UserID
+			// StartID is the startID argument value.
+			StartID model.NotificationID
+			// Size is the size argument value.
+			Size int
+		}
+		// GetUncheckedNotificationCount holds details about calls to the GetUncheckedNotificationCount method.
+		GetUncheckedNotificationCount []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// UID is the uid argument value.
+			UID model.UserID
 		}
 	}
-	lockGenerateToken sync.RWMutex
+	lockCheckNotification             sync.RWMutex
+	lockCreateNotification            sync.RWMutex
+	lockGetNotificationByID           sync.RWMutex
+	lockGetNotifications              sync.RWMutex
+	lockGetUncheckedNotificationCount sync.RWMutex
 }
 
-// GenerateToken calls GenerateTokenFunc.
-func (mock *TokenGeneratorMock) GenerateToken(ctx context.Context, u model.User) ([]byte, error) {
-	if mock.GenerateTokenFunc == nil {
-		panic("TokenGeneratorMock.GenerateTokenFunc: method is nil but TokenGenerator.GenerateToken was just called")
+// CheckNotification calls CheckNotificationFunc.
+func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
+	if mock.CheckNotificationFunc == nil {
+		panic("NotificationRepoMock.CheckNotificationFunc: method is nil but NotificationRepo.CheckNotification was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		U   model.User
+		Db  repository.Execer
+		UID model.UserID
+		Nid model.NotificationID
 	}{
 		Ctx: ctx,
-		U:   u,
+		Db:  db,
+		UID: uid,
+		Nid: nid,
 	}
-	mock.lockGenerateToken.Lock()
-	mock.calls.GenerateToken = append(mock.calls.GenerateToken, callInfo)
-	mock.lockGenerateToken.Unlock()
-	return mock.GenerateTokenFunc(ctx, u)
+	mock.lockCheckNotification.Lock()
+	mock.calls.CheckNotification = append(mock.calls.CheckNotification, callInfo)
+	mock.lockCheckNotification.Unlock()
+	return mock.CheckNotificationFunc(ctx, db, uid, nid)
 }
 
-// GenerateTokenCalls gets all the calls that were made to GenerateToken.
+// CheckNotificationCalls gets all the calls that were made to CheckNotification.
 // Check the length with:
 //
-//	len(mockedTokenGenerator.GenerateTokenCalls())
-func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
+//	len(mockedNotificationRepo.CheckNotificationCalls())
+func (mock *NotificationRepoMock) CheckNotificationCalls() []struct {
 	Ctx context.Context
-	U   model.User
+	Db  repository.Execer
+	UID model.UserID
+	Nid model.NotificationID
 } {
 	var calls []struct {
 		Ctx context.Context
-		U   model.User
+		Db  repository.Execer
+		UID model.UserID
+		Nid model.NotificationID
 	}
-	mock.lockGenerateToken.RLock()
-	calls = mock.calls.GenerateToken
-	mock.lockGenerateToken.RUnlock()
+	mock.lockCheckNotification.RLock()
+	calls = mock.calls.CheckNotification
+	mock.lockCheckNotification.RUnlock()
 	return calls
 }
 
-// CacheMock is a mock implementation of domain.Cache.
-//
-//	func TestSomethingThatUsesCache(t *testing.T) {
-//
-//		// make and configure a mocked domain.Cache
-//		mockedCache := &CacheMock{
-//			DeleteFunc: func(ctx context.Context, key string) error {
-//				panic("mock out the Delete method")
-//			},
-//			LoadFunc: func(ctx context.Context, key string) (string, error) {
-//				panic("mock out the Load method")
-//			},
-//			SaveFunc: func(ctx context.Context, key string, value string, minute time.Duration) error {
-//				panic("mock out the Save method")
-//			},
-//		}
-//
-//		// use mockedCache in code that requires domain.Cache
-//		// and then make assertions.
-//
-//	}
-type CacheMock struct {
-	// DeleteFunc mocks the Delete method.
-	DeleteFunc func(ctx context.Context, key string) error
-
-	// LoadFunc mocks the Load method.
-	LoadFunc func(ctx context.Context, key string) (string, error)
-
-	// SaveFunc mocks the Save method.
-	SaveFunc func(ctx context.Context, key string, value string, minute time.Duration) error
-
-	// calls tracks calls to the methods.
-	calls struct {
-		// Delete holds details about calls to the Delete method.
-		Delete []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Key is the key argument value.
-			Key string
-		}
-		// Load holds details about calls to the Load method.
-		Load []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Key is the key argument value.
-			Key string
-		}
-		// Save holds details about calls to the Save method.
-		Save []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Key is the key argument value.
-			Key string
-			// Value is the value argument value.
-			Value string
-			// Minute is the minute argument value.
-			Minute time.Duration
-		}
-	}
-	lockDelete sync.RWMutex
-	lockLoad   sync.RWMutex
-	lockSave   sync.RWMutex
-}
-
-// Delete calls DeleteFunc.
-func (mock *CacheMock) Delete(ctx context.Context, key string) error {
-	if mock.DeleteFunc == nil {
-		panic("CacheMock.DeleteFunc: method is nil but Cache.Delete was just called")
+// CreateNotification calls CreateNotificationFunc.
+func (mock *NotificationRepoMock) CreateNotification(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error) {
+	if mock.CreateNotificationFunc == nil {
+		panic("NotificationRepoMock.CreateNotificationFunc: method is nil but NotificationRepo.CreateNotification was just called")
 	}
 	callInfo := struct {
-		Ctx context.Context
-		Key string
+		Ctx          context.Context
+		Db           repository.Execer
+		Notification model.Notification
 	}{
-		Ctx: ctx,
-		Key: key,
+		Ctx:          ctx,
+		Db:           db,
+		Notification: notification,
 	}
-	mock.lockDelete.Lock()
-	mock.calls.Delete = append(mock.calls.Delete, callInfo)
-	mock.lockDelete.Unlock()
-	return mock.DeleteFunc(ctx, key)
+	mock.lockCreateNotification.Lock()
+	mock.calls.CreateNotification = append(mock.calls.CreateNotification, callInfo)
+	mock.lockCreateNotification.Unlock()
+	return mock.CreateNotificationFunc(ctx, db, notification)
 }
 
-// DeleteCalls gets all the calls that were made to Delete.
+// CreateNotificationCalls gets all the calls that were made to CreateNotification.
 // Check the length with:
 //
-//	len(mockedCache.DeleteCalls())
-func (mock *CacheMock) DeleteCalls() []struct {
-	Ctx context.Context
-	Key string
+//	len(mockedNotificationRepo.CreateNotificationCalls())
+func (mock *NotificationRepoMock) CreateNotificationCalls() []struct {
+	Ctx          context.Context
+	Db           repository.Execer
+	Notification model.Notification
 } {
 	var calls []struct {
-		Ctx context.Context
-		Key string
+		Ctx          context.Context
+		Db           repository.Execer
+		Notification model.Notification
 	}
-	mock.lockDelete.RLock()
-	calls = mock.calls.Delete
-	mock.lockDelete.RUnlock()
+	mock.lockCreateNotification.RLock()
+	calls = mock.calls.CreateNotification
+	mock.lockCreateNotification.RUnlock()
 	return calls
 }
 
-// Load calls LoadFunc.
-func (mock *CacheMock) Load(ctx context.Context, key string) (string, error) {
-	if mock.LoadFunc == nil {
-		panic("CacheMock.LoadFunc: method is nil but Cache.Load was just called")
+// GetNotificationByID calls GetNotificationByIDFunc.
+func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error) {
+	if mock.GetNotificationByIDFunc == nil {
+		panic("NotificationRepoMock.GetNotificationByIDFunc: method is nil but NotificationRepo.GetNotificationByID was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Key string
+		Db  repository.Queryer
+		UID model.UserID
+		Nid model.NotificationID
 	}{
 		Ctx: ctx,
-		Key: key,
+		Db:  db,
+		UID: uid,
+		Nid: nid,
 	}
-	mock.lockLoad.Lock()
-	mock.calls.Load = append(mock.calls.Load, callInfo)
-	mock.lockLoad.Unlock()
-	return mock.LoadFunc(ctx, key)
+	mock.lockGetNotificationByID.Lock()
+	mock.calls.GetNotificationByID = append(mock.calls.GetNotificationByID, callInfo)
+	mock.lockGetNotificationByID.Unlock()
+	return mock.GetNotificationByIDFunc(ctx, db, uid, nid)
 }
 
-// LoadCalls gets all the calls that were made to Load.
+// GetNotificationByIDCalls gets all the calls that were made to GetNotificationByID.
 // Check the length with:
 //
-//	len(mockedCache.LoadCalls())
-func (mock *CacheMock) LoadCalls() []struct {
+//	len(mockedNotificationRepo.GetNotificationByIDCalls())
+func (mock *NotificationRepoMock) GetNotificationByIDCalls() []struct {
 	Ctx context.Context
-	Key string
+	Db  repository.Queryer
+	UID model.UserID
+	Nid model.NotificationID
 } {
 	var calls []struct {
 		Ctx context.Context
-		Key string
+		Db  repository.Queryer
+		UID model.UserID
+		Nid model.NotificationID
 	}
-	mock.lockLoad.RLock()
-	calls = mock.calls.Load
-	mock.lockLoad.RUnlock()
+	mock.lockGetNotificationByID.RLock()
+	calls = mock.calls.GetNotificationByID
+	mock.lockGetNotificationByID.RUnlock()
 	return calls
 }
 
-// Save calls SaveFunc.
-func (mock *CacheMock) Save(ctx context.Context, key string, value string, minute time.Duration) error {
-	if mock.SaveFunc == nil {
-		panic("CacheMock.SaveFunc: method is nil but Cache.Save was just called")
+// GetNotifications calls GetNotificationsFunc.
+func (mock *NotificationRepoMock) GetNotifications(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
+	if mock.GetNotificationsFunc == nil {
+		panic("NotificationRepoMock.GetNotificationsFunc: method is nil but NotificationRepo.GetNotifications was just called")
 	}
 	callInfo := struct {
-		Ctx    context.Context
-		Key    string
-		Value  string
-		Minute time.Duration
+		Ctx     context.Context
+		Db      repository.Queryer
+		UID     model.UserID
+		StartID model.NotificationID
+		Size    int
 	}{
-		Ctx:    ctx,
-		Key:    key,
-		Value:  value,
-		Minute: minute,
+		Ctx:     ctx,
+		Db:      db,
+		UID:     uid,
+		StartID: startID,
+		Size:    size,
 	}
-	mock.lockSave.Lock()
-	mock.calls.Save = append(mock.calls.Save, callInfo)
-	mock.lockSave.Unlock()
-	return mock.SaveFunc(ctx, key, value, minute)
+	mock.lockGetNotifications.Lock()
+	mock.calls.GetNotifications = append(mock.calls.GetNotifications, callInfo)
+	mock.lockGetNotifications.Unlock()
+	return mock.GetNotificationsFunc(ctx, db, uid, startID, size)
 }
 
-// SaveCalls gets all the calls that were made to Save.
+// GetNotificationsCalls gets all the calls that were made to GetNotifications.
 // Check the length with:
 //
-//	len(mockedCache.SaveCalls())
-func (mock *CacheMock) SaveCalls() []struct {
-	Ctx    context.Context
-	Key    string
-	Value  string
-	Minute time.Duration
+//	len(mockedNotificationRepo.GetNotificationsCalls())
+func (mock *NotificationRepoMock) GetNotificationsCalls() []struct {
+	Ctx     context.Context
+	Db      repository.Queryer
+	UID     model.UserID
+	StartID model.NotificationID
+	Size    int
 } {
 	var calls []struct {
-		Ctx    context.Context
-		Key    string
-		Value  string
-		Minute time.Duration
+		Ctx     context.Context
+		Db      repository.Queryer
+		UID     model.UserID
+		StartID model.NotificationID
+		Size    int
 	}
-	mock.lockSave.RLock()
-	calls = mock.calls.Save
-	mock.lockSave.RUnlock()
+	mock.lockGetNotifications.RLock()
+	calls = mock.calls.GetNotifications
+	mock.lockGetNotifications.RUnlock()
+	return calls
+}
+
+// GetUncheckedNotificationCount calls GetUncheckedNotificationCountFunc.
+func (mock *NotificationRepoMock) GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
+	if mock.GetUncheckedNotificationCountFunc == nil {
+		panic("NotificationRepoMock.GetUncheckedNotificationCountFunc: method is nil but NotificationRepo.GetUncheckedNotificationCount was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Db  repository.Queryer
+		UID model.UserID
+	}{
+		Ctx: ctx,
+		Db:  db,
+		UID: uid,
+	}
+	mock.lockGetUncheckedNotificationCount.Lock()
+	mock.calls.GetUncheckedNotificationCount = append(mock.calls.GetUncheckedNotificationCount, callInfo)
+	mock.lockGetUncheckedNotificationCount.Unlock()
+	return mock.GetUncheckedNotificationCountFunc(ctx, db, uid)
+}
+
+// GetUncheckedNotificationCountCalls gets all the calls that were made to GetUncheckedNotificationCount.
+// Check the length with:
+//
+//	len(mockedNotificationRepo.GetUncheckedNotificationCountCalls())
+func (mock *NotificationRepoMock) GetUncheckedNotificationCountCalls() []struct {
+	Ctx context.Context
+	Db  repository.Queryer
+	UID model.UserID
+} {
+	var calls []struct {
+		Ctx context.Context
+		Db  repository.Queryer
+		UID model.UserID
+	}
+	mock.lockGetUncheckedNotificationCount.RLock()
+	calls = mock.calls.GetUncheckedNotificationCount
+	mock.lockGetUncheckedNotificationCount.RUnlock()
 	return calls
 }

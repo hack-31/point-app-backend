@@ -16,8 +16,8 @@ import (
 //
 //		// make and configure a mocked repository.Beginner
 //		mockedBeginner := &BeginnerMock{
-//			BeginTxFunc: func(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
-//				panic("mock out the BeginTx method")
+//			BeginTxxFunc: func(ctx context.Context, opts *sql.TxOptions) (*sqlx.Tx, error) {
+//				panic("mock out the BeginTxx method")
 //			},
 //		}
 //
@@ -26,26 +26,26 @@ import (
 //
 //	}
 type BeginnerMock struct {
-	// BeginTxFunc mocks the BeginTx method.
-	BeginTxFunc func(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	// BeginTxxFunc mocks the BeginTxx method.
+	BeginTxxFunc func(ctx context.Context, opts *sql.TxOptions) (*sqlx.Tx, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// BeginTx holds details about calls to the BeginTx method.
-		BeginTx []struct {
+		// BeginTxx holds details about calls to the BeginTxx method.
+		BeginTxx []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Opts is the opts argument value.
 			Opts *sql.TxOptions
 		}
 	}
-	lockBeginTx sync.RWMutex
+	lockBeginTxx sync.RWMutex
 }
 
-// BeginTx calls BeginTxFunc.
-func (mock *BeginnerMock) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error) {
-	if mock.BeginTxFunc == nil {
-		panic("BeginnerMock.BeginTxFunc: method is nil but Beginner.BeginTx was just called")
+// BeginTxx calls BeginTxxFunc.
+func (mock *BeginnerMock) BeginTxx(ctx context.Context, opts *sql.TxOptions) (*sqlx.Tx, error) {
+	if mock.BeginTxxFunc == nil {
+		panic("BeginnerMock.BeginTxxFunc: method is nil but Beginner.BeginTxx was just called")
 	}
 	callInfo := struct {
 		Ctx  context.Context
@@ -54,17 +54,17 @@ func (mock *BeginnerMock) BeginTx(ctx context.Context, opts *sql.TxOptions) (*sq
 		Ctx:  ctx,
 		Opts: opts,
 	}
-	mock.lockBeginTx.Lock()
-	mock.calls.BeginTx = append(mock.calls.BeginTx, callInfo)
-	mock.lockBeginTx.Unlock()
-	return mock.BeginTxFunc(ctx, opts)
+	mock.lockBeginTxx.Lock()
+	mock.calls.BeginTxx = append(mock.calls.BeginTxx, callInfo)
+	mock.lockBeginTxx.Unlock()
+	return mock.BeginTxxFunc(ctx, opts)
 }
 
-// BeginTxCalls gets all the calls that were made to BeginTx.
+// BeginTxxCalls gets all the calls that were made to BeginTxx.
 // Check the length with:
 //
-//	len(mockedBeginner.BeginTxCalls())
-func (mock *BeginnerMock) BeginTxCalls() []struct {
+//	len(mockedBeginner.BeginTxxCalls())
+func (mock *BeginnerMock) BeginTxxCalls() []struct {
 	Ctx  context.Context
 	Opts *sql.TxOptions
 } {
@@ -72,9 +72,9 @@ func (mock *BeginnerMock) BeginTxCalls() []struct {
 		Ctx  context.Context
 		Opts *sql.TxOptions
 	}
-	mock.lockBeginTx.RLock()
-	calls = mock.calls.BeginTx
-	mock.lockBeginTx.RUnlock()
+	mock.lockBeginTxx.RLock()
+	calls = mock.calls.BeginTxx
+	mock.lockBeginTxx.RUnlock()
 	return calls
 }
 
@@ -155,6 +155,9 @@ func (mock *PreparerMock) PreparexContextCalls() []struct {
 //			ExecContextFunc: func(ctx context.Context, query string, args ...any) (sql.Result, error) {
 //				panic("mock out the ExecContext method")
 //			},
+//			NamedExecContextFunc: func(ctx context.Context, query string, arg interface{}) (sql.Result, error) {
+//				panic("mock out the NamedExecContext method")
+//			},
 //		}
 //
 //		// use mockedExecer in code that requires repository.Execer
@@ -164,6 +167,9 @@ func (mock *PreparerMock) PreparexContextCalls() []struct {
 type ExecerMock struct {
 	// ExecContextFunc mocks the ExecContext method.
 	ExecContextFunc func(ctx context.Context, query string, args ...any) (sql.Result, error)
+
+	// NamedExecContextFunc mocks the NamedExecContext method.
+	NamedExecContextFunc func(ctx context.Context, query string, arg interface{}) (sql.Result, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -176,8 +182,18 @@ type ExecerMock struct {
 			// Args is the args argument value.
 			Args []any
 		}
+		// NamedExecContext holds details about calls to the NamedExecContext method.
+		NamedExecContext []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Query is the query argument value.
+			Query string
+			// Arg is the arg argument value.
+			Arg interface{}
+		}
 	}
-	lockExecContext sync.RWMutex
+	lockExecContext      sync.RWMutex
+	lockNamedExecContext sync.RWMutex
 }
 
 // ExecContext calls ExecContextFunc.
@@ -217,6 +233,46 @@ func (mock *ExecerMock) ExecContextCalls() []struct {
 	mock.lockExecContext.RLock()
 	calls = mock.calls.ExecContext
 	mock.lockExecContext.RUnlock()
+	return calls
+}
+
+// NamedExecContext calls NamedExecContextFunc.
+func (mock *ExecerMock) NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error) {
+	if mock.NamedExecContextFunc == nil {
+		panic("ExecerMock.NamedExecContextFunc: method is nil but Execer.NamedExecContext was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Query string
+		Arg   interface{}
+	}{
+		Ctx:   ctx,
+		Query: query,
+		Arg:   arg,
+	}
+	mock.lockNamedExecContext.Lock()
+	mock.calls.NamedExecContext = append(mock.calls.NamedExecContext, callInfo)
+	mock.lockNamedExecContext.Unlock()
+	return mock.NamedExecContextFunc(ctx, query, arg)
+}
+
+// NamedExecContextCalls gets all the calls that were made to NamedExecContext.
+// Check the length with:
+//
+//	len(mockedExecer.NamedExecContextCalls())
+func (mock *ExecerMock) NamedExecContextCalls() []struct {
+	Ctx   context.Context
+	Query string
+	Arg   interface{}
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Query string
+		Arg   interface{}
+	}
+	mock.lockNamedExecContext.RLock()
+	calls = mock.calls.NamedExecContext
+	mock.lockNamedExecContext.RUnlock()
 	return calls
 }
 
@@ -521,5 +577,178 @@ func (mock *QueryerMock) SelectContextCalls() []struct {
 	mock.lockSelectContext.RLock()
 	calls = mock.calls.SelectContext
 	mock.lockSelectContext.RUnlock()
+	return calls
+}
+
+// TransacterMock is a mock implementation of repository.Transacter.
+//
+//	func TestSomethingThatUsesTransacter(t *testing.T) {
+//
+//		// make and configure a mocked repository.Transacter
+//		mockedTransacter := &TransacterMock{
+//			BeginFunc: func(ctx context.Context) error {
+//				panic("mock out the Begin method")
+//			},
+//			CommitFunc: func() error {
+//				panic("mock out the Commit method")
+//			},
+//			DBFunc: func() *sqlx.Tx {
+//				panic("mock out the DB method")
+//			},
+//			RollbackFunc: func() error {
+//				panic("mock out the Rollback method")
+//			},
+//		}
+//
+//		// use mockedTransacter in code that requires repository.Transacter
+//		// and then make assertions.
+//
+//	}
+type TransacterMock struct {
+	// BeginFunc mocks the Begin method.
+	BeginFunc func(ctx context.Context) error
+
+	// CommitFunc mocks the Commit method.
+	CommitFunc func() error
+
+	// DBFunc mocks the DB method.
+	DBFunc func() *sqlx.Tx
+
+	// RollbackFunc mocks the Rollback method.
+	RollbackFunc func() error
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// Begin holds details about calls to the Begin method.
+		Begin []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
+		// Commit holds details about calls to the Commit method.
+		Commit []struct {
+		}
+		// DB holds details about calls to the DB method.
+		DB []struct {
+		}
+		// Rollback holds details about calls to the Rollback method.
+		Rollback []struct {
+		}
+	}
+	lockBegin    sync.RWMutex
+	lockCommit   sync.RWMutex
+	lockDB       sync.RWMutex
+	lockRollback sync.RWMutex
+}
+
+// Begin calls BeginFunc.
+func (mock *TransacterMock) Begin(ctx context.Context) error {
+	if mock.BeginFunc == nil {
+		panic("TransacterMock.BeginFunc: method is nil but Transacter.Begin was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockBegin.Lock()
+	mock.calls.Begin = append(mock.calls.Begin, callInfo)
+	mock.lockBegin.Unlock()
+	return mock.BeginFunc(ctx)
+}
+
+// BeginCalls gets all the calls that were made to Begin.
+// Check the length with:
+//
+//	len(mockedTransacter.BeginCalls())
+func (mock *TransacterMock) BeginCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockBegin.RLock()
+	calls = mock.calls.Begin
+	mock.lockBegin.RUnlock()
+	return calls
+}
+
+// Commit calls CommitFunc.
+func (mock *TransacterMock) Commit() error {
+	if mock.CommitFunc == nil {
+		panic("TransacterMock.CommitFunc: method is nil but Transacter.Commit was just called")
+	}
+	callInfo := struct {
+	}{}
+	mock.lockCommit.Lock()
+	mock.calls.Commit = append(mock.calls.Commit, callInfo)
+	mock.lockCommit.Unlock()
+	return mock.CommitFunc()
+}
+
+// CommitCalls gets all the calls that were made to Commit.
+// Check the length with:
+//
+//	len(mockedTransacter.CommitCalls())
+func (mock *TransacterMock) CommitCalls() []struct {
+} {
+	var calls []struct {
+	}
+	mock.lockCommit.RLock()
+	calls = mock.calls.Commit
+	mock.lockCommit.RUnlock()
+	return calls
+}
+
+// DB calls DBFunc.
+func (mock *TransacterMock) DB() *sqlx.Tx {
+	if mock.DBFunc == nil {
+		panic("TransacterMock.DBFunc: method is nil but Transacter.DB was just called")
+	}
+	callInfo := struct {
+	}{}
+	mock.lockDB.Lock()
+	mock.calls.DB = append(mock.calls.DB, callInfo)
+	mock.lockDB.Unlock()
+	return mock.DBFunc()
+}
+
+// DBCalls gets all the calls that were made to DB.
+// Check the length with:
+//
+//	len(mockedTransacter.DBCalls())
+func (mock *TransacterMock) DBCalls() []struct {
+} {
+	var calls []struct {
+	}
+	mock.lockDB.RLock()
+	calls = mock.calls.DB
+	mock.lockDB.RUnlock()
+	return calls
+}
+
+// Rollback calls RollbackFunc.
+func (mock *TransacterMock) Rollback() error {
+	if mock.RollbackFunc == nil {
+		panic("TransacterMock.RollbackFunc: method is nil but Transacter.Rollback was just called")
+	}
+	callInfo := struct {
+	}{}
+	mock.lockRollback.Lock()
+	mock.calls.Rollback = append(mock.calls.Rollback, callInfo)
+	mock.lockRollback.Unlock()
+	return mock.RollbackFunc()
+}
+
+// RollbackCalls gets all the calls that were made to Rollback.
+// Check the length with:
+//
+//	len(mockedTransacter.RollbackCalls())
+func (mock *TransacterMock) RollbackCalls() []struct {
+} {
+	var calls []struct {
+	}
+	mock.lockRollback.RLock()
+	calls = mock.calls.Rollback
+	mock.lockRollback.RUnlock()
 	return calls
 }
