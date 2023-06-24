@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
 	"github.com/hack-31/point-app-backend/config"
 )
@@ -76,4 +77,40 @@ func (k *KVS) Expire(ctx context.Context, key string, minitue time.Duration) err
 		return fmt.Errorf("failed to expire by %q: %w", key, ErrNotFoundSession)
 	}
 	return nil
+}
+
+// チャネルにパブリッシュする
+// @params
+// ctx context
+// channel チャンネル名
+// payload 送信するデータ
+func (k *KVS) Publish(ctx context.Context, channel, palyload string) error {
+	if err := k.Cli.Publish(ctx, channel, palyload).Err(); err != nil {
+		return NewDBError(fmt.Errorf("failed to publish by %q: %w", channel, ErrCacheException)).WithOrign(err)
+	}
+	return nil
+}
+
+// チャネルをサブスクライブする
+// @params
+// ctx context
+// channel チャンネル名
+//
+// @return
+// payload 送信されたら発火し、payloadが送られる
+func (k *KVS) Subscribe(ctx *gin.Context, channel string) (<-chan string, error) {
+	ch := k.Cli.Subscribe(ctx, channel).Channel()
+	payload := make(chan string)
+	go func() {
+		for {
+			select {
+			case <-ctx.Request.Context().Done():
+				close(payload)
+				return
+			case c := <-ch:
+				payload <- c.Payload
+			}
+		}
+	}()
+	return payload, nil
 }

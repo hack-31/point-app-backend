@@ -34,4 +34,7 @@ type Cache interface {
 	Save(ctx context.Context, key, value string, minute time.Duration) error
 	Load(ctx context.Context, key string) (string, error)
 	Delete(ctx context.Context, key string) error
+	Expire(ctx context.Context, key string, minitue time.Duration) error
+	Publish(ctx context.Context, channel, palyload string) error
+	Subscribe(ctx *gin.Context, channel string) (<-chan string, error)
 }
