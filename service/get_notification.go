@@ -46,7 +46,7 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID mode
 		return GetNotificationResponse{}, err
 	}
 	// ロールバック
-	defer gn.Connection.Rollback()
+	defer func() { _ = gn.Connection.Rollback() }()
 
 	// 閲覧したので、お知らせをチェック済みとする
 	if err := gn.NotifRepo.CheckNotification(ctx, gn.Connection.DB(), userID, notificationID); err != nil {

@@ -38,7 +38,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	if err := sp.Connection.Begin(ctx); err != nil {
 		return fmt.Errorf("cannot trasanction: %w ", err)
 	}
-	defer sp.Connection.Rollback()
+	defer func() { _ = sp.Connection.Rollback() }()
 
 	// 送付可能か残高を調べる
 	email, _ := ctx.Get(auth.Email)
