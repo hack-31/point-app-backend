@@ -6,8 +6,9 @@ package service
 import (
 	"context"
 	"database/sql"
-	"github.com/jmoiron/sqlx"
 	"sync"
+
+	"github.com/jmoiron/sqlx"
 )
 
 // BeginnerMock is a mock implementation of repository.Beginner.

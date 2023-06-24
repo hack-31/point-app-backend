@@ -5,11 +5,12 @@ package service
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
-	"sync"
-	"time"
 )
 
 // CacheMock is a mock implementation of domain.Cache.
