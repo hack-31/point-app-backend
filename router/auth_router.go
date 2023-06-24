@@ -77,5 +77,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	updateEmailHandler := handler.NewUpdateEmailHandler(updateEmailService)
 	groupRoute.PATCH("/email", updateEmailHandler.ServeHTTP)
 
+	notificationService := service.NewGetNotification(cache, rep, appConnection)
+	notificationHandler := handler.NewGetNotification(notificationService)
+	groupRoute.GET("/notifications/:id", notificationHandler.ServeHTTP)
+
 	return nil
 }
