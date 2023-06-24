@@ -847,6 +847,243 @@ paths:
         '500':
           $ref: '#/components/responses/500Error'    
 
+  /notifications/{notificationId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - お知らせ
+      summary: お知らせ詳細取得
+      description: |
+        - パスパラメータに指定されたお知らせIDのお知らせ詳細を取得する
+      parameters:
+        - in: path
+          name: notificationId
+          schema:
+            type: integer
+          required: true
+          example: 1
+          description: お知らせID(1以上の値)
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "お知らせ情報の取得に成功しました。"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: お知らせID
+                        example: 1
+                      title:
+                        type: string
+                        example: ポイント送付のお知らせ
+                      isChecked:
+                        type: boolean
+                        example: true
+                      description:
+                        type: string
+                        example: 斉藤さんよりポイントが100ポイント送付されました。
+                      createdAt:
+                        type: string
+                        description: 8888/88/88 88:88:88の形式
+                        example: 2022/12/08 11:08:08
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'    
+
+  /notifications:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - お知らせ
+      summary: お知らせ一覧取得
+      description: |
+        - クエリに応じた条件でお知らせ一覧を取得
+      parameters:
+          - in: query
+            name: nextToken
+            schema:
+              type: integer
+            description: 次にアクセスするためのトークンキー
+          - in: query
+            name: size
+            schema:
+              type: integer
+              example: 5
+            description: 取得件数
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    format: number
+                    example: 200
+                  message:
+                    type: string
+                    example: "お知らせ情報の取得に成功しました。"
+                  data:
+                    type: object
+                    properties:
+                      notifications:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              description: お知らせID
+                              example: 1
+                            title:
+                              type: string
+                              description: タイトル
+                              example: ポイント送付のお知らせ
+                            description:
+                              type: string
+                              description: 太郎から100ポイント送付されました。
+                              example: 1
+                            isChecked:
+                              type: boolean
+                              description: チェックフラグ
+                              example: false
+                      nextToken:
+                        type: integer
+                        description: 次の件数を取得するためのトークン
+                        example: 100
+        '401':
+          $ref: '#/components/responses/401UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+
+  /unchecked_notification_count:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - お知らせ
+      summary: 未読のお知らせ数取得
+      description: |
+        - 未読のお知らせ数を通知
+        - SSEを利用したプッシュ通知対応
+      parameters:
+        - in: header
+          name: Accept
+          schema:
+            type: string
+            example: text/event-stream
+          required: true
+        - in: header
+          name: Connection
+          schema:
+            type: string
+            example: keep-alive
+          required: true
+      responses:
+        '200':
+          description: 成功
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    format: json
+                    example: "{\"count\":1}"
+                  event:
+                    type: string
+                    example: "message"
+                  retry:
+                    type: integer
+                    example: 2
+                  id:
+                    type: string
+                    example: "1"
+        '401':
+          description: 認証失敗
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                  event:
+                    type: string
+                    example: "error"
+                  retry:
+                    type: integer
+                    example: 2
+                  id:
+                    type: string
+                    example: ""
+        '500':
+          description: 内部エラー
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: no-cache
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                  event:
+                    type: string
+                    example: "error"
+                  retry:
+                    type: integer
+                    example: 2
+                  id:
+                    type: string
+                    example: ""
+
 components:
   securitySchemes:
     bearerAuth:
@@ -893,6 +1130,25 @@ components:
               message: 
                 type: string
                 example: "認証が失敗しました。再ログインしてください。"
+
+    404Error:
+      description: |
+        データ存在しない
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: int64
+                example: "404"
+              title: 
+                type: string
+                example: "データが存在しない"
+              message: 
+                type: string
+                example: "データが存在しません。"
 
     500Error:
       description: |
