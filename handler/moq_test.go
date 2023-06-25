@@ -929,3 +929,81 @@ func (mock *GetNotificationServiceMock) GetNotificationCalls() []struct {
 	mock.lockGetNotification.RUnlock()
 	return calls
 }
+
+// Ensure, that GetNotificationsServiceMock does implement GetNotificationsService.
+// If this is not the case, regenerate this file with moq.
+var _ GetNotificationsService = &GetNotificationsServiceMock{}
+
+// GetNotificationsServiceMock is a mock implementation of GetNotificationsService.
+//
+//	func TestSomethingThatUsesGetNotificationsService(t *testing.T) {
+//
+//		// make and configure a mocked GetNotificationsService
+//		mockedGetNotificationsService := &GetNotificationsServiceMock{
+//			GetNotificationsFunc: func(ctx *gin.Context, nextToken string, size string) (service.GetNotificationsResponse, error) {
+//				panic("mock out the GetNotifications method")
+//			},
+//		}
+//
+//		// use mockedGetNotificationsService in code that requires GetNotificationsService
+//		// and then make assertions.
+//
+//	}
+type GetNotificationsServiceMock struct {
+	// GetNotificationsFunc mocks the GetNotifications method.
+	GetNotificationsFunc func(ctx *gin.Context, nextToken string, size string) (service.GetNotificationsResponse, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// GetNotifications holds details about calls to the GetNotifications method.
+		GetNotifications []struct {
+			// Ctx is the ctx argument value.
+			Ctx *gin.Context
+			// NextToken is the nextToken argument value.
+			NextToken string
+			// Size is the size argument value.
+			Size string
+		}
+	}
+	lockGetNotifications sync.RWMutex
+}
+
+// GetNotifications calls GetNotificationsFunc.
+func (mock *GetNotificationsServiceMock) GetNotifications(ctx *gin.Context, nextToken string, size string) (service.GetNotificationsResponse, error) {
+	if mock.GetNotificationsFunc == nil {
+		panic("GetNotificationsServiceMock.GetNotificationsFunc: method is nil but GetNotificationsService.GetNotifications was just called")
+	}
+	callInfo := struct {
+		Ctx       *gin.Context
+		NextToken string
+		Size      string
+	}{
+		Ctx:       ctx,
+		NextToken: nextToken,
+		Size:      size,
+	}
+	mock.lockGetNotifications.Lock()
+	mock.calls.GetNotifications = append(mock.calls.GetNotifications, callInfo)
+	mock.lockGetNotifications.Unlock()
+	return mock.GetNotificationsFunc(ctx, nextToken, size)
+}
+
+// GetNotificationsCalls gets all the calls that were made to GetNotifications.
+// Check the length with:
+//
+//	len(mockedGetNotificationsService.GetNotificationsCalls())
+func (mock *GetNotificationsServiceMock) GetNotificationsCalls() []struct {
+	Ctx       *gin.Context
+	NextToken string
+	Size      string
+} {
+	var calls []struct {
+		Ctx       *gin.Context
+		NextToken string
+		Size      string
+	}
+	mock.lockGetNotifications.RLock()
+	calls = mock.calls.GetNotifications
+	mock.lockGetNotifications.RUnlock()
+	return calls
+}
