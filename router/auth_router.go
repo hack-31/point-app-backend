@@ -81,5 +81,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	notificationHandler := handler.NewGetNotification(notificationService)
 	groupRoute.GET("/notifications/:id", notificationHandler.ServeHTTP)
 
+	notificationsService := service.NewGetNotifications(db, rep)
+	notificationsHandler := handler.NewGetNotifications(notificationsService)
+	groupRoute.GET("/notifications", notificationsHandler.ServeHTTP)
+
 	return nil
 }
