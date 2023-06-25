@@ -79,7 +79,9 @@ moq: ## Generate mock
 					SignoutService \
 					GetAccountService \
 					UpdateTemporaryEmailService \
-					GetNotificationService
+					GetNotificationService \
+					GetNotificationsService 
+
 	# リポジトリのモック生成
 	moq -out ./service/moq_test.go -skip-ensure -pkg service ./domain \
 					Cache \
