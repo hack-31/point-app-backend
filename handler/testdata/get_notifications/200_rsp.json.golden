@@ -1,0 +1,15 @@
+{
+  "statusCode": 200,
+  "message": "取得に成功しました。",
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "title": "ポイント送付のお知らせ",
+        "description": "太郎から100ポイント送付されました。",
+        "isChecked": false
+      }
+    ],
+    "nextToken": 100
+  }
+}
