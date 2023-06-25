@@ -59,3 +59,8 @@ type UpdateEmailService interface {
 type GetNotificationService interface {
 	GetNotification(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error)
 }
+
+type GetNotificationsService interface {
+	GetNotifications(ctx *gin.Context, nextToken, size string) (service.GetNotificationsResponse, error)
+}
+
