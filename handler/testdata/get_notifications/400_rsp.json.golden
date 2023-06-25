@@ -1,0 +1,5 @@
+{
+  "statusCode": 400,
+  "title": "お知らせ一覧取得エラー",
+  "message": "size: must be an integer number."
+}
