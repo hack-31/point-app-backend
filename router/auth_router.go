@@ -85,5 +85,9 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	notificationsHandler := handler.NewGetNotifications(notificationsService)
 	groupRoute.GET("/notifications", notificationsHandler.ServeHTTP)
 
+	uncheckedNotificationCountService := service.NewGetUncheckedNotificationCount(db, cache, rep)
+	uncheckedNotificationsHandler := handler.NewGetUncheckedNotificationCount(uncheckedNotificationCountService)
+	groupRoute.GET("/unchecked_notification_count", uncheckedNotificationsHandler.ServeHTTP)
+
 	return nil
 }
