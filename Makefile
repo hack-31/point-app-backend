@@ -84,13 +84,13 @@ moq: ## Generate mock
 					GetUncheckedNotificationCountService
 
 	# リポジトリのモック生成
-	moq -out ./service/moq_test.go -skip-ensure -pkg service ./domain \
+	moq -fmt goimports -out ./service/moq_test.go -skip-ensure -pkg service ./domain \
 					Cache \
 					TokenGenerator \
 					UserRepo \
 					PointRepo \
 					NotificationRepo
-	moq -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer Transacter
+	moq -fmt goimports -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer Transacter
 
 
 test: ## テスト
