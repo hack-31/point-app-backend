@@ -63,3 +63,7 @@ type GetNotificationService interface {
 type GetNotificationsService interface {
 	GetNotifications(ctx *gin.Context, nextToken, size string) (service.GetNotificationsResponse, error)
 }
+
+type GetUncheckedNotificationCountService interface {
+	GetUncheckedNotificationCount(ctx *gin.Context, notificationCntChan chan<- int) (int, error)
+}
