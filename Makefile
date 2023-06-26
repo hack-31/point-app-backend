@@ -80,7 +80,8 @@ moq: ## Generate mock
 					GetAccountService \
 					UpdateTemporaryEmailService \
 					GetNotificationService \
-					GetNotificationsService 
+					GetNotificationsService \
+					GetUncheckedNotificationCountService
 
 	# リポジトリのモック生成
 	moq -out ./service/moq_test.go -skip-ensure -pkg service ./domain \
