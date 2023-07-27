@@ -20,14 +20,11 @@ println(result)
 
 2. 送信したメールを確認
 
-コンテナ内かホスト内かで、コマンドが異なる
 また、ホスト側で確認する際は、[jq](https://formulae.brew.sh/formula/jq)を入れる必要がある
 
 ```sh
-# ホスト
-$ make read-mail-h
-# コンテナ
-$ make read-mail-c 
+# メールを確認
+$ make rdm
 ```
 
 実行結果は以下となり、一番下がユーザに送られたメールの内容になる
