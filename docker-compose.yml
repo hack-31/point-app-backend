@@ -8,6 +8,7 @@ services:
     volumes:
       - ./:/app
     environment:
+      CONTAINER_ENV: true
       GO_ENV: development
       DB_HOST: db
       DB_PORT: 3306
@@ -25,6 +26,7 @@ services:
     tty: true
     ports:
       - 8081:80
+    command: air
     depends_on:
       db:
         condition: service_healthy
