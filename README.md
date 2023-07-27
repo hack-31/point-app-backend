@@ -15,17 +15,16 @@ $ make build-up
 # コンテナの中に入る
 $ make in
 # マイグレーション適用
-$ maae migrate
-# サーバー起動
-$ air
+$ make migrate
+$ make seed
+# コンテナを抜ける
+$ exit
+# サーバーログ
+$ make log
 
 # ２回目位以降
 $ make up
-$ make serve
-# or
-$ make up
-$ make in 
-$ air
+$ make log
 ```
 
 詳しくは、makeコマンドを実行
@@ -55,8 +54,8 @@ dev containerでの開発方法
 ```sh
 # フォーマッター
 $ make format
-# リンター
-$ make linter
+# リンター(フォーマッターを事前)
+$ make lint
 ```
 
 
@@ -71,8 +70,6 @@ $ maek test
 より詳細なテストのカバレッジを表示したい場合は以下のコマンドを実行
 
 ```sh
-# coverage.htmlの作成(コンテナ内)
-$ make mc
 # ブラウザで表示(ホスト側)
 $ make wc
 ```
@@ -180,6 +177,13 @@ $ docker image build \
 $ aws ecr --region ap-northeast-1 get-login-password | docker login --username AWS --password-stdin ${ECR_REGISTRY}/point-app-backend
 # ECR push
 $ docker image push -a ${ECR_REGISTRY}/point-app-backend
+```
+
+makeコマンドを利用する場合は、以下の2つでデプロイ可能
+
+```sh
+$ make build
+$ make push
 ```
 
 ECRにデプロイされると、latestタグの更新がトリガーとなり、codepipelineによってECSにデプロイが走ります。
