@@ -3,15 +3,14 @@ package service
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"net/http/httptest"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUpdateTemporaryEmail(t *testing.T) {
@@ -88,12 +87,8 @@ func TestUpdateTemporaryEmail(t *testing.T) {
 			gotTemporaryEmailId, gotErr := ute.UpdateTemporaryEmail(ctx, tt.input.email)
 
 			// アサーション
-			if !errors.Is(gotErr, tt.wants.err) {
-				t.Errorf("%s error\nwant: %+v\ngot: %+v\n", t.Name(), gotErr, tt.wants.err)
-			}
-			if d := cmp.Diff(gotTemporaryEmailId, tt.wants.temporaryEmailId); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
+			assert.ErrorIs(t, gotErr, tt.wants.err)
+			assert.Equal(t, tt.wants.temporaryEmailId, gotTemporaryEmailId)
 		})
 	}
 }

@@ -7,11 +7,11 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
 )
 
 func prepareUsers(ctx context.Context, t *testing.T, con Execer) model.Users {
@@ -93,13 +93,11 @@ func prepareUsers(ctx context.Context, t *testing.T, con Execer) model.Users {
 		users[1].FirstName, users[1].FirstNameKana, users[1].FamilyName, users[1].FamilyNameKana, users[1].Email, users[1].Password, users[1].SendingPoint, users[1].CreatedAt, users[1].UpdateAt,
 		users[2].FirstName, users[2].FirstNameKana, users[2].FamilyName, users[2].FamilyNameKana, users[2].Email, users[2].Password, users[2].SendingPoint, users[2].CreatedAt, users[2].UpdateAt,
 	)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
+
 	id, err := result.LastInsertId()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
+
 	wants[0].ID = model.UserID(id)
 	wants[1].ID = model.UserID(id + 1)
 	wants[2].ID = model.UserID(id + 2)
@@ -121,9 +119,7 @@ func TestRepository_FindUsers(t *testing.T) {
 			// 外部キー制約を有効にする
 			_, _ = tx.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS=1`)
 		})
-		if err != nil {
-			t.Fatal(err)
-		}
+		assert.NoError(t, err)
 
 		wants := prepareUsers(ctx, t, tx)
 
@@ -132,12 +128,8 @@ func TestRepository_FindUsers(t *testing.T) {
 		gots, err := r.FindUsers(ctx, tx)
 
 		// アサーション
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if d := cmp.Diff(gots, wants); len(d) != 0 {
-			t.Errorf("differs: (-got +want)\n%s", d)
-		}
+		assert.Nil(t, err)
+		assert.Equal(t, wants, gots)
 	})
 }
 
@@ -158,9 +150,8 @@ func TestRepository_RegisterUser(t *testing.T) {
 		}
 
 		db, mock, err := sqlmock.New()
-		if err != nil {
-			t.Fatal(err)
-		}
+		assert.NoError(t, err)
+
 		t.Cleanup(func() { _ = db.Close() })
 
 		var wantID int64 = 10
@@ -188,11 +179,8 @@ func TestRepository_RegisterUser(t *testing.T) {
 		xdb := sqlx.NewDb(db, "mysql")
 		r := &Repository{Clocker: c}
 
-		if err := r.RegisterUser(ctx, xdb, okUser); err != nil {
-			t.Errorf("want no error, but got %v", err)
-		}
-		if d := cmp.Diff(okUser.ID, model.UserID(wantID)); len(d) != 0 {
-			t.Errorf("differs: (-got +want)\n%s", d)
-		}
+		err = r.RegisterUser(ctx, xdb, okUser)
+		assert.NoError(t, err)
+		assert.Equal(t, model.UserID(wantID), okUser.ID)
 	})
 }

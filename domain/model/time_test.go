@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/utils/clock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTime(t *testing.T) {
@@ -35,10 +35,7 @@ func TestTime(t *testing.T) {
 		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 			got := NewTime(tt.input.time).Format()
-			// アサーション
-			if d := cmp.Diff(got, tt.want.time); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
+			assert.Equal(t, tt.want.time, got)
 		})
 	}
 }

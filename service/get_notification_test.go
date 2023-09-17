@@ -3,18 +3,17 @@ package service
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetNotification(t *testing.T) {
@@ -149,9 +148,7 @@ func TestGetNotification(t *testing.T) {
 			moqCache := &CacheMock{
 				PublishFunc: func(ctx context.Context, channel, palyload string) error {
 					wantChannel := fmt.Sprintf("notification:%d", tt.input.notificationID)
-					if d := cmp.Diff(channel, wantChannel); len(d) != 0 {
-						t.Fatalf("differs: (-got +want)\n%s", d)
-					}
+					assert.Equal(t, wantChannel, channel)
 					return tt.publish.err
 				},
 			}
@@ -169,11 +166,13 @@ func TestGetNotification(t *testing.T) {
 					return &sqlx.Tx{}
 				},
 			}
-			moqNotificationRrepo := &NotificationRepoMock{
+			moqNotificationRepo := &NotificationRepoMock{
 				CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
+					// TODO: 引数のテストも入れる
 					return tt.checkNotification.err
 				},
 				GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error) {
+					// TODO: 引数のテストも入れる
 					return tt.getNotificationByID.notification, tt.getNotificationByID.err
 				},
 			}
@@ -182,17 +181,13 @@ func TestGetNotification(t *testing.T) {
 			gn := &GetNotification{
 				Cache:      moqCache,
 				Connection: moqTranactor,
-				NotifRepo:  moqNotificationRrepo,
+				NotifRepo:  moqNotificationRepo,
 			}
 			gotNs, gotErr := gn.GetNotification(ctx, tt.input.notificationID)
 
 			// アサーション
-			if !errors.Is(gotErr, tt.want.err) {
-				t.Errorf("%s error\nwant: %+v\ngot: %+v\n", t.Name(), gotErr, tt.want.err)
-			}
-			if d := cmp.Diff(gotNs, tt.want.notification); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
+			assert.ErrorIs(t, gotErr, tt.want.err)
+			assert.Equal(t, tt.want.notification, gotNs)
 		})
 	}
 }

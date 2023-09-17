@@ -2,16 +2,15 @@ package service
 
 import (
 	"context"
-	"errors"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/utils/clock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetNotifications(t *testing.T) {
@@ -172,20 +171,14 @@ func TestGetNotifications(t *testing.T) {
 			moqQueryer := &QueryerMock{}
 			moqNotificationRepo := &NotificationRepoMock{
 				GetNotificationsFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
-					if d := cmp.Diff(startID, tt.getNotifications.startID); len(d) != 0 {
-						t.Fatalf("differs: (-got +want)\n%s", d)
-					}
-					if d := cmp.Diff(size, tt.getNotifications.size); len(d) != 0 {
-						t.Fatalf("differs: (-got +want)\n%s", d)
-					}
+					assert.Equal(t, tt.getNotifications.startID, startID)
+					assert.Equal(t, tt.getNotifications.size, size)
 					return tt.getNotifications.notifications, tt.getNotifications.err
 				},
 			}
 			moqUserRepo := &UserRepoMock{
 				GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error) {
-					if d := cmp.Diff(ID, userID); len(d) != 0 {
-						t.Fatalf("differs: (-got +want)\n%s", d)
-					}
+					assert.Equal(t, userID, ID)
 					return tt.getUserByID.user, tt.getUserByID.err
 				},
 			}
@@ -199,12 +192,8 @@ func TestGetNotifications(t *testing.T) {
 			gotNs, gotErr := gns.GetNotifications(ctx, tt.input.nextToken, tt.input.size)
 
 			// アサーション
-			if !errors.Is(gotErr, tt.want.err) {
-				t.Errorf("%s error\nwant: %+v\ngot: %+v\n", t.Name(), gotErr, tt.want.err)
-			}
-			if d := cmp.Diff(gotNs, tt.want.ns); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
+			assert.ErrorIs(t, gotErr, tt.want.err)
+			assert.Equal(t, tt.want.ns, gotNs)
 		})
 	}
 }

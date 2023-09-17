@@ -3,8 +3,8 @@ package model_test
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTemporaryUser_Join(t *testing.T) {
@@ -49,9 +49,7 @@ func TestTemporaryUser_Join(t *testing.T) {
 			)
 
 			// アサーション
-			if d := cmp.Diff(got, tt.want); len(d) != 0 {
-				t.Errorf("%s error\nwant:\n%+v\n\ngot:\n%+v\n", t.Name(), got, tt.want)
-			}
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -90,24 +88,12 @@ func TestTemporaryUser_Split(t *testing.T) {
 			gotFirstName, gotFirstNameKana, gotFamilyName, gotFamilyNameKana, gotEmail, gotPassword := tempUser.Split()
 
 			// アサーション
-			if d := cmp.Diff(gotFirstName, tt.want.firstName); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
-			if d := cmp.Diff(gotFirstNameKana, tt.want.firstNameKana); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
-			if d := cmp.Diff(gotFamilyName, tt.want.familyName); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
-			if d := cmp.Diff(gotFamilyNameKana, tt.want.familyNameKana); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
-			if d := cmp.Diff(gotPassword, tt.want.password); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
-			if d := cmp.Diff(gotEmail, tt.want.email); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
+			assert.Equal(t, tt.want.firstName, gotFirstName)
+			assert.Equal(t, tt.want.firstNameKana, gotFirstNameKana)
+			assert.Equal(t, tt.want.familyName, gotFamilyName)
+			assert.Equal(t, tt.want.familyNameKana, gotFamilyNameKana)
+			assert.Equal(t, tt.want.password, gotPassword)
+			assert.Equal(t, tt.want.email, gotEmail)
 		})
 	}
 }

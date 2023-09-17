@@ -2,14 +2,13 @@ package service
 
 import (
 	"context"
-	"errors"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/go-cmp/cmp"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -149,9 +148,7 @@ func TestRegisterUser(t *testing.T) {
 			moqRepo := &UserRepoMock{}
 			moqCache := &CacheMock{}
 			moqCache.LoadFunc = func(pctx context.Context, key string) (string, error) {
-				if ctx != pctx {
-					t.Fatalf("not want context %v", pctx)
-				}
+				assert.Equal(t, ctx, pctx)
 				return tt.tumprm.rps, tt.tumprm.err
 			}
 			moqCache.DeleteFunc = func(pctx context.Context, key string) error {
@@ -159,22 +156,14 @@ func TestRegisterUser(t *testing.T) {
 			}
 			moqTokenGenerator := &TokenGeneratorMock{}
 			moqTokenGenerator.GenerateTokenFunc = func(pctx context.Context, u model.User) ([]byte, error) {
-				if *wantUser != u {
-					t.Fatalf("not want user %v", u)
-				}
+				assert.Equal(t, *wantUser, u)
 				return tt.gtmprm.rsp, tt.gtmprm.err
 			}
 			moqRepo.RegisterUserFunc = func(pctx context.Context, db repository.Execer, user *model.User) error {
-				if ctx != pctx {
-					t.Fatalf("not want context %v", pctx)
-				}
-				if db != moqDB {
-					t.Fatalf("not want db %v", db)
-				}
 				user.ID = wantUserID
-				if d := cmp.Diff(user, tt.uaprm.in); len(d) != 0 {
-					t.Fatalf("differs: (-got +want)\n%s", d)
-				}
+				assert.Equal(t, tt.uaprm.in, user)
+				assert.Equal(t, ctx, pctx)
+				assert.Equal(t, moqDB, db)
 				return tt.uaprm.err
 			}
 			ru := &RegisterUser{
@@ -188,15 +177,9 @@ func TestRegisterUser(t *testing.T) {
 			gotUser, gotToken, gotErr := ru.RegisterUser(ctx, tt.input.temporaryUserId, tt.input.confirmCode)
 
 			// アサーション
-			if !errors.Is(gotErr, tt.wants.err) {
-				t.Errorf("%s error\nwant: %+v\ngot: %+v\n", t.Name(), gotErr, tt.wants.err)
-			}
-			if d := cmp.Diff(gotUser, tt.wants.user); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
-			if d := cmp.Diff(gotToken, tt.wants.token); len(d) != 0 {
-				t.Errorf("differs: (-got +want)\n%s", d)
-			}
+			assert.ErrorIs(t, gotErr, tt.wants.err)
+			assert.Equal(t, tt.wants.user, gotUser)
+			assert.Equal(t, tt.wants.token, gotToken)
 		})
 	}
 }
