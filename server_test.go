@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -36,25 +37,19 @@ func TestServer_Run(t *testing.T) {
 	url := fmt.Sprintf("http://localhost:%d/%s", port, in)
 	t.Logf("try request to %q", url)
 	rsp, err := http.Get(url)
-	if err != nil {
-		t.Errorf("failed to get: %+v", err)
-	}
+	assert.NoError(t, err)
 
 	defer rsp.Body.Close()
 	// レスポンス整形
 	got, err := io.ReadAll(rsp.Body)
-	if err != nil {
-		t.Fatalf("failed to read body: %v", err)
-	}
+	assert.NoError(t, err, "failed to read body")
+
 	// サーバの終了動作を検証する
 	cancel()
-	if err := eg.Wait(); err != nil {
-		t.Fatal(err)
-	}
+	err = eg.Wait()
+	assert.NoError(t, err)
 
 	// 戻り値を検証する
 	want := fmt.Sprintf("Hello, %s!", in)
-	if string(got) != want {
-		t.Errorf("want %q, but got %q", want, got)
-	}
+	assert.Equal(t, want, string(got))
 }

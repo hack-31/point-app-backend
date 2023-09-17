@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
 )
 
 // テストにおいてデータベース接続する
@@ -23,10 +24,8 @@ func OpenDBForTest(t *testing.T) *sqlx.DB {
 		"mysql",
 		fmt.Sprintf("admin:password@tcp(%s:3306)/point_app?parseTime=true&loc=Asia%%2FTokyo", host),
 	)
+	assert.NoError(t, err, "cannot open db")
 
-	if err != nil {
-		t.Fatal(err)
-	}
 	t.Cleanup(
 		func() { _ = db.Close() },
 	)
