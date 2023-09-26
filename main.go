@@ -54,9 +54,6 @@ func run(ctx context.Context) error {
 	if err = routers.SetRouting(ctx, db, router, cfg); err != nil {
 		return err
 	}
-	if err = routers.SetAuthRouting(ctx, db, router, cfg); err != nil {
-		return err
-	}
 
 	// サーバー起動
 	log.Printf("Listening and serving HTTP on :%v", cfg.Port)
