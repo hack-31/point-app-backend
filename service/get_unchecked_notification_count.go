@@ -17,7 +17,7 @@ type GetUncheckedNotificationCount struct {
 	NotifRepo domain.NotificationRepo
 }
 
-func NewGetUncheckedNotificationCount(db *sqlx.DB, cache domain.Cache, repo *repository.Repository) *GetUncheckedNotificationCount {
+func NewGetUncheckedNotificationCount(db *sqlx.DB, cache domain.Cache, repo domain.NotificationRepo) *GetUncheckedNotificationCount {
 	return &GetUncheckedNotificationCount{DB: db, Cache: cache, NotifRepo: repo}
 }
 
