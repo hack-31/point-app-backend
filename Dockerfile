@@ -38,4 +38,5 @@ RUN go install github.com/cosmtrek/air@latest \
   && go install honnef.co/go/tools/cmd/staticcheck@latest \
   && go install golang.org/x/tools/cmd/goimports@latest \
   && go install github.com/matryer/moq@latest \
-  && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+  && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest \
+  && go install github.com/google/wire/cmd/wire@latest
