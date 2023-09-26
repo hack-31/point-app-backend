@@ -142,6 +142,10 @@ wc: mc ## watch coverage カバレッジを見る（ホスト側）
 	# ブラウザで表示
 	@open ./tmp/cover.html
 
+.PHONY: wire
+wire: ## DIファイル生成
+	@wire ./router
+
 .PHONY: help
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
