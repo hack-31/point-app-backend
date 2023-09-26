@@ -8,7 +8,6 @@ import (
 	"github.com/hack-31/point-app-backend/config"
 	"github.com/hack-31/point-app-backend/handler"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/service"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
 )
@@ -43,51 +42,20 @@ func SetAuthRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *c
 	appConnection := repository.NewAppConnection(db)
 
 	// ルーティング設定
-	groupRoute := router.Group("/api/v1").Use(handler.AuthMiddleware(jwter))
+	groupRoute := router.Group("/api/v1").
+		Use(handler.AuthMiddleware(jwter))
 
-	getUsersService := service.NewGetUsers(db, rep, jwter)
-	getUsersHandler := handler.NewGetUsers(getUsersService)
-	groupRoute.GET("/users", getUsersHandler.ServeHTTP)
-
-	getAccountService := service.NewGetAccount(db, rep)
-	getUserHandler := handler.NewGetAccount(getAccountService)
-	groupRoute.GET("/account", getUserHandler.ServeHTTP)
-
-	signoutService := service.NewSignout(tokenCache)
-	signoutHandler := handler.NewSignoutHandler(signoutService)
-	groupRoute.DELETE("/signout", signoutHandler.ServeHTTP)
-
-	sendPointService := service.NewSendPoint(rep, appConnection, cache)
-	sendPointHandler := handler.NewSendPoint(sendPointService)
-	groupRoute.POST("/point_transactions", sendPointHandler.ServeHTTP)
-
-	updatePassService := service.NewUpdatePassword(db, rep)
-	updatePassHandler := handler.NewUpdatePasswordHandler(updatePassService)
-	groupRoute.PATCH("/password", updatePassHandler.ServeHTTP)
-
-	updateAccountService := service.NewUpdateAccount(db, rep)
-	updateAccountHandler := handler.NewUpdateAccountHandler(updateAccountService)
-	groupRoute.PUT("/account", updateAccountHandler.ServeHTTP)
-
-	updateTemporaryEmailService := service.NewUpdateTemporaryEmail(db, cache, rep)
-	updateTemporaryEmailHandler := handler.NewUpdateTemporaryEmailHandler(updateTemporaryEmailService)
-	groupRoute.POST("/temporary_email", updateTemporaryEmailHandler.ServeHTTP)
-
-	updateEmailService := service.NewUpdateEmail(db, cache, rep)
-	updateEmailHandler := handler.NewUpdateEmailHandler(updateEmailService)
-	groupRoute.PATCH("/email", updateEmailHandler.ServeHTTP)
-
-	notificationService := service.NewGetNotification(cache, rep, appConnection)
-	notificationHandler := handler.NewGetNotification(notificationService)
-	groupRoute.GET("/notifications/:id", notificationHandler.ServeHTTP)
-
-	notificationsService := service.NewGetNotifications(db, rep)
-	notificationsHandler := handler.NewGetNotifications(notificationsService)
-	groupRoute.GET("/notifications", notificationsHandler.ServeHTTP)
-
-	uncheckedNotificationCountService := service.NewGetUncheckedNotificationCount(db, cache, rep)
-	uncheckedNotificationsHandler := handler.NewGetUncheckedNotificationCount(uncheckedNotificationCountService)
-	groupRoute.GET("/unchecked_notification_count", uncheckedNotificationsHandler.ServeHTTP)
+	groupRoute.GET("/users", InitGetUsers(db, rep, jwter).ServeHTTP)
+	groupRoute.GET("/account", InitGetAccount(db, rep).ServeHTTP)
+	groupRoute.DELETE("/signout", InitSignout(tokenCache).ServeHTTP)
+	groupRoute.POST("/point_transactions", InitSendPoint(rep, appConnection, cache).ServeHTTP)
+	groupRoute.PATCH("/password", InitUpdatePassword(db, rep).ServeHTTP)
+	groupRoute.PUT("/account", InitUpdateAccount(db, rep).ServeHTTP)
+	groupRoute.POST("/temporary_email", InitUpdateTemporaryEmail(db, cache, rep).ServeHTTP)
+	groupRoute.PATCH("/email", InitUpdateEmail(db, cache, rep).ServeHTTP)
+	groupRoute.GET("/notifications/:id", InitGetNotification(cache, rep, appConnection).ServeHTTP)
+	groupRoute.GET("/notifications", InitGetNotifications(db, rep).ServeHTTP)
+	groupRoute.GET("/unchecked_notification_count", InitGetUncheckedNotificationCount(db, cache, rep).ServeHTTP)
 
 	return nil
 }
