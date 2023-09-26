@@ -6,9 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/config"
-	"github.com/hack-31/point-app-backend/handler"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/service"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
 )
@@ -39,25 +37,12 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	}
 
 	// ルーティング設定
-	healthCheckhandler := handler.NewHealthCheckHandler()
-	router.GET("/healthcheck", healthCheckhandler.ServeHTTP)
-
 	groupRoute := router.Group("/api/v1")
-	registerUserService := service.NewRegisterUser(db, rep, cache, jwter)
-	registerUserHandler := handler.NewRegisterUserHandler(registerUserService)
-	groupRoute.POST("/users", registerUserHandler.ServeHTTP)
-
-	registerTempUserService := service.NewRegisterTemporaryUser(db, rep, cache)
-	registerTempUserHandler := handler.NewRegisterTemporaryUserHandler(registerTempUserService)
-	groupRoute.POST("/temporary_users", registerTempUserHandler.ServeHTTP)
-
-	signinService := service.NewSignin(db, rep, cache, jwter)
-	signinHandler := handler.NewSigninHandler(signinService)
-	groupRoute.POST("/signin", signinHandler.ServeHTTP)
-
-	resetPassService := service.NewResetPassword(db, rep)
-	resetPassHandler := handler.NewResetPasswordHandler(resetPassService)
-	groupRoute.PATCH("/random_password", resetPassHandler.ServeHTTP)
+	router.GET("/healthcheck", InitHealthCheck().ServeHTTP)
+	groupRoute.POST("/users", InitRegisterUser(db, rep, cache, jwter).ServeHTTP)
+	groupRoute.POST("/temporary_users", InitRegisterTemporaryUser(db, rep, cache).ServeHTTP)
+	groupRoute.POST("/signin", InitSignin(db, rep, cache, jwter).ServeHTTP)
+	groupRoute.PATCH("/random_password", InitResetPassword(db, rep).ServeHTTP)
 
 	return nil
 }
