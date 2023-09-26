@@ -105,12 +105,22 @@ AWS cloud9の[point-app-dev](https://ap-northeast-1.console.aws.amazon.com/cloud
 $ make seed
 ```
 
+# DIツール
+　DIを行う際には、[google/wire](https://github.com/google/wire)というDIツールを使用します。新しいルーティングを追加したり、既存のルーティングのIFが変更された場合は、それに合わせて更新する必要があります。以下のコマンドで更新できます。
+
+```sh
+$ make wire
+```
+
+　`router/wire.go`は定義元のファイルであり、`router/wire_gen.go`は生成されたファイルです。実際の利用では、`router/wire_gen.go`が使用されます。
+
 # 各ディレクトリの説明
 詳しい説明は、各ディレクトリのREADME.mdに些細されているものもあります。
 - `/auth`
   - JWT認証におけるトークン作成や検証を行う処理が書かれたパッケージ
 - `/router`
   - ルーティング処理を書きます
+  - DIを行う
 - `/docs`
   - ドキュメントが配置
   - swaggerなどを修正する際は`/docs/openapi.yml`で行う
