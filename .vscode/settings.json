@@ -1,4 +1,7 @@
 {
   "editor.defaultFormatter": "golang.go",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "gopls": {
+    "build.buildFlags": ["-tags=wireinject"],
+  },
 }
