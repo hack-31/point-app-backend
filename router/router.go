@@ -41,27 +41,28 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	transacter := repository.NewAppConnection(db)
 
 	// ルーティング設定
-	rootRoute := router.Group("/api/v1")
-	publicRoute := rootRoute
-	protectRoute := publicRoute.Use(handler.AuthMiddleware(jwter))
+	r := router.Group("/api/v1")
+	authMiddleware := handler.AuthMiddleware(jwter)
 
+	// パブリック
 	router.GET("/healthcheck", InitHealthCheck().ServeHTTP)
-	publicRoute.POST("/users", InitRegisterUser(db, rep, cache, jwter).ServeHTTP)
-	publicRoute.POST("/temporary_users", InitRegisterTemporaryUser(db, rep, cache).ServeHTTP)
-	publicRoute.POST("/signin", InitSignin(db, rep, cache, jwter).ServeHTTP)
-	publicRoute.PATCH("/random_password", InitResetPassword(db, rep).ServeHTTP)
+	r.POST("/users", InitRegisterUser(db, rep, cache, jwter).ServeHTTP)
+	r.POST("/temporary_users", InitRegisterTemporaryUser(db, rep, cache).ServeHTTP)
+	r.POST("/signin", InitSignin(db, rep, cache, jwter).ServeHTTP)
+	r.PATCH("/random_password", InitResetPassword(db, rep).ServeHTTP)
 
-	protectRoute.GET("/users", InitGetUsers(db, rep, jwter).ServeHTTP)
-	protectRoute.GET("/account", InitGetAccount(db, rep).ServeHTTP)
-	protectRoute.DELETE("/signout", InitSignout(tokenCache).ServeHTTP)
-	protectRoute.POST("/point_transactions", InitSendPoint(rep, transacter, cache).ServeHTTP)
-	protectRoute.PATCH("/password", InitUpdatePassword(db, rep).ServeHTTP)
-	protectRoute.PUT("/account", InitUpdateAccount(db, rep).ServeHTTP)
-	protectRoute.POST("/temporary_email", InitUpdateTemporaryEmail(db, cache, rep).ServeHTTP)
-	protectRoute.PATCH("/email", InitUpdateEmail(db, cache, rep).ServeHTTP)
-	protectRoute.GET("/notifications/:id", InitGetNotification(cache, rep, transacter).ServeHTTP)
-	protectRoute.GET("/notifications", InitGetNotifications(db, rep).ServeHTTP)
-	protectRoute.GET("/unchecked_notification_count", InitGetUncheckedNotificationCount(db, cache, rep).ServeHTTP)
+	// プロテクト
+	r.GET("/users", authMiddleware, InitGetUsers(db, rep, jwter).ServeHTTP)
+	r.GET("/account", authMiddleware, InitGetAccount(db, rep).ServeHTTP)
+	r.DELETE("/signout", authMiddleware, InitSignout(tokenCache).ServeHTTP)
+	r.POST("/point_transactions", authMiddleware, InitSendPoint(rep, transacter, cache).ServeHTTP)
+	r.PATCH("/password", authMiddleware, InitUpdatePassword(db, rep).ServeHTTP)
+	r.PUT("/account", authMiddleware, InitUpdateAccount(db, rep).ServeHTTP)
+	r.POST("/temporary_email", authMiddleware, InitUpdateTemporaryEmail(db, cache, rep).ServeHTTP)
+	r.PATCH("/email", authMiddleware, InitUpdateEmail(db, cache, rep).ServeHTTP)
+	r.GET("/notifications/:id", authMiddleware, InitGetNotification(cache, rep, transacter).ServeHTTP)
+	r.GET("/notifications", authMiddleware, InitGetNotifications(db, rep).ServeHTTP)
+	r.GET("/unchecked_notification_count", authMiddleware, InitGetUncheckedNotificationCount(db, cache, rep).ServeHTTP)
 
 	return nil
 }
