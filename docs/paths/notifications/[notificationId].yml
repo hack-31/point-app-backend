@@ -1,0 +1,57 @@
+get:
+  security:
+    - bearerAuth: []
+  tags:
+    - お知らせ
+  summary: お知らせ詳細取得
+  description: |
+    - パスパラメータに指定されたお知らせIDのお知らせ詳細を取得する
+  parameters:
+    - in: path
+      name: notificationId
+      schema:
+        type: integer
+      required: true
+      example: 1
+      description: お知らせID(1以上の値)
+  responses:
+    '200':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "お知らせ情報の取得に成功しました。"
+              data:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: お知らせID
+                    example: 1
+                  title:
+                    type: string
+                    example: ポイント送付のお知らせ
+                  isChecked:
+                    type: boolean
+                    example: true
+                  description:
+                    type: string
+                    example: 斉藤さんよりポイントが100ポイント送付されました。
+                  createdAt:
+                    type: string
+                    description: 8888/88/88 88:88:88の形式
+                    example: 2022/12/08 11:08:08
+    '401':
+      $ref: '../../openapi.yml#/components/responses/401UnauthorizedError'
+    '404':
+      $ref: '../../openapi.yml#/components/responses/404Error'
+    '500':
+      $ref: '../../openapi.yml#/components/responses/500Error'    

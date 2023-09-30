@@ -1,0 +1,67 @@
+get:
+  security:
+    - bearerAuth: []
+  tags:
+    - お知らせ
+  summary: お知らせ一覧取得
+  description: |
+    - クエリに応じた条件でお知らせ一覧を取得
+  parameters:
+    - in: query
+      name: nextToken
+      schema:
+        type: integer
+      description: 次にアクセスするためのトークンキー
+    - in: query
+      name: size
+      schema:
+        type: integer
+        example: 5
+      description: 取得件数
+  responses:
+    '200':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "お知らせ情報の取得に成功しました。"
+              data:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: お知らせID
+                          example: 1
+                        title:
+                          type: string
+                          description: タイトル
+                          example: ポイント送付のお知らせ
+                        description:
+                          type: string
+                          description: 説明
+                          example: 太郎から100ポイント送付されました。
+                        isChecked:
+                          type: boolean
+                          description: チェックフラグ
+                          example: false
+                  nextToken:
+                    type: integer
+                    description: 次の件数を取得するためのトークン
+                    example: 100
+    '401':
+      $ref: '../openapi.yml#/components/responses/401UnauthorizedError'
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'

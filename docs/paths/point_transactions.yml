@@ -1,0 +1,86 @@
+post:
+  security:
+    - bearerAuth: []
+  tags:
+    - ポイント
+  summary: ポイントの取引
+  description: |
+    - 指定したユーザーにポイントを送付する
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            toUserId:
+              type: integer
+              example: 12345
+            sendPoint:
+              type: integer
+              example: 100
+          required:
+            - toUserId
+            - sendPoint
+  responses:
+    '201':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "ポイントの送信に成功しました。"
+              data:
+                type: object
+                example: null
+
+    '400':
+      description: |
+        送付可能ポイントの不足
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 400
+              title: 
+                type: string
+                example: "送付エラー"
+              message:
+                type: string
+                example: "送付可能ポイントが不足しています。"
+
+    '401':
+      $ref: '../openapi.yml#/components/responses/401UnauthorizedError'
+
+    '404':
+      description: |
+        送付先ユーザが存在しない
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 404
+              title: 
+                type: string
+                example: "送付エラー"
+              message:
+                type: string
+                example: "ユーザが存在しません。"
+
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'

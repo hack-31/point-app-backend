@@ -1,0 +1,78 @@
+patch:
+  security:
+    - bearerAuth: []
+  tags:
+    - アカウント
+  summary: メール本変更
+  description: |
+    - 仮変更されたメールアドレスを本更新する
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            temporaryEmailId:
+              type: string
+              example: 8e8d0f82-89a1-4cc6-ba25-13c864ad09db
+            confirmCode:
+              type: string
+              example: 7821
+  responses:
+    '201':
+      description: 更新成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 201
+              message:
+                type: string
+                example: "更新が完了しました。"
+              data:
+                type: object
+                example: null
+    '400':
+        $ref: '../openapi.yml#/components/responses/400Error'
+    '401':
+      description: |
+        確認コードまたはトークンが無効
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 401
+              title: 
+                type: string
+                example: "メールアドレス本更新エラー"
+              message:
+                type: string
+                example: "確認コードが無効です。"
+    '409':
+      description: |
+        登録済みのメールアドレス
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 409
+              title: 
+                type: string
+                example: "メールアドレス本更新エラー"
+              message:
+                type: string
+                example: "登録済みのメールアドレスは登録できません。"
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'

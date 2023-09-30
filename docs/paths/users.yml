@@ -1,0 +1,161 @@
+post:
+  tags:
+    - ユーザ登録・認証
+  summary: サインアップ(ユーザ本登録)
+  description: |
+    - ユーザーの本登録を行う
+    - 確認コードconfirmCodeは、仮登録で指定したメールアドレスに送信される
+    - 確認コードには有効期限がある
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            temporaryUserId:
+              type: string
+              example: 8e8d0f82-89a1-4cc6-ba25-13c864ad09db
+            confirmCode:
+              type: string
+              example: 7821
+  responses:
+    '201':
+      description: 本登録完了
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 201
+              message:
+                type: string
+                example: "本登録が完了しました。"
+              data: 
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 24
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzEzMDcyNjYsImlhdCI6MTY3MTMwNTQ2NiwiaXNzIjoiZ2l0aHViLmNvbS9oYWNrLTMxL3BvaW50LWFwcC1iYWNrZW5kIiwianRpIjoiZGJkNzU3MzItNzFmZC00ZDQ4LWIyNmYtMTdlNTkwMjRlNDYxIiwicm9sZSI6InlhbWFkYUBzZmRhYXNtcGxlLmNvbSIsInN1YiI6ImFjY2Vzc190b2tlbiIsInVzZXJfbmFtZSI6MzQ0fQ.cE8BtV82WELa4mE7I0V92zriMTCPS9ztzaL-SZW0zJc3oLCameUI0OPa3pCjv-_YGUF3PyDmh5NuP0cKLZE2tT68fyvskhs_RgaaY-N6_tHFHzY9d8wiMyBO4fuGyp1tFX9BwUSvzLTDynhXDMN2DeaFGBapXoFgiI0dZE215dsPgtXCSOaz536hJShWOKTPgBEJ7uVRMATKJ--g0SUomj29P4bmHPYUIQyAoZSXZH-m3oOR-Et9F_MjuTy2BwZE6SNIO6oeAbdfzIW7f1qxSjM_5T64n_X_1O_gdRP0_ebcp4s7w2y4MX5c79gYKnAolwEMY5pVEqYFf-Eeig_G4Be6Tp_xm9zHcMi_aarQ7vbPebT6KXLZn5y5a0MraG0TnnOluZo-_Os5CEwFAfaOr2Y67NIZRcnnDvX9gLfAvaapyvBfcQ8DOXjimH-MOxjGGM0RYRZ9U9QLn3NgTZkrgmvbUlJJcRuCX48PaCtRiU_GdmOOTA3LA141_sk8Ce0YUiUqmWASD0DmuPJIfkGgHbqugXPgchHMl68U6oli22BuRTal3WHg4JQPgqKTeqt9bruVTecJ5XAIzdcvLEY_Nz62jc1VX4aY8Ty6dB1zlQbbriuN78DId0qwv5aqeHzv5StKChZOayRSchu_lSZVfq7s8N4DHJxg0SgvD0qoDd8
+    '400':
+        $ref: '../openapi.yml#/components/responses/400Error'
+    '401':
+      description: |
+        確認コードまたはトークンが無効
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 401
+              title: 
+                type: string
+                example: "ユーザ本登録エラー"
+              message:
+                type: string
+                example: "確認コードまたは、トークンが無効です。"
+
+    '409':
+      description: |
+        登録済みのメールアドレス
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 409
+              title: 
+                type: string
+                example: "ユーザ本登録エラー"
+              message:
+                type: string
+                example: "登録済みのメールアドレスは登録できません。"
+
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'    
+
+get:
+  security:
+    - bearerAuth: []
+  tags:
+    - ユーザー情報
+  summary: ユーザ一覧情報取得
+  description: |
+    - ユーザ情報一覧を取得する
+  responses:
+    '200':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "取得成功しました。"
+              data:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        familyName:
+                          type: string
+                        familyNameKana:
+                          type: string
+                        firstName:
+                          type: string
+                        firstNameKana:
+                          type: string
+                        email:
+                          type: string
+                          format: email
+                        acquisitionPoint:
+                          type: number
+                        id:
+                          type: number
+                    example:
+                      - familyName: 山田
+                        familyNameKana: ヤマダ
+                        firstName: 太郎
+                        firstNameKana: タロウ
+                        email: yamada@sample.com
+                        acquisitionPoint: 200
+                        id: 1
+                      - familyName: 本郷
+                        familyNameKana: ホンゴウ
+                        firstName: 奏
+                        firstNameKana: カナタ
+                        email: hongo@sample.com
+                        acquisitionPoint: 1000000
+                        id: 2
+                      - familyName: 本田
+                        familyNameKana: ホンダ
+                        firstName: 美優
+                        firstNameKana: ミユ
+                        email: honda@sample.com
+                        acquisitionPoint: 11100
+                        id: 3
+
+    '401':
+      $ref: '../openapi.yml#/components/responses/401UnauthorizedError'
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'    

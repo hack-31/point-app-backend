@@ -1,0 +1,64 @@
+post:
+  security:
+    - bearerAuth: []
+  tags:
+    - アカウント
+  summary: メール仮変更
+  description: |
+    - メールを仮登録をする
+    - リクエストされたメールアドレスに確認コードを送信する
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              example: yamada.taro@sample.com
+  responses:
+    '201':
+      description: メールアドレス仮登録成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 201
+              message:
+                type: string
+                example: "指定のメールアドレスに確認コードを送信しました。"
+              data:
+                type: object
+                properties:
+                  temporaryEmailId:
+                    type: string
+                    example: testString
+    '401':
+      $ref: '../openapi.yml#/components/responses/401UnauthorizedError'
+    '400':
+        $ref: '../openapi.yml#/components/responses/400Error'
+    '409':
+      description: |
+        登録済みのメールアドレス
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 409
+              title: 
+                type: string
+                example: "メールアドレス仮登録エラー"
+              message:
+                type: string
+                example: "登録済みのメールアドレスは登録できません。"
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'

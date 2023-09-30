@@ -1,0 +1,72 @@
+get:
+  security:
+    - bearerAuth: []
+  tags:
+    - お知らせ
+  summary: 未読のお知らせ数取得
+  description: |
+    - 未読のお知らせ数を通知
+    - SSEを利用したプッシュ通知対応
+  parameters:
+    - in: header
+      name: Accept
+      schema:
+        type: string
+        example: text/event-stream
+      required: true
+    - in: header
+      name: Connection
+      schema:
+        type: string
+        example: keep-alive
+      required: true
+  responses:
+    '200':
+      description: 成功
+      headers:
+        Cache-Control:
+          schema:
+            type: string
+            example: no-cache
+        Connection:
+          schema:
+            type: string
+            example: keep-alive
+      content:
+        text/event-stream:
+          schema:
+            type: string
+            example: "data: {\"count\":1}\n\nevent: message\n\n"
+    '401':
+      description: 認証失敗
+      headers:
+        Cache-Control:
+          schema:
+            type: string
+            example: no-cache
+        Connection:
+          schema:
+            type: string
+            example: keep-alive
+      content:
+        text/event-stream:
+          schema:
+            type: string
+            example: "data: {\"count\":1}\n\nevent: error"
+
+    '500':
+      description: 内部エラー
+      headers:
+        Cache-Control:
+          schema:
+            type: string
+            example: no-cache
+        Connection:
+          schema:
+            type: string
+            example: keep-alive
+      content:
+        text/event-stream:
+          schema:
+            type: string
+            example: "data: {\"count\":1}\n\nevent: error"
