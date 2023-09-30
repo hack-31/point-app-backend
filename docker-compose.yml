@@ -38,6 +38,7 @@ services:
     restart: always
     volumes:
       - ./docs/openapi.yml:/usr/share/nginx/html/openapi.yml
+      - ./docs/paths:/usr/share/nginx/html/paths
     environment:
       - URL=http://localhost/openapi.yml
       - SWAGGER_JSON=./docs/openapi.yml
