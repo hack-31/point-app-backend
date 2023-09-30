@@ -4,7 +4,10 @@
 # 各構造
 
 ### openapi.yml
-- swaggerIF定義ファイル
+- swagger親IF定義ファイル
+
+### /paths
+- swaggerの各パスIF定義ファイル
 
 ### /swagger
 - swagger公開用ディレクトリ
