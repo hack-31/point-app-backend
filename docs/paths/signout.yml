@@ -1,0 +1,45 @@
+delete:
+  security:
+    - bearerAuth: []
+  tags:
+    - ユーザ登録・認証
+  summary: サインアウト
+  description: |
+    - 対象userIdのAccessTokenを削除し、ログアウト処理とする
+  responses:
+    '200':
+      description: サインアウトが成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "サインアウトが成功しました。"
+              data:
+                type: object
+                example: null
+    '404':
+      description: 無効なトークン
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 404
+              title:
+                type: string
+                example: "サインアウト"
+              message:
+                type: string
+                example: "トークンが無効です。"
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'    

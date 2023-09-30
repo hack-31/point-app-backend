@@ -1,0 +1,115 @@
+get:
+  security:
+    - bearerAuth: []
+  tags:
+    - アカウント
+  summary: アカウント情報取得
+  description: |
+    - セッションキーのユーザ情報を返却する
+  responses:
+    '200':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "アカウント情報の取得に成功しました。"
+              data:
+                type: object
+                properties:
+                  familyName:
+                    type: string
+                  userId:
+                    type: number
+                  familyNameKana:
+                    type: string
+                  firstName:
+                    type: string
+                  firstNameKana:
+                    type: string
+                  email:
+                    type: string
+                  acquisitionPoint:
+                    type: integer
+                    description: 保有ポイント
+                  sendablePoint:
+                    type: integer
+                    description: 送信可能ポイント
+                example:
+                  userId: 200
+                  familyName: 山田
+                  familyNameKana: ヤマダ
+                  firstName: 太郎
+                  firstNameKana: タロウ
+                  email: yamada@sample.com
+                  acquisitionPoint: 30000
+                  sendablePoint: 1000           
+    '401':
+      $ref: '../openapi.yml#/components/responses/401UnauthorizedError'
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'    
+
+put:
+  security:
+    - bearerAuth: []
+  tags:
+    - アカウント
+  summary: アカウント情報更新
+  description: |
+    - セッションキーのユーザ情報を更新する
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            familyName:
+              type: string
+              example: 葛飾
+            familyNameKana:
+              type: string
+              example: カツシカ
+            firstName:
+              type: string
+              example: 北斎
+            firstNameKana:
+              type: string
+              example: ホクサイ
+          required:
+            - firstName
+            - firstNameKana
+            - familyName
+            - familyNameKana
+            - email
+  responses:
+    '201':
+      description: 成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 201
+              message:
+                type: string
+                example: "アカウント情報の更新に成功しました。"           
+              data:
+                type: object
+                example: null
+    '400':
+        $ref: '../openapi.yml#/components/responses/400Error'
+    '401':
+      $ref: '../openapi.yml#/components/responses/401UnauthorizedError'
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'

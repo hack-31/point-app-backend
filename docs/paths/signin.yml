@@ -1,0 +1,66 @@
+post:
+  tags:
+    - ユーザ登録・認証
+  summary: サインイン
+  description: |
+    - メールアドレスとパスワードで認証する
+    - トークンを生成し、返却
+    - 保護されたエンドポイントのリクエストヘッダーにトークンを付与する必要がある
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              example: yamada@sample.com
+            password:
+              type: string
+              format: password
+              example: qwerty123456789
+          required:
+            - email
+            - password
+  responses:
+    '200':
+      description: 認証が成功
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 200
+              message:
+                type: string
+                example: "サインイン成功しました。"
+              data:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzEzMDcyNjYsImlhdCI6MTY3MTMwNTQ2NiwiaXNzIjoiZ2l0aHViLmNvbS9oYWNrLTMxL3BvaW50LWFwcC1iYWNrZW5kIiwianRpIjoiZGJkNzU3MzItNzFmZC00ZDQ4LWIyNmYtMTdlNTkwMjRlNDYxIiwicm9sZSI6InlhbWFkYUBzZmRhYXNtcGxlLmNvbSIsInN1YiI6ImFjY2Vzc190b2tlbiIsInVzZXJfbmFtZSI6MzQ0fQ.cE8BtV82WELa4mE7I0V92zriMTCPS9ztzaL-SZW0zJc3oLCameUI0OPa3pCjv-_YGUF3PyDmh5NuP0cKLZE2tT68fyvskhs_RgaaY-N6_tHFHzY9d8wiMyBO4fuGyp1tFX9BwUSvzLTDynhXDMN2DeaFGBapXoFgiI0dZE215dsPgtXCSOaz536hJShWOKTPgBEJ7uVRMATKJ--g0SUomj29P4bmHPYUIQyAoZSXZH-m3oOR-Et9F_MjuTy2BwZE6SNIO6oeAbdfzIW7f1qxSjM_5T64n_X_1O_gdRP0_ebcp4s7w2y4MX5c79gYKnAolwEMY5pVEqYFf-Eeig_G4Be6Tp_xm9zHcMi_aarQ7vbPebT6KXLZn5y5a0MraG0TnnOluZo-_Os5CEwFAfaOr2Y67NIZRcnnDvX9gLfAvaapyvBfcQ8DOXjimH-MOxjGGM0RYRZ9U9QLn3NgTZkrgmvbUlJJcRuCX48PaCtRiU_GdmOOTA3LA141_sk8Ce0YUiUqmWASD0DmuPJIfkGgHbqugXPgchHMl68U6oli22BuRTal3WHg4JQPgqKTeqt9bruVTecJ5XAIzdcvLEY_Nz62jc1VX4aY8Ty6dB1zlQbbriuN78DId0qwv5aqeHzv5StKChZOayRSchu_lSZVfq7s8N4DHJxg0SgvD0qoDd8
+    '401':
+      description: メールアドレス、または、パスワードが異なる
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 401
+              title:
+                type: string
+                example: "サインインエラー"
+              message:
+                type: string
+                example: "メールアドレスまたはパスワードが異なります。"
+    '500':
+      $ref: '../openapi.yml#/components/responses/500Error'    
