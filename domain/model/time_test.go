@@ -9,6 +9,7 @@ import (
 )
 
 func TestTime(t *testing.T) {
+	t.Parallel()
 	type input struct {
 		time time.Time
 	}

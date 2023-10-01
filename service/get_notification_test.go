@@ -17,6 +17,7 @@ import (
 )
 
 func TestGetNotification(t *testing.T) {
+	t.Parallel()
 	type input struct {
 		notificationID model.NotificationID
 	}

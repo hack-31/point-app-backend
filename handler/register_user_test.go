@@ -16,6 +16,7 @@ import (
 )
 
 func TestRegisterUser(t *testing.T) {
+	t.Parallel()
 	type want struct {
 		status  int
 		rspFile string

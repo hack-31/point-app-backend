@@ -14,6 +14,7 @@ import (
 )
 
 func TestGetNotifications(t *testing.T) {
+	t.Parallel()
 	type input struct {
 		nextToken string
 		size      string
