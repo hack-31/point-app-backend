@@ -1,0 +1,43 @@
+delete:
+  tags:
+    - ユーザ登録・認証
+  summary: ユーザー削除
+  description: |
+    - ユーザーの削除を行う
+  parameters:
+    - in: path
+      name: userId
+      schema:
+        type: integer
+      required: true
+      example: 1
+      description: ユーザーID(1以上の値)
+  responses:
+    '201':
+      description: 削除完了
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: integer
+                format: number
+                example: 201
+              message:
+                type: string
+                example: "本登録が完了しました。"
+              data: 
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 24
+    '400':
+      $ref: '../../openapi.yml#/components/responses/400Error'
+    '401':
+      $ref: '../../openapi.yml#/components/responses/401UnauthorizedError'
+    '404':
+      $ref: '../../openapi.yml#/components/responses/404Error'
+    '500':
+      $ref: '../../openapi.yml#/components/responses/500Error'
