@@ -15,6 +15,8 @@ servers:
 paths:
   /temporary_users:
     $ref: ./paths/temporary_user.yml
+  /users/{userId}:
+    $ref: ./paths/users/[userId].yml
   /users:
     $ref: ./paths/users.yml
   /account:
@@ -71,7 +73,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            example: "400"
+            statusCode: "400"
             title: "パラメータエラー"
             message: "name: cannot be blank." 
 
@@ -83,7 +85,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            example: "401"
+            statusCode: "401"
             title: "認証エラー"
             message: "認証が失敗しました。再ログインしてください。" 
 
@@ -95,7 +97,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            example: "404"
+            statusCode: "404"
             title: "データが存在しないエラー"
             message: "データが存在しません。" 
 
@@ -107,6 +109,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            example: "500"
+            statusCode: "500"
             title: "サーバーエラー"
             message: "サーバー側で何らかのエラーが発生しました。時間をおいて再度アクセスしてください。" 
