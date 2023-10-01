@@ -13,6 +13,7 @@ import (
 )
 
 func TestUpdateTemporaryEmail(t *testing.T) {
+	t.Parallel()
 	type want struct {
 		status  int
 		rspFile string

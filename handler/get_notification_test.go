@@ -13,6 +13,7 @@ import (
 )
 
 func TestGetNotification(t *testing.T) {
+	t.Parallel()
 	type want struct {
 		status  int
 		rspFile string

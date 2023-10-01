@@ -14,6 +14,7 @@ import (
 )
 
 func TestUpdateTemporaryEmail(t *testing.T) {
+	t.Parallel()
 	inputEmail := "yamada.tarotestetst@sample.com"
 	inputExistEmail := "yamada@sample.com"
 	wantUserID := model.UserID(10)
