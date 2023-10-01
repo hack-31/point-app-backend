@@ -47,7 +47,21 @@ components:
       scheme: bearer
       bearerFormat: JWT 
       description: 認証トークン
-
+  schemas:
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int64
+          example: "400"
+        title:
+          type: string
+          example: "パラメータエラー"
+        message: 
+          type: string
+          example: "name: cannot be blank."   
+  
   responses:
     400Error:
       description: |
@@ -55,18 +69,11 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-                format: int64
-                example: "400"
-              title:
-                type: string
-                example: "パラメータエラー"
-              message: 
-                type: string
-                example: "name: cannot be blank."
+            $ref: '#/components/schemas/Error'
+          example:
+            example: "400"
+            title: "パラメータエラー"
+            message: "name: cannot be blank." 
 
     401UnauthorizedError:
       description: |
@@ -74,18 +81,11 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-                format: int64
-                example: "401"
-              title: 
-                type: string
-                example: "認証エラー"
-              message: 
-                type: string
-                example: "認証が失敗しました。再ログインしてください。"
+            $ref: '#/components/schemas/Error'
+          example:
+            example: "401"
+            title: "認証エラー"
+            message: "認証が失敗しました。再ログインしてください。" 
 
     404Error:
       description: |
@@ -93,18 +93,11 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-                format: int64
-                example: "404"
-              title: 
-                type: string
-                example: "データが存在しない"
-              message: 
-                type: string
-                example: "データが存在しません。"
+            $ref: '#/components/schemas/Error'
+          example:
+            example: "404"
+            title: "データが存在しないエラー"
+            message: "データが存在しません。" 
 
     500Error:
       description: |
@@ -112,15 +105,8 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              statusCode:
-                type: integer
-                format: int64
-                example: "500"
-              title:
-                type: string
-                example: "サーバーエラー"
-              message: 
-                type: string
-                example: "サーバー側で何らかのエラーが発生しました。時間をおいて再度アクセスしてください。"
+            $ref: '#/components/schemas/Error'
+          example:
+            example: "500"
+            title: "サーバーエラー"
+            message: "サーバー側で何らかのエラーが発生しました。時間をおいて再度アクセスしてください。" 
