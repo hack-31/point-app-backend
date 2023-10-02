@@ -13,6 +13,7 @@ import (
 type UserRepo interface {
 	FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
 	GetUserByID(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error)
+	DeleteUserByID(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error)
 	RegisterUser(ctx context.Context, db repository.Execer, u *model.User) error
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
 	UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
