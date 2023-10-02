@@ -429,6 +429,9 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //
 //		// make and configure a mocked domain.UserRepo
 //		mockedUserRepo := &UserRepoMock{
+//			DeleteUserByIDFunc: func(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error) {
+//				panic("mock out the DeleteUserByID method")
+//			},
 //			FindUserByEmailFunc: func(ctx context.Context, db repository.Queryer, e *string) (model.User, error) {
 //				panic("mock out the FindUserByEmail method")
 //			},
@@ -460,6 +463,9 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //
 //	}
 type UserRepoMock struct {
+	// DeleteUserByIDFunc mocks the DeleteUserByID method.
+	DeleteUserByIDFunc func(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error)
+
 	// FindUserByEmailFunc mocks the FindUserByEmail method.
 	FindUserByEmailFunc func(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
 
@@ -486,6 +492,15 @@ type UserRepoMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// DeleteUserByID holds details about calls to the DeleteUserByID method.
+		DeleteUserByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Execer
+			// ID is the ID argument value.
+			ID model.UserID
+		}
 		// FindUserByEmail holds details about calls to the FindUserByEmail method.
 		FindUserByEmail []struct {
 			// Ctx is the ctx argument value.
@@ -571,6 +586,7 @@ type UserRepoMock struct {
 			Pass *string
 		}
 	}
+	lockDeleteUserByID                 sync.RWMutex
 	lockFindUserByEmail                sync.RWMutex
 	lockFindUsers                      sync.RWMutex
 	lockGetUserByID                    sync.RWMutex
@@ -579,6 +595,46 @@ type UserRepoMock struct {
 	lockUpdateEmail                    sync.RWMutex
 	lockUpdateNotificationLatestIDByID sync.RWMutex
 	lockUpdatePassword                 sync.RWMutex
+}
+
+// DeleteUserByID calls DeleteUserByIDFunc.
+func (mock *UserRepoMock) DeleteUserByID(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error) {
+	if mock.DeleteUserByIDFunc == nil {
+		panic("UserRepoMock.DeleteUserByIDFunc: method is nil but UserRepo.DeleteUserByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Db  repository.Execer
+		ID  model.UserID
+	}{
+		Ctx: ctx,
+		Db:  db,
+		ID:  ID,
+	}
+	mock.lockDeleteUserByID.Lock()
+	mock.calls.DeleteUserByID = append(mock.calls.DeleteUserByID, callInfo)
+	mock.lockDeleteUserByID.Unlock()
+	return mock.DeleteUserByIDFunc(ctx, db, ID)
+}
+
+// DeleteUserByIDCalls gets all the calls that were made to DeleteUserByID.
+// Check the length with:
+//
+//	len(mockedUserRepo.DeleteUserByIDCalls())
+func (mock *UserRepoMock) DeleteUserByIDCalls() []struct {
+	Ctx context.Context
+	Db  repository.Execer
+	ID  model.UserID
+} {
+	var calls []struct {
+		Ctx context.Context
+		Db  repository.Execer
+		ID  model.UserID
+	}
+	mock.lockDeleteUserByID.RLock()
+	calls = mock.calls.DeleteUserByID
+	mock.lockDeleteUserByID.RUnlock()
+	return calls
 }
 
 // FindUserByEmail calls FindUserByEmailFunc.

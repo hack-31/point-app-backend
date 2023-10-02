@@ -109,7 +109,8 @@ moq: ## mock作成(コンテナ内)
 					UpdateTemporaryEmailService \
 					GetNotificationService \
 					GetNotificationsService \
-					GetUncheckedNotificationCountService
+					GetUncheckedNotificationCountService \
+					DeleteUserService
 
 	# リポジトリのモック生成中
 	@docker compose exec app moq -fmt goimports -out ./service/moq_test.go -skip-ensure -pkg service ./domain \
