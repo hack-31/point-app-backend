@@ -62,6 +62,15 @@ func InitGetUsers(db *sqlx.DB, repo domain.UserRepo, jwter domain.TokenGenerator
 	return &handler.GetUsers{}
 }
 
+func InitDeleteUser(transacter repository.Transacter, repo domain.UserRepo, cache domain.Cache) *handler.DeleteUser {
+	wire.Build(
+		handler.NewDeleteUser,
+		service.NewDeleteUser,
+		wire.Bind(new(handler.DeleteUserService), new(*service.DeleteUser)),
+	)
+	return &handler.DeleteUser{}
+}
+
 func InitGetAccount(db *sqlx.DB, repo domain.UserRepo) *handler.GetAccount {
 	wire.Build(
 		handler.NewGetAccount,
