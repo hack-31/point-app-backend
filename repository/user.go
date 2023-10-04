@@ -107,6 +107,17 @@ func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID model.UserI
 	return user, nil
 }
 
+// 削除
+func (r *Repository) DeleteUserByID(ctx context.Context, db Execer, ID model.UserID) (int64, error) {
+	sql := "DELETE FROM `users`" +
+		"WHERE `id` = ?"
+	res, err := db.ExecContext(ctx, sql, ID)
+	if err != nil {
+		return 0, err
+	}
+	return res.RowsAffected()
+}
+
 // パスワードを上書き
 // @params
 // ctx context

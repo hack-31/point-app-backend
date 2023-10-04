@@ -1,0 +1,5 @@
+{
+  "statusCode": 400,
+  "title": "ユーザー削除エラー",
+  "message": "must be no less than 1"
+}

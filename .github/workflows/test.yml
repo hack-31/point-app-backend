@@ -17,6 +17,8 @@ jobs:
           --health-retries 10
         ports:
           - 3306:3306
+        volumes:
+          - ${{ github.workspace }}/_tools/mysql/conf.d:/etc/mysql/conf.d
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_USER: admin
@@ -35,10 +37,16 @@ jobs:
     - uses: actions/setup-go@v4
       with:
         go-version: '>=1.21'
+    # service内のvolumesでリポジトリにアクセスする際は必要 
+    # https://github.com/actions/checkout/issues/211#issuecomment-1336952468 
+    - name: Chown user
+      run: |
+        sudo chown -R $USER:$USER $GITHUB_WORKSPACE
     - uses: actions/checkout@v3
-    - run: |
+    - name: Migration
+      run: |
         go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
-        mysqldef -u admin -p password -h 127.0.0.1 -P 3306 point_app < ./_tools/mysql/schema.sql
+        mysqldef -u root -h 127.0.0.1 -P 3306 point_app < ./_tools/mysql/schema.sql
     - name: generate secret key in JWT
       run: | 
         echo "${{ secrets.JWT_SECRET_KEY }}" > ./auth/certificate/secret.pem

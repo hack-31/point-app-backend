@@ -55,6 +55,7 @@ func SetRouting(ctx context.Context, db *sqlx.DB, router *gin.Engine, cfg *confi
 	r.GET("/users", authMiddleware, InitGetUsers(db, rep, jwter).ServeHTTP)
 	r.GET("/account", authMiddleware, InitGetAccount(db, rep).ServeHTTP)
 	r.DELETE("/signout", authMiddleware, InitSignout(tokenCache).ServeHTTP)
+	r.DELETE("/users/:id", authMiddleware, InitDeleteUser(transacter, rep, tokenCache).ServeHTTP)
 	r.POST("/point_transactions", authMiddleware, InitSendPoint(rep, transacter, cache).ServeHTTP)
 	r.PATCH("/password", authMiddleware, InitUpdatePassword(db, rep).ServeHTTP)
 	r.PUT("/account", authMiddleware, InitUpdateAccount(db, rep).ServeHTTP)

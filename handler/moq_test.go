@@ -1079,3 +1079,75 @@ func (mock *GetUncheckedNotificationCountServiceMock) GetUncheckedNotificationCo
 	mock.lockGetUncheckedNotificationCount.RUnlock()
 	return calls
 }
+
+// Ensure, that DeleteUserServiceMock does implement DeleteUserService.
+// If this is not the case, regenerate this file with moq.
+var _ DeleteUserService = &DeleteUserServiceMock{}
+
+// DeleteUserServiceMock is a mock implementation of DeleteUserService.
+//
+//	func TestSomethingThatUsesDeleteUserService(t *testing.T) {
+//
+//		// make and configure a mocked DeleteUserService
+//		mockedDeleteUserService := &DeleteUserServiceMock{
+//			DeleteUserFunc: func(ctx *gin.Context, userID model.UserID) error {
+//				panic("mock out the DeleteUser method")
+//			},
+//		}
+//
+//		// use mockedDeleteUserService in code that requires DeleteUserService
+//		// and then make assertions.
+//
+//	}
+type DeleteUserServiceMock struct {
+	// DeleteUserFunc mocks the DeleteUser method.
+	DeleteUserFunc func(ctx *gin.Context, userID model.UserID) error
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// DeleteUser holds details about calls to the DeleteUser method.
+		DeleteUser []struct {
+			// Ctx is the ctx argument value.
+			Ctx *gin.Context
+			// UserID is the userID argument value.
+			UserID model.UserID
+		}
+	}
+	lockDeleteUser sync.RWMutex
+}
+
+// DeleteUser calls DeleteUserFunc.
+func (mock *DeleteUserServiceMock) DeleteUser(ctx *gin.Context, userID model.UserID) error {
+	if mock.DeleteUserFunc == nil {
+		panic("DeleteUserServiceMock.DeleteUserFunc: method is nil but DeleteUserService.DeleteUser was just called")
+	}
+	callInfo := struct {
+		Ctx    *gin.Context
+		UserID model.UserID
+	}{
+		Ctx:    ctx,
+		UserID: userID,
+	}
+	mock.lockDeleteUser.Lock()
+	mock.calls.DeleteUser = append(mock.calls.DeleteUser, callInfo)
+	mock.lockDeleteUser.Unlock()
+	return mock.DeleteUserFunc(ctx, userID)
+}
+
+// DeleteUserCalls gets all the calls that were made to DeleteUser.
+// Check the length with:
+//
+//	len(mockedDeleteUserService.DeleteUserCalls())
+func (mock *DeleteUserServiceMock) DeleteUserCalls() []struct {
+	Ctx    *gin.Context
+	UserID model.UserID
+} {
+	var calls []struct {
+		Ctx    *gin.Context
+		UserID model.UserID
+	}
+	mock.lockDeleteUser.RLock()
+	calls = mock.calls.DeleteUser
+	mock.lockDeleteUser.RUnlock()
+	return calls
+}

@@ -1,0 +1,7 @@
+{
+  "statusCode": 201,
+  "message": "ユーザー削除しました。",
+  "data": {
+    "userId": 1
+  }
+}

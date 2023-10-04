@@ -51,6 +51,12 @@ func InitGetUsers(db *sqlx.DB, repo domain.UserRepo, jwter domain.TokenGenerator
 	return handlerGetUsers
 }
 
+func InitDeleteUser(transacter repository.Transacter, repo domain.UserRepo, cache domain.Cache) *handler.DeleteUser {
+	deleteUser := service.NewDeleteUser(cache, repo, transacter)
+	handlerDeleteUser := handler.NewDeleteUser(deleteUser)
+	return handlerDeleteUser
+}
+
 func InitGetAccount(db *sqlx.DB, repo domain.UserRepo) *handler.GetAccount {
 	getAccount := service.NewGetAccount(db, repo)
 	handlerGetAccount := handler.NewGetAccount(getAccount)
