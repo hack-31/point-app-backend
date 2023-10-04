@@ -1,6 +1,6 @@
 # ----------------------------------------------
 # ビルド用環境
-FROM golang:1.19.2-bullseye AS deploy-builder
+FROM golang:1.21.1-bullseye AS deploy-builder
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ CMD ["./app"]
 
 # ----------------------------------------------
 # 開発環境
-FROM golang:1.19.2-alpine3.16 AS dev
+FROM golang:1.21.1-alpine AS dev
 
 WORKDIR /app
 
