@@ -44,22 +44,48 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	u, _ := ctx.Get(auth.UserID)
 	userID := u.(model.UserID)
 
-	// nextTokenが空文字（未指定）の場合は、ユーザ情報から最新のお知らせIDを取得する
-	nt, err := strconv.Atoi(nextToken)
-	if err != nil {
-		// nextTokenが空文字の場合
-		user, err := gn.UserRepo.GetUserByID(ctx, gn.DB, userID)
+	var ns []*model.Notification
+	// 初回時
+	if nextToken == "" {
+		s, _ := strconv.Atoi(size)
+		n, err := gn.NotifRepo.GetByToUserOrderByLatest(
+			ctx,
+			gn.DB,
+			userID,
+			s,
+			"n.id",
+			"n.is_checked",
+			"n.description",
+			"n.created_at",
+			"nt.title",
+		)
 		if err != nil {
-			return GetNotificationsResponse{}, fmt.Errorf("cannot GetUserByID: %w", err)
+			return GetNotificationsResponse{}, fmt.Errorf("cannot GetNotifications : %w", err)
 		}
-		nt = int(user.NotificationLatestID)
+		ns = n
 	}
-
-	// お知らせ一覧を取得
-	s, _ := strconv.Atoi(size)
-	ns, err := gn.NotifRepo.GetNotifications(ctx, gn.DB, userID, model.NotificationID(nt), s)
-	if err != nil {
-		return GetNotificationsResponse{}, fmt.Errorf("cannot GetNotifications : %w", err)
+	if nextToken != "" {
+		nt, err := strconv.Atoi(nextToken)
+		if err != nil {
+			return GetNotificationsResponse{}, nil
+		}
+		s, _ := strconv.Atoi(size)
+		// お知らせ一覧を取得
+		ns, err = gn.NotifRepo.GetByToUserByStartIdOrderByLatest(
+			ctx,
+			gn.DB,
+			userID,
+			model.NotificationID(nt),
+			s,
+			"n.id",
+			"n.is_checked",
+			"n.description",
+			"n.created_at",
+			"nt.title",
+		)
+		if err != nil {
+			return GetNotificationsResponse{}, fmt.Errorf("cannot GetNotifications : %w", err)
+		}
 	}
 
 	// レスポンス作成
