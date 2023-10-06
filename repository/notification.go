@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	"github.com/hack-31/point-app-backend/domain/model"
 )
@@ -40,31 +41,48 @@ func (r *Repository) CreateNotification(ctx context.Context, db Execer, n model.
 // @params
 // ctx context
 // db dbインスタンス
-// uid ユーザID
+// uid 受信者ユーザID
 // startID 開始するお知らせID
 // size 取得件数
 //
 // @returns
 // お知らせ一覧
-func (r *Repository) GetNotifications(ctx context.Context, db Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
-	sql := `
-		SELECT 
-			n.id,
-			n.from_user_id,
-			n.from_user_id,
-			n.description,
-			n.created_at,
-			n.is_checked,
-			nt.title
-		FROM notifications AS n
-		LEFT JOIN notification_types AS nt
-		ON nt.id = n.notification_type_id
-		WHERE n.id <= ? AND n.to_user_id = ?
-		ORDER BY n.id DESC
-		LIMIT ?
-	`
+func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error) {
+	column := "*"
+	if len(columns) > 0 {
+		column = strings.Join(columns, ", ")
+	}
+
+	sql := "SELECT " + column + " " +
+		"FROM notifications AS n " +
+		"LEFT JOIN notification_types AS nt " +
+		"ON nt.id = n.notification_type_id " +
+		"WHERE n.to_user_id = ? AND n.id <= ? " +
+		"ORDER BY n.id DESC " +
+		"LIMIT ?;"
 	var n model.Notifications
 	if err := db.SelectContext(ctx, &n, sql, startID, uid, size); err != nil {
+		return n, err
+	}
+	return n, nil
+}
+
+// 指定した受信者ユーザーIDを元にお知らせ一覧を取得
+func (r *Repository) GetByToUserOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error) {
+	column := "*"
+	if len(columns) > 0 {
+		column = strings.Join(columns, ", ")
+	}
+
+	sql := "SELECT " + column + " " +
+		"FROM notifications AS n " +
+		"LEFT JOIN notification_types AS nt " +
+		"ON nt.id = n.notification_type_id " +
+		"WHERE n.to_user_id = ? " +
+		"ORDER BY n.id DESC " +
+		"LIMIT ?;"
+	var n model.Notifications
+	if err := db.SelectContext(ctx, &n, sql, uid, size); err != nil {
 		return n, err
 	}
 	return n, nil
