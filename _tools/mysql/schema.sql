@@ -64,6 +64,7 @@ CREATE TABLE `notifications` (
     `description`           VARCHAR(256) NOT NULL COMMENT '説明',
     `created_at`            DATETIME(6) NOT NULL COMMENT '作成日時',
     PRIMARY KEY (`id`),
+    INDEX `idx_to_user_id` (`to_user_id`, `id`),
     CONSTRAINT `fk_notification_type_id`
         FOREIGN KEY (`notification_type_id`) REFERENCES `notification_types` (`id`) ON UPDATE CASCADE
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='お知らせ';
