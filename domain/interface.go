@@ -31,7 +31,8 @@ type PointRepo interface {
 // お知らせに対するリポジトリインターフェース
 type NotificationRepo interface {
 	CreateNotification(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error)
-	GetNotifications(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error)
+	GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error)
+	GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error)
 	GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error)
 	GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
 	CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error
