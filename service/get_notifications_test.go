@@ -23,12 +23,20 @@ func TestGetNotifications(t *testing.T) {
 		ns  GetNotificationsResponse
 		err error
 	}
-	type getNotifications struct {
+	type getByToUserByStartIdOrderByLatest struct {
 		startID       model.NotificationID
 		size          int
+		userID        model.UserID
 		notifications model.Notifications
 		err           error
 	}
+	type getByToUserOrderByLatest struct {
+		size          int
+		userID        model.UserID
+		notifications model.Notifications
+		err           error
+	}
+
 	type getUserByID struct {
 		user model.User
 		err  error
@@ -36,19 +44,21 @@ func TestGetNotifications(t *testing.T) {
 
 	userID := model.UserID(1)
 	tests := map[string]struct {
-		input            input
-		getNotifications getNotifications
-		getUserByID      getUserByID
-		want             want
+		input                             input
+		getByToUserByStartIdOrderByLatest getByToUserByStartIdOrderByLatest
+		getByToUserOrderByLatest          getByToUserOrderByLatest
+		getUserByID                       getUserByID
+		want                              want
 	}{
 		"GetNotificationsサービスは、指定されたお知らせIDを開始位置として、サイズ数に応じたお知らせの一覧を返す": {
 			input: input{
 				nextToken: "90",
 				size:      "5",
 			},
-			getNotifications: getNotifications{
+			getByToUserByStartIdOrderByLatest: getByToUserByStartIdOrderByLatest{
 				startID: model.NotificationID(90),
 				size:    5,
+				userID:  userID,
 				err:     nil,
 				notifications: model.Notifications{
 					&model.Notification{
@@ -61,6 +71,7 @@ func TestGetNotifications(t *testing.T) {
 					},
 				},
 			},
+			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
 				err:  nil,
 				user: model.User{},
@@ -87,12 +98,14 @@ func TestGetNotifications(t *testing.T) {
 				nextToken: "90",
 				size:      "5",
 			},
-			getNotifications: getNotifications{
+			getByToUserByStartIdOrderByLatest: getByToUserByStartIdOrderByLatest{
 				startID:       model.NotificationID(90),
 				size:          5,
+				userID:        userID,
 				err:           nil,
 				notifications: model.Notifications{},
 			},
+			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
 				err:  nil,
 				user: model.User{},
@@ -116,10 +129,10 @@ func TestGetNotifications(t *testing.T) {
 				nextToken: "",
 				size:      "5",
 			},
-			getNotifications: getNotifications{
-				startID: model.NotificationID(90),
-				size:    5,
-				err:     nil,
+			getByToUserOrderByLatest: getByToUserOrderByLatest{
+				userID: userID,
+				size:   5,
+				err:    nil,
 				notifications: model.Notifications{
 					&model.Notification{
 						ID:        90,
@@ -171,10 +184,15 @@ func TestGetNotifications(t *testing.T) {
 			// モックの定義
 			moqQueryer := &QueryerMock{}
 			moqNotificationRepo := &NotificationRepoMock{
-				GetNotificationsFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
-					assert.Equal(t, tt.getNotifications.startID, startID)
-					assert.Equal(t, tt.getNotifications.size, size)
-					return tt.getNotifications.notifications, tt.getNotifications.err
+				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error) {
+					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.startID, startID)
+					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.size, size)
+					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.userID, uid)
+					return tt.getByToUserByStartIdOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
+				},
+				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error) {
+					assert.Equal(t, tt.getByToUserOrderByLatest.userID, uid)
+					return tt.getByToUserOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},
 			}
 			moqUserRepo := &UserRepoMock{

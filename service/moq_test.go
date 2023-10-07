@@ -450,9 +450,6 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //			UpdateEmailFunc: func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 //				panic("mock out the UpdateEmail method")
 //			},
-//			UpdateNotificationLatestIDByIDFunc: func(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error {
-//				panic("mock out the UpdateNotificationLatestIDByID method")
-//			},
 //			UpdatePasswordFunc: func(ctx context.Context, db repository.Execer, email *string, pass *string) error {
 //				panic("mock out the UpdatePassword method")
 //			},
@@ -483,9 +480,6 @@ type UserRepoMock struct {
 
 	// UpdateEmailFunc mocks the UpdateEmail method.
 	UpdateEmailFunc func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
-
-	// UpdateNotificationLatestIDByIDFunc mocks the UpdateNotificationLatestIDByID method.
-	UpdateNotificationLatestIDByIDFunc func(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error
 
 	// UpdatePasswordFunc mocks the UpdatePassword method.
 	UpdatePasswordFunc func(ctx context.Context, db repository.Execer, email *string, pass *string) error
@@ -563,17 +557,6 @@ type UserRepoMock struct {
 			// NewEmail is the newEmail argument value.
 			NewEmail string
 		}
-		// UpdateNotificationLatestIDByID holds details about calls to the UpdateNotificationLatestIDByID method.
-		UpdateNotificationLatestIDByID []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Db is the db argument value.
-			Db repository.Execer
-			// ID is the ID argument value.
-			ID model.UserID
-			// NotificationID is the notificationID argument value.
-			NotificationID model.NotificationID
-		}
 		// UpdatePassword holds details about calls to the UpdatePassword method.
 		UpdatePassword []struct {
 			// Ctx is the ctx argument value.
@@ -586,15 +569,14 @@ type UserRepoMock struct {
 			Pass *string
 		}
 	}
-	lockDeleteUserByID                 sync.RWMutex
-	lockFindUserByEmail                sync.RWMutex
-	lockFindUsers                      sync.RWMutex
-	lockGetUserByID                    sync.RWMutex
-	lockRegisterUser                   sync.RWMutex
-	lockUpdateAccount                  sync.RWMutex
-	lockUpdateEmail                    sync.RWMutex
-	lockUpdateNotificationLatestIDByID sync.RWMutex
-	lockUpdatePassword                 sync.RWMutex
+	lockDeleteUserByID  sync.RWMutex
+	lockFindUserByEmail sync.RWMutex
+	lockFindUsers       sync.RWMutex
+	lockGetUserByID     sync.RWMutex
+	lockRegisterUser    sync.RWMutex
+	lockUpdateAccount   sync.RWMutex
+	lockUpdateEmail     sync.RWMutex
+	lockUpdatePassword  sync.RWMutex
 }
 
 // DeleteUserByID calls DeleteUserByIDFunc.
@@ -893,50 +875,6 @@ func (mock *UserRepoMock) UpdateEmailCalls() []struct {
 	return calls
 }
 
-// UpdateNotificationLatestIDByID calls UpdateNotificationLatestIDByIDFunc.
-func (mock *UserRepoMock) UpdateNotificationLatestIDByID(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error {
-	if mock.UpdateNotificationLatestIDByIDFunc == nil {
-		panic("UserRepoMock.UpdateNotificationLatestIDByIDFunc: method is nil but UserRepo.UpdateNotificationLatestIDByID was just called")
-	}
-	callInfo := struct {
-		Ctx            context.Context
-		Db             repository.Execer
-		ID             model.UserID
-		NotificationID model.NotificationID
-	}{
-		Ctx:            ctx,
-		Db:             db,
-		ID:             ID,
-		NotificationID: notificationID,
-	}
-	mock.lockUpdateNotificationLatestIDByID.Lock()
-	mock.calls.UpdateNotificationLatestIDByID = append(mock.calls.UpdateNotificationLatestIDByID, callInfo)
-	mock.lockUpdateNotificationLatestIDByID.Unlock()
-	return mock.UpdateNotificationLatestIDByIDFunc(ctx, db, ID, notificationID)
-}
-
-// UpdateNotificationLatestIDByIDCalls gets all the calls that were made to UpdateNotificationLatestIDByID.
-// Check the length with:
-//
-//	len(mockedUserRepo.UpdateNotificationLatestIDByIDCalls())
-func (mock *UserRepoMock) UpdateNotificationLatestIDByIDCalls() []struct {
-	Ctx            context.Context
-	Db             repository.Execer
-	ID             model.UserID
-	NotificationID model.NotificationID
-} {
-	var calls []struct {
-		Ctx            context.Context
-		Db             repository.Execer
-		ID             model.UserID
-		NotificationID model.NotificationID
-	}
-	mock.lockUpdateNotificationLatestIDByID.RLock()
-	calls = mock.calls.UpdateNotificationLatestIDByID
-	mock.lockUpdateNotificationLatestIDByID.RUnlock()
-	return calls
-}
-
 // UpdatePassword calls UpdatePasswordFunc.
 func (mock *UserRepoMock) UpdatePassword(ctx context.Context, db repository.Execer, email *string, pass *string) error {
 	if mock.UpdatePasswordFunc == nil {
@@ -1141,11 +1079,14 @@ func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 //			CreateNotificationFunc: func(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error) {
 //				panic("mock out the CreateNotification method")
 //			},
+//			GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error) {
+//				panic("mock out the GetByToUserByStartIdOrderByLatest method")
+//			},
+//			GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error) {
+//				panic("mock out the GetByToUserOrderByLatest method")
+//			},
 //			GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error) {
 //				panic("mock out the GetNotificationByID method")
-//			},
-//			GetNotificationsFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
-//				panic("mock out the GetNotifications method")
 //			},
 //			GetUncheckedNotificationCountFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
 //				panic("mock out the GetUncheckedNotificationCount method")
@@ -1163,11 +1104,14 @@ type NotificationRepoMock struct {
 	// CreateNotificationFunc mocks the CreateNotification method.
 	CreateNotificationFunc func(ctx context.Context, db repository.Execer, notification model.Notification) (model.Notification, error)
 
+	// GetByToUserByStartIdOrderByLatestFunc mocks the GetByToUserByStartIdOrderByLatest method.
+	GetByToUserByStartIdOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error)
+
+	// GetByToUserOrderByLatestFunc mocks the GetByToUserOrderByLatest method.
+	GetByToUserOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error)
+
 	// GetNotificationByIDFunc mocks the GetNotificationByID method.
 	GetNotificationByIDFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error)
-
-	// GetNotificationsFunc mocks the GetNotifications method.
-	GetNotificationsFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error)
 
 	// GetUncheckedNotificationCountFunc mocks the GetUncheckedNotificationCount method.
 	GetUncheckedNotificationCountFunc func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
@@ -1194,6 +1138,34 @@ type NotificationRepoMock struct {
 			// Notification is the notification argument value.
 			Notification model.Notification
 		}
+		// GetByToUserByStartIdOrderByLatest holds details about calls to the GetByToUserByStartIdOrderByLatest method.
+		GetByToUserByStartIdOrderByLatest []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// UID is the uid argument value.
+			UID model.UserID
+			// StartID is the startID argument value.
+			StartID model.NotificationID
+			// Size is the size argument value.
+			Size int
+			// Columns is the columns argument value.
+			Columns []string
+		}
+		// GetByToUserOrderByLatest holds details about calls to the GetByToUserOrderByLatest method.
+		GetByToUserOrderByLatest []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// UID is the uid argument value.
+			UID model.UserID
+			// Size is the size argument value.
+			Size int
+			// Columns is the columns argument value.
+			Columns []string
+		}
 		// GetNotificationByID holds details about calls to the GetNotificationByID method.
 		GetNotificationByID []struct {
 			// Ctx is the ctx argument value.
@@ -1205,19 +1177,6 @@ type NotificationRepoMock struct {
 			// Nid is the nid argument value.
 			Nid model.NotificationID
 		}
-		// GetNotifications holds details about calls to the GetNotifications method.
-		GetNotifications []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// Db is the db argument value.
-			Db repository.Queryer
-			// UID is the uid argument value.
-			UID model.UserID
-			// StartID is the startID argument value.
-			StartID model.NotificationID
-			// Size is the size argument value.
-			Size int
-		}
 		// GetUncheckedNotificationCount holds details about calls to the GetUncheckedNotificationCount method.
 		GetUncheckedNotificationCount []struct {
 			// Ctx is the ctx argument value.
@@ -1228,11 +1187,12 @@ type NotificationRepoMock struct {
 			UID model.UserID
 		}
 	}
-	lockCheckNotification             sync.RWMutex
-	lockCreateNotification            sync.RWMutex
-	lockGetNotificationByID           sync.RWMutex
-	lockGetNotifications              sync.RWMutex
-	lockGetUncheckedNotificationCount sync.RWMutex
+	lockCheckNotification                 sync.RWMutex
+	lockCreateNotification                sync.RWMutex
+	lockGetByToUserByStartIdOrderByLatest sync.RWMutex
+	lockGetByToUserOrderByLatest          sync.RWMutex
+	lockGetNotificationByID               sync.RWMutex
+	lockGetUncheckedNotificationCount     sync.RWMutex
 }
 
 // CheckNotification calls CheckNotificationFunc.
@@ -1319,6 +1279,106 @@ func (mock *NotificationRepoMock) CreateNotificationCalls() []struct {
 	return calls
 }
 
+// GetByToUserByStartIdOrderByLatest calls GetByToUserByStartIdOrderByLatestFunc.
+func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error) {
+	if mock.GetByToUserByStartIdOrderByLatestFunc == nil {
+		panic("NotificationRepoMock.GetByToUserByStartIdOrderByLatestFunc: method is nil but NotificationRepo.GetByToUserByStartIdOrderByLatest was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		Db      repository.Queryer
+		UID     model.UserID
+		StartID model.NotificationID
+		Size    int
+		Columns []string
+	}{
+		Ctx:     ctx,
+		Db:      db,
+		UID:     uid,
+		StartID: startID,
+		Size:    size,
+		Columns: columns,
+	}
+	mock.lockGetByToUserByStartIdOrderByLatest.Lock()
+	mock.calls.GetByToUserByStartIdOrderByLatest = append(mock.calls.GetByToUserByStartIdOrderByLatest, callInfo)
+	mock.lockGetByToUserByStartIdOrderByLatest.Unlock()
+	return mock.GetByToUserByStartIdOrderByLatestFunc(ctx, db, uid, startID, size, columns...)
+}
+
+// GetByToUserByStartIdOrderByLatestCalls gets all the calls that were made to GetByToUserByStartIdOrderByLatest.
+// Check the length with:
+//
+//	len(mockedNotificationRepo.GetByToUserByStartIdOrderByLatestCalls())
+func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []struct {
+	Ctx     context.Context
+	Db      repository.Queryer
+	UID     model.UserID
+	StartID model.NotificationID
+	Size    int
+	Columns []string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		Db      repository.Queryer
+		UID     model.UserID
+		StartID model.NotificationID
+		Size    int
+		Columns []string
+	}
+	mock.lockGetByToUserByStartIdOrderByLatest.RLock()
+	calls = mock.calls.GetByToUserByStartIdOrderByLatest
+	mock.lockGetByToUserByStartIdOrderByLatest.RUnlock()
+	return calls
+}
+
+// GetByToUserOrderByLatest calls GetByToUserOrderByLatestFunc.
+func (mock *NotificationRepoMock) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error) {
+	if mock.GetByToUserOrderByLatestFunc == nil {
+		panic("NotificationRepoMock.GetByToUserOrderByLatestFunc: method is nil but NotificationRepo.GetByToUserOrderByLatest was just called")
+	}
+	callInfo := struct {
+		Ctx     context.Context
+		Db      repository.Queryer
+		UID     model.UserID
+		Size    int
+		Columns []string
+	}{
+		Ctx:     ctx,
+		Db:      db,
+		UID:     uid,
+		Size:    size,
+		Columns: columns,
+	}
+	mock.lockGetByToUserOrderByLatest.Lock()
+	mock.calls.GetByToUserOrderByLatest = append(mock.calls.GetByToUserOrderByLatest, callInfo)
+	mock.lockGetByToUserOrderByLatest.Unlock()
+	return mock.GetByToUserOrderByLatestFunc(ctx, db, uid, size, columns...)
+}
+
+// GetByToUserOrderByLatestCalls gets all the calls that were made to GetByToUserOrderByLatest.
+// Check the length with:
+//
+//	len(mockedNotificationRepo.GetByToUserOrderByLatestCalls())
+func (mock *NotificationRepoMock) GetByToUserOrderByLatestCalls() []struct {
+	Ctx     context.Context
+	Db      repository.Queryer
+	UID     model.UserID
+	Size    int
+	Columns []string
+} {
+	var calls []struct {
+		Ctx     context.Context
+		Db      repository.Queryer
+		UID     model.UserID
+		Size    int
+		Columns []string
+	}
+	mock.lockGetByToUserOrderByLatest.RLock()
+	calls = mock.calls.GetByToUserOrderByLatest
+	mock.lockGetByToUserOrderByLatest.RUnlock()
+	return calls
+}
+
 // GetNotificationByID calls GetNotificationByIDFunc.
 func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error) {
 	if mock.GetNotificationByIDFunc == nil {
@@ -1360,54 +1420,6 @@ func (mock *NotificationRepoMock) GetNotificationByIDCalls() []struct {
 	mock.lockGetNotificationByID.RLock()
 	calls = mock.calls.GetNotificationByID
 	mock.lockGetNotificationByID.RUnlock()
-	return calls
-}
-
-// GetNotifications calls GetNotificationsFunc.
-func (mock *NotificationRepoMock) GetNotifications(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int) (model.Notifications, error) {
-	if mock.GetNotificationsFunc == nil {
-		panic("NotificationRepoMock.GetNotificationsFunc: method is nil but NotificationRepo.GetNotifications was just called")
-	}
-	callInfo := struct {
-		Ctx     context.Context
-		Db      repository.Queryer
-		UID     model.UserID
-		StartID model.NotificationID
-		Size    int
-	}{
-		Ctx:     ctx,
-		Db:      db,
-		UID:     uid,
-		StartID: startID,
-		Size:    size,
-	}
-	mock.lockGetNotifications.Lock()
-	mock.calls.GetNotifications = append(mock.calls.GetNotifications, callInfo)
-	mock.lockGetNotifications.Unlock()
-	return mock.GetNotificationsFunc(ctx, db, uid, startID, size)
-}
-
-// GetNotificationsCalls gets all the calls that were made to GetNotifications.
-// Check the length with:
-//
-//	len(mockedNotificationRepo.GetNotificationsCalls())
-func (mock *NotificationRepoMock) GetNotificationsCalls() []struct {
-	Ctx     context.Context
-	Db      repository.Queryer
-	UID     model.UserID
-	StartID model.NotificationID
-	Size    int
-} {
-	var calls []struct {
-		Ctx     context.Context
-		Db      repository.Queryer
-		UID     model.UserID
-		StartID model.NotificationID
-		Size    int
-	}
-	mock.lockGetNotifications.RLock()
-	calls = mock.calls.GetNotifications
-	mock.lockGetNotifications.RUnlock()
 	return calls
 }
 
