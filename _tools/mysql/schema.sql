@@ -1,6 +1,5 @@
 CREATE TABLE `users` (
     `id`                      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ユーザーの識別子',
-    `notification_latest_id`  BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '最新のお知らせID',
     `family_name`             VARCHAR(256) NOT NULL COMMENT '苗字',
     `family_name_kana`        VARCHAR(256) NOT NULL COMMENT '苗字カナ',
     `first_name`              VARCHAR(256) NOT NULL COMMENT '名前',
