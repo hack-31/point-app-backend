@@ -18,7 +18,6 @@ type UserRepo interface {
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
 	UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 	UpdateAccount(ctx context.Context, db repository.Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error
-	UpdateNotificationLatestIDByID(ctx context.Context, db repository.Execer, ID model.UserID, notificationID model.NotificationID) error
 	FindUsers(ctx context.Context, db repository.Queryer) (model.Users, error)
 }
 

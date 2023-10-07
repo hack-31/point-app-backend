@@ -189,34 +189,6 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 	return nil
 }
 
-// 最新のお知らせIDを更新
-// @params
-// ctx context
-// db dbインスタンス
-// notificationID お知らせID
-//
-// @returns
-// error
-func (r *Repository) UpdateNotificationLatestIDByID(ctx context.Context, db Execer, uid model.UserID, nid model.NotificationID) error {
-	sql := `
-		UPDATE users
-		SET notification_latest_id = ?
-		WHERE id = ?
-	`
-	fmt.Println(nid, uid)
-	_, err := db.ExecContext(
-		ctx,
-		sql,
-		nid,
-		uid,
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to update DB: %w", err)
-	}
-	return nil
-}
-
 // ユーザ一覧
 //
 // @params
