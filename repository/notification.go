@@ -61,7 +61,7 @@ func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Q
 		"ORDER BY n.id DESC " +
 		"LIMIT ?;"
 	var n model.Notifications
-	if err := db.SelectContext(ctx, &n, sql, startID, uid, size); err != nil {
+	if err := db.SelectContext(ctx, &n, sql, uid, startID, size); err != nil {
 		return n, err
 	}
 	return n, nil
