@@ -80,11 +80,6 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 		return fmt.Errorf("cannot CreateNotification in sending point: %w ", err)
 	}
 
-	// 最新お知らせIDをユーザテーブルに保存
-	if err := sp.UserRepo.UpdateNotificationLatestIDByID(ctx, sp.Connection.DB(), n.ToUserID, registeredNotif.ID); err != nil {
-		return fmt.Errorf("cannot UpdateNotificationLatestIDByID in sending point: %w ", err)
-	}
-
 	// トランザクションコミット
 	if err := sp.Connection.Commit(); err != nil {
 		return fmt.Errorf("cannot Comit in send point: %w ", err)
