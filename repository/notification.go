@@ -48,7 +48,7 @@ func (r *Repository) CreateNotification(ctx context.Context, db Execer, n model.
 // @returns
 // お知らせ一覧
 func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error) {
-	column := "*"
+	column := "n.id, n.is_checked, n.to_user_id, n.from_user_id, n.description, n.created_at, nt.title"
 	if len(columns) > 0 {
 		column = strings.Join(columns, ", ")
 	}
@@ -69,7 +69,7 @@ func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Q
 
 // 指定した受信者ユーザーIDを元にお知らせ一覧を取得
 func (r *Repository) GetByToUserOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error) {
-	column := "*"
+	column := "n.id, n.is_checked, n.to_user_id, n.from_user_id, n.description, n.created_at, nt.title"
 	if len(columns) > 0 {
 		column = strings.Join(columns, ", ")
 	}
