@@ -4,10 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,8 +28,8 @@ func NewGetUncheckedNotificationCount(db *sqlx.DB, cache domain.Cache, repo doma
 // ユーザ一覧
 func (gunc *GetUncheckedNotificationCount) GetUncheckedNotificationCount(ctx *gin.Context, notificationCntChan chan<- int) (int, error) {
 	// ユーザID確認
-	u, _ := ctx.Get(auth.UserID)
-	userID := u.(model.UserID)
+
+	userID := utils.GetUserID(ctx)
 
 	// お知らせ数の確認
 	cnt, err := gunc.NotifRepo.GetUncheckedNotificationCount(ctx, gunc.DB, userID)

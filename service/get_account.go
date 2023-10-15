@@ -2,10 +2,10 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -25,12 +25,10 @@ func NewGetAccount(db *sqlx.DB, repo domain.UserRepo) *GetAccount {
 // @return
 // ユーザ一覧
 func (ga *GetAccount) GetAccount(ctx *gin.Context) (model.User, error) {
-	// コンテキストよりEmailを取得
-	email, _ := ctx.Get(auth.Email)
-	stringMail := email.(string)
+	mail := utils.GetEmail(ctx)
 
 	// Emailよりユーザ情報を取得する
-	user, err := ga.Repo.FindUserByEmail(ctx, ga.DB, &stringMail)
+	user, err := ga.Repo.FindUserByEmail(ctx, ga.DB, &mail)
 	if err != nil {
 		return user, err
 	}

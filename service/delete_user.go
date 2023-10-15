@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 )
 
 type DeleteUser struct {
@@ -22,9 +22,6 @@ func NewDeleteUser(cache domain.Cache, repo domain.UserRepo, connection reposito
 
 // ユーザー削除サービス
 func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID model.UserID) error {
-	// ユーザID確認
-	u, _ := ctx.Get(auth.UserID)
-	ownID := u.(model.UserID)
 
 	// トランザクション開始
 	if err := du.Connection.Begin(ctx); err != nil {
@@ -47,6 +44,7 @@ func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID model.UserID) error {
 	}
 
 	// キャッシュから削除
+	ownID := utils.GetUserID(ctx)
 	if userID == ownID {
 		if err := du.Cache.Delete(ctx, fmt.Sprint(userID)); err != nil {
 			return fmt.Errorf("cannot delete in cache: %w", err)

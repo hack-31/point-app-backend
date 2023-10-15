@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,11 +29,10 @@ func NewUpdatePassword(db *sqlx.DB, repo domain.UserRepo) *UpdatePassword {
 // newPassword 新しいパスワード
 func (up *UpdatePassword) UpdatePassword(ctx *gin.Context, oldPassword, newPassword string) error {
 	// コンテキストよりEmailを取得
-	email, _ := ctx.Get(auth.Email)
-	stringMail := email.(string)
+	mail := utils.GetEmail(ctx)
 
 	// Emailよりユーザ情報を取得する
-	u, err := up.UserRepo.FindUserByEmail(ctx, up.QueryerDB, &stringMail)
+	u, err := up.UserRepo.FindUserByEmail(ctx, up.QueryerDB, &mail)
 	if err != nil {
 		return err
 	}
@@ -56,7 +55,7 @@ func (up *UpdatePassword) UpdatePassword(ctx *gin.Context, oldPassword, newPassw
 	if err != nil {
 		return fmt.Errorf("cannot create hash password: %w", err)
 	}
-	if err := up.UserRepo.UpdatePassword(ctx, up.ExecerDB, &stringMail, &hashNewPass); err != nil {
+	if err := up.UserRepo.UpdatePassword(ctx, up.ExecerDB, &mail, &hashNewPass); err != nil {
 		return fmt.Errorf("failed to update password: %w", err)
 	}
 
