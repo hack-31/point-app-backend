@@ -68,10 +68,9 @@ func parse(rawKey []byte) (jwk.Key, error) {
 // @returns
 // token アクセストークン
 func (j *JWTer) GenerateToken(ctx context.Context, u model.User) ([]byte, error) {
+
 	tok, err := jwt.NewBuilder().
 		JwtID(uuid.New().String()).
-		Issuer(`github.com/hack-31/point-app-backend`).
-		Subject("access_token").
 		IssuedAt(j.Clocker.Now()).
 		Expiration(j.Clocker.Now().Add(time.Duration(constant.MaxTokenExpiration_m)*time.Minute)).
 		Claim(Email, u.Email).
