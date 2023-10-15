@@ -34,15 +34,17 @@ jobs:
         ports:
           - 6379:6379
     steps:
-    - uses: actions/setup-go@v4
-      with:
-        go-version: '>=1.21'
     # service内のvolumesでリポジトリにアクセスする際は必要 
     # https://github.com/actions/checkout/issues/211#issuecomment-1336952468 
     - name: Chown user
       run: |
         sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+    # キャッシュを使うため、checkout->setup-goの順番にする
+    # https://medium.com/@s0k0mata/github-actions-and-go-the-new-cache-feature-in-actions-setup-go-v4-and-what-to-watch-out-for-aeea373ed07d
     - uses: actions/checkout@v3
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '>=1.21'
     - name: Migration
       run: |
         go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
