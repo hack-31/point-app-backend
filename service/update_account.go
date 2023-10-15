@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,11 +29,10 @@ func NewUpdateAccount(db *sqlx.DB, repo domain.UserRepo) *UpdateAccount {
 // firstNameKana 名前カナ
 func (ua *UpdateAccount) UpdateAccount(ctx *gin.Context, familyName, familyNameKana, firstName, firstNameKana string) error {
 	// コンテキストよりEmailを取得
-	email, _ := ctx.Get(auth.Email)
-	stringMail := email.(string)
 
+	mail := utils.GetEmail(ctx)
 	// アカウント情報更新
-	if err := ua.UserRepo.UpdateAccount(ctx, ua.ExecerDB, &stringMail, &familyName, &familyNameKana, &firstName, &firstNameKana); err != nil {
+	if err := ua.UserRepo.UpdateAccount(ctx, ua.ExecerDB, &mail, &familyName, &familyNameKana, &firstName, &firstNameKana); err != nil {
 		return fmt.Errorf("failed to update account: %w", err)
 	}
 

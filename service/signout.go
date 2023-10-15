@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/utils"
 )
 
 type Signout struct {
@@ -27,8 +26,7 @@ func NewSignout(cache domain.Cache) *Signout {
 // err
 func (s *Signout) Signout(ctx *gin.Context) error {
 	// ユーザIDの取得
-	userId, _ := ctx.Get(auth.UserID)
-	uid := userId.(model.UserID)
+	uid := utils.GetUserID(ctx)
 
 	// ユーザIDをキャッシュから削除
 	if err := s.Cache.Delete(ctx, fmt.Sprint(uid)); err != nil {

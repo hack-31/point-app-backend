@@ -4,11 +4,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/domain/service"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -33,10 +32,7 @@ func NewUpdateEmail(db *sqlx.DB, cache domain.Cache, rep domain.UserRepo) *Updat
 func (ue *UpdateEmail) UpdateEmail(ctx *gin.Context, temporaryEmailID, confirmCode string) error {
 	// ユーザードメインサービス
 	userService := service.NewUserService(ue.UserRepo)
-
-	// コンテキストよりUserIDを取得する
-	uid, _ := ctx.Get(auth.UserID)
-	userID := uid.(model.UserID)
+	userID := utils.GetUserID(ctx)
 
 	// 一時メールアドレスの復元
 	key := fmt.Sprintf("email:%s:%s", confirmCode, temporaryEmailID)

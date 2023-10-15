@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 )
 
 type SendPoint struct {
@@ -31,8 +31,7 @@ func NewSendPoint(repo *repository.Repository, connection *repository.AppConnect
 // sendPoint 送付ポイント
 func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error {
 	// コンテキストよりUserIDを取得
-	uid, _ := ctx.Get(auth.UserID)
-	fromUserID := uid.(model.UserID)
+	fromUserID := utils.GetUserID(ctx)
 
 	// トランザクション開始
 	if err := sp.Connection.Begin(ctx); err != nil {
@@ -41,9 +40,8 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	defer func() { _ = sp.Connection.Rollback() }()
 
 	// 送付可能か残高を調べる
-	email, _ := ctx.Get(auth.Email)
-	stringMail := email.(string)
-	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.Connection.DB(), &stringMail)
+	mail := utils.GetEmail(ctx)
+	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.Connection.DB(), &mail)
 	if err != nil {
 		return fmt.Errorf("cannot FindUserByEmail in sending point: %w ", err)
 	}

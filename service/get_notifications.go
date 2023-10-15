@@ -5,10 +5,10 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -41,8 +41,7 @@ type GetNotificationsResponse struct {
 // ユーザ一覧
 func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size string) (GetNotificationsResponse, error) {
 	// ユーザID確認
-	u, _ := ctx.Get(auth.UserID)
-	userID := u.(model.UserID)
+	userID := utils.GetUserID(ctx)
 
 	var ns []*model.Notification
 	// 初回時
