@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: generate secret key in JWT
       run: | 
@@ -70,7 +70,7 @@ jobs:
         sudo chown -R $USER:$USER $GITHUB_WORKSPACE
     # キャッシュを使うため、checkout->setup-goの順番にする
     # https://medium.com/@s0k0mata/github-actions-and-go-the-new-cache-feature-in-actions-setup-go-v4-and-what-to-watch-out-for-aeea373ed07d
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-go@v4
       with:
         go-version: '>=1.21'
