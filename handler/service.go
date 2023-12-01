@@ -69,5 +69,5 @@ type GetNotificationsService interface {
 }
 
 type GetUncheckedNotificationCountService interface {
-	GetUncheckedNotificationCount(ctx *gin.Context, notificationCntChan chan<- int) (int, error)
+	GetUncheckedNotificationCount(ctx *gin.Context) (<-chan int, error)
 }
