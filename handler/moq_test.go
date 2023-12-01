@@ -1018,7 +1018,7 @@ var _ GetUncheckedNotificationCountService = &GetUncheckedNotificationCountServi
 //
 //		// make and configure a mocked GetUncheckedNotificationCountService
 //		mockedGetUncheckedNotificationCountService := &GetUncheckedNotificationCountServiceMock{
-//			GetUncheckedNotificationCountFunc: func(ctx *gin.Context, notificationCntChan chan<- int) (int, error) {
+//			GetUncheckedNotificationCountFunc: func(ctx *gin.Context) (<-chan int, error) {
 //				panic("mock out the GetUncheckedNotificationCount method")
 //			},
 //		}
@@ -1029,7 +1029,7 @@ var _ GetUncheckedNotificationCountService = &GetUncheckedNotificationCountServi
 //	}
 type GetUncheckedNotificationCountServiceMock struct {
 	// GetUncheckedNotificationCountFunc mocks the GetUncheckedNotificationCount method.
-	GetUncheckedNotificationCountFunc func(ctx *gin.Context, notificationCntChan chan<- int) (int, error)
+	GetUncheckedNotificationCountFunc func(ctx *gin.Context) (<-chan int, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -1037,29 +1037,25 @@ type GetUncheckedNotificationCountServiceMock struct {
 		GetUncheckedNotificationCount []struct {
 			// Ctx is the ctx argument value.
 			Ctx *gin.Context
-			// NotificationCntChan is the notificationCntChan argument value.
-			NotificationCntChan chan<- int
 		}
 	}
 	lockGetUncheckedNotificationCount sync.RWMutex
 }
 
 // GetUncheckedNotificationCount calls GetUncheckedNotificationCountFunc.
-func (mock *GetUncheckedNotificationCountServiceMock) GetUncheckedNotificationCount(ctx *gin.Context, notificationCntChan chan<- int) (int, error) {
+func (mock *GetUncheckedNotificationCountServiceMock) GetUncheckedNotificationCount(ctx *gin.Context) (<-chan int, error) {
 	if mock.GetUncheckedNotificationCountFunc == nil {
 		panic("GetUncheckedNotificationCountServiceMock.GetUncheckedNotificationCountFunc: method is nil but GetUncheckedNotificationCountService.GetUncheckedNotificationCount was just called")
 	}
 	callInfo := struct {
-		Ctx                 *gin.Context
-		NotificationCntChan chan<- int
+		Ctx *gin.Context
 	}{
-		Ctx:                 ctx,
-		NotificationCntChan: notificationCntChan,
+		Ctx: ctx,
 	}
 	mock.lockGetUncheckedNotificationCount.Lock()
 	mock.calls.GetUncheckedNotificationCount = append(mock.calls.GetUncheckedNotificationCount, callInfo)
 	mock.lockGetUncheckedNotificationCount.Unlock()
-	return mock.GetUncheckedNotificationCountFunc(ctx, notificationCntChan)
+	return mock.GetUncheckedNotificationCountFunc(ctx)
 }
 
 // GetUncheckedNotificationCountCalls gets all the calls that were made to GetUncheckedNotificationCount.
@@ -1067,12 +1063,10 @@ func (mock *GetUncheckedNotificationCountServiceMock) GetUncheckedNotificationCo
 //
 //	len(mockedGetUncheckedNotificationCountService.GetUncheckedNotificationCountCalls())
 func (mock *GetUncheckedNotificationCountServiceMock) GetUncheckedNotificationCountCalls() []struct {
-	Ctx                 *gin.Context
-	NotificationCntChan chan<- int
+	Ctx *gin.Context
 } {
 	var calls []struct {
-		Ctx                 *gin.Context
-		NotificationCntChan chan<- int
+		Ctx *gin.Context
 	}
 	mock.lockGetUncheckedNotificationCount.RLock()
 	calls = mock.calls.GetUncheckedNotificationCount
