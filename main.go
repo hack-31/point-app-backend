@@ -37,10 +37,21 @@ func run(ctx context.Context) error {
 	router := gin.Default()
 	// ミドルウェアの設定
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"http://localhost*", "https://*.dkjrwfcbom7qp.amplifyapp.com", "https://hack-31.github.io"},
-		AllowMethods:  []string{"*"},
-		AllowHeaders:  []string{"*"},
-		AllowWildcard: true,
+		AllowOrigins: []string{
+			"http://localhost*",
+			"https://*.dkjrwfcbom7qp.amplifyapp.com",
+			"https://hack-31.github.io",
+		},
+		AllowMethods: []string{
+			"POST",
+			"GET",
+			"OPTIONS",
+			"PUT",
+			"DELETE",
+		},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowWildcard:    true,
+		AllowCredentials: true,
 	}))
 
 	// DB関係初期化
