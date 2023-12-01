@@ -110,8 +110,6 @@ func (k *KVS) Subscribe(ctx *gin.Context, channel string) (<-chan string, error)
 				return
 			case <-ctx.Request.Context().Done():
 				return
-			case <-time.After(5 * time.Second):
-				return
 			case c, ok := <-ch:
 				// ch チャンネルがクローズ
 				if !ok {
