@@ -77,7 +77,7 @@ jobs:
     - name: go module install
       if: ${{ steps.setup-go.outputs.cache-hit != 'true' }}
       run: |
-        go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
+        go install github.com/sqldef/sqldef/cmd/mysqldef@latest
     - name: Migration
       run: |
         mysqldef -u root -h 127.0.0.1 -P 3306 point_app < ./_tools/mysql/schema.sql

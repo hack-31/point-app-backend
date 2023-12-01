@@ -34,7 +34,7 @@ WORKDIR /app
 RUN apk update && apk add alpine-sdk jq mysql mysql-client
 
 RUN go install github.com/cosmtrek/air@latest \
-  && go install github.com/k0kubun/sqldef/cmd/mysqldef@latest \
+  && go install github.com/sqldef/sqldef/cmd/mysqldef@latest \
   && go install honnef.co/go/tools/cmd/staticcheck@latest \
   && go install golang.org/x/tools/cmd/goimports@latest \
   && go install github.com/matryer/moq@latest \
