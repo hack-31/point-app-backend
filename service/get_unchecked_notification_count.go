@@ -26,28 +26,40 @@ func NewGetUncheckedNotificationCount(db *sqlx.DB, cache domain.Cache, repo doma
 //
 // @return
 // ユーザ一覧
-func (gunc *GetUncheckedNotificationCount) GetUncheckedNotificationCount(ctx *gin.Context, notificationCntChan chan<- int) (int, error) {
+func (gunc *GetUncheckedNotificationCount) GetUncheckedNotificationCount(ctx *gin.Context) (<-chan int, error) {
 	// ユーザID確認
-
 	userID := utils.GetUserID(ctx)
 
 	// お知らせ数の確認
+	notificationCntChan := make(chan int)
 	cnt, err := gunc.NotifRepo.GetUncheckedNotificationCount(ctx, gunc.DB, userID)
 	if err != nil {
-		return 0, fmt.Errorf("faild to get unchecked notification count from db: %w", err)
+		return notificationCntChan, fmt.Errorf("faild to get unchecked notification count from db: %w", err)
 	}
 
 	// お知らせ通知をサブスクライブ
 	go func() {
+		defer close(notificationCntChan)
+
+		// 初回のお知らせ通知
+		notificationCntChan <- cnt
+
+		// お知らせ通知をサブスク
 		payloadChan, err := gunc.Cache.Subscribe(ctx, fmt.Sprintf("notification:%d", userID))
 		if err != nil {
 			return
 		}
 		for {
 			select {
-			case <-ctx.Request.Context().Done():
+			case <-ctx.Request.Context().Done(): // リクエストのコンテキストがキャンセルされたらゴルーチンを終了
 				return
-			case <-payloadChan:
+			case <-ctx.Done():
+				return
+			case _, ok := <-payloadChan:
+				// payloadChanがクローズされたらゴルーチンを終了
+				if !ok {
+					return
+				}
 				// お知らせの通知が来たら、お知らせテーブルよりお知らせ数取得
 				cnt, err := gunc.NotifRepo.GetUncheckedNotificationCount(ctx, gunc.DB, userID)
 				if err != nil {
@@ -58,5 +70,5 @@ func (gunc *GetUncheckedNotificationCount) GetUncheckedNotificationCount(ctx *gi
 		}
 	}()
 
-	return cnt, nil
+	return notificationCntChan, nil
 }

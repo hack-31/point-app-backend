@@ -101,16 +101,26 @@ func (k *KVS) Publish(ctx context.Context, channel, palyload string) error {
 func (k *KVS) Subscribe(ctx *gin.Context, channel string) (<-chan string, error) {
 	ch := k.Cli.Subscribe(ctx, channel).Channel()
 	payload := make(chan string)
+
 	go func() {
+		defer close(payload)
 		for {
 			select {
-			case <-ctx.Request.Context().Done():
-				close(payload)
+			case <-ctx.Done():
 				return
-			case c := <-ch:
+			case <-ctx.Request.Context().Done():
+				return
+			case <-time.After(5 * time.Second):
+				return
+			case c, ok := <-ch:
+				// ch チャンネルがクローズ
+				if !ok {
+					return
+				}
 				payload <- c.Payload
 			}
 		}
 	}()
+
 	return payload, nil
 }
