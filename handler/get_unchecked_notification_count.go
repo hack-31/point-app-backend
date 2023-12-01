@@ -23,36 +23,30 @@ func (gunc *GetUncheckedNotificationCount) ServeHTTP(ctx *gin.Context) {
 	ctx.Header("Cache-Control", "no-cache")
 	ctx.Header("Connection", "keep-alive")
 
-	notificationCntChan := make(chan int)
-	defer close(notificationCntChan)
-
-	//　初回お知らせ数の返却
-	cnt, err := gunc.Service.GetUncheckedNotificationCount(ctx, notificationCntChan)
+	notificationCntChan, err := gunc.Service.GetUncheckedNotificationCounts(ctx)
 	if err != nil {
 		ctx.SSEvent("error", err.Error())
 		ctx.Writer.Flush()
 		return
 	}
-	res := struct {
-		Count int `json:"count"`
-	}{
-		Count: cnt,
-	}
-	jsonData, err := json.Marshal(res)
-	if err != nil {
-		ctx.SSEvent("error", err.Error())
-		ctx.Writer.Flush()
-		return
-	}
-	ctx.SSEvent("message", string(jsonData))
-	ctx.Writer.Flush()
 
 	// お知らせ通知を待機
 	for {
 		select {
 		case <-ctx.Request.Context().Done():
+			ctx.SSEvent("error", "キャンセルされました。")
+			ctx.Writer.Flush()
 			return
-		case cnt := <-notificationCntChan:
+		case <-ctx.Done():
+			ctx.SSEvent("error", "キャンセルされました。")
+			ctx.Writer.Flush()
+			return
+		case cnt, ok := <-notificationCntChan:
+			if !ok {
+				ctx.SSEvent("error", "キャンセルされました。")
+				ctx.Writer.Flush()
+				return
+			}
 			res := struct {
 				Count int `json:"count"`
 			}{
