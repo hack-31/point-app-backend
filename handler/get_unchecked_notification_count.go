@@ -23,7 +23,7 @@ func (gunc *GetUncheckedNotificationCount) ServeHTTP(ctx *gin.Context) {
 	ctx.Header("Cache-Control", "no-cache")
 	ctx.Header("Connection", "keep-alive")
 
-	notificationCntChan, err := gunc.Service.GetUncheckedNotificationCounts(ctx)
+	notificationCntChan, err := gunc.Service.GetUncheckedNotificationCount(ctx)
 	if err != nil {
 		ctx.SSEvent("error", err.Error())
 		ctx.Writer.Flush()
