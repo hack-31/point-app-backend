@@ -29,5 +29,11 @@ func OpenDBForTest(t *testing.T) *sqlx.DB {
 	t.Cleanup(
 		func() { _ = db.Close() },
 	)
-	return sqlx.NewDb(db, "mysql")
+
+	xdb := sqlx.NewDb(db, "mysql")
+
+	// AUTO_INCREMENTをリセットする
+	xdb.Exec("ALTER TABLE `users` AUTO_INCREMENT = 1;")
+
+	return xdb
 }
