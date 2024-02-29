@@ -18,7 +18,7 @@ type UserRepo interface {
 	UpdatePassword(ctx context.Context, db repository.Execer, email, pass *string) error
 	UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 	UpdateAccount(ctx context.Context, db repository.Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error
-	FindUsers(ctx context.Context, db repository.Queryer) (model.Users, error)
+	GetAll(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error)
 }
 
 // ポイントに対するリポジトリインターフェース

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/hack-31/point-app-backend/domain/model"
@@ -197,21 +198,24 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 //
 // @returns
 // Users ユーザ一覧
-func (r *Repository) FindUsers(ctx context.Context, db Queryer) (model.Users, error) {
-	sql := `
-		SELECT 
-			u.id, 
-			u.first_name, 
-			u.first_name_kana, 
-			u.family_name, 
-			u.family_name_kana, 
-			u.email, 
-			SUM(IFNULL(t.transaction_point, 0)) AS acquisition_point 
-		from users AS u
-		LEFT JOIN transactions AS t
-		ON u.id = t.receiving_user_id
-		GROUP BY u.id`
-
+func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) (model.Users, error) {
+	var formattedColumns = "u.id, u.first_name, u.first_name_kana, u.family_name, u.family_name_kana, u.email, u.password, u.sending_point, u.created_at, u.update_at"
+	// 列名を "u.id, u.name" のような形式に変換する
+	if len(columns) > 0 {
+		formattedColumns = ""
+		for _, column := range columns {
+			formattedColumns += fmt.Sprintf("u.%s, ", column)
+		}
+	}
+	// 最後のカンマとスペースを削除する
+	formattedColumns = strings.TrimSuffix(formattedColumns, ", ")
+	sql :=
+		`SELECT ` + formattedColumns + `,
+				SUM(IFNULL(t.transaction_point, 0)) AS acquisition_point
+			from users AS u
+			LEFT JOIN transactions AS t
+			ON u.id = t.receiving_user_id
+			GROUP BY u.id;`
 	var users model.Users
 	if err := db.SelectContext(ctx, &users, sql); err != nil {
 		return users, err
