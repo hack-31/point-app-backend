@@ -147,10 +147,9 @@ func TestGetNotifications(t *testing.T) {
 			getUserByID: getUserByID{
 				err: nil,
 				user: model.User{
-					ID:                   userID,
-					NotificationLatestID: 90,
-					Email:                "yamada@sample.com",
-					SendingPoint:         100,
+					ID:           userID,
+					Email:        "yamada@sample.com",
+					SendingPoint: 100,
 				},
 			},
 			want: want{
