@@ -1,142 +1,255 @@
 package repository
 
 import (
-	"context"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/testdata"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareUsers(ctx context.Context, t *testing.T, con Execer) model.Users {
-	t.Helper()
-	// 外部キー制約を一時的ににする
-	if _, err := con.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS=0;`); err != nil {
-		t.Logf("%v", err)
+func TestRepository_users_GetAll(t *testing.T) {
+	c := clock.FixedClocker{
+		IsAsia: true,
 	}
-	// 一旦データを全て削除
-	if _, err := con.ExecContext(ctx, `DELETE FROM transactions;`); err != nil {
-		t.Logf("%v", err)
+	type want struct {
+		users model.Users
+		err   error
 	}
-	if _, err := con.ExecContext(ctx, `DELETE FROM users;`); err != nil {
-		t.Logf("%v", err)
+	type input struct {
+		columns []string
 	}
 
-	c := clock.FixedClocker{}
-	// 全ユーザ取得メソッドを呼び出した時の期待データ
-	wants := model.Users{
-		{
-			FirstName:      "太郎",
-			FirstNameKana:  "たろう",
-			FamilyName:     "山田",
-			FamilyNameKana: "やまだ",
-			Email:          "yamada.taro@example.com",
+	tests := map[string]struct {
+		input input
+		want  want
+	}{
+		"全カラムのユーザー一覧を取得する": {
+			input: input{
+				columns: []string{},
+			},
+			want: want{
+				users: model.Users{
+					&model.User{
+						ID:             1,
+						FirstName:      "太郎",
+						FirstNameKana:  "タロウ",
+						FamilyName:     "本田",
+						FamilyNameKana: "ホンダ",
+						Email:          "honda.taro@sample.com",
+						Password:       "honda.pass",
+						SendingPoint:   0,
+						CreatedAt:      c.Now(),
+						UpdateAt:       c.Now(),
+					},
+					&model.User{
+						ID:             2,
+						FirstNameKana:  "あおい",
+						FirstName:      "葵",
+						FamilyName:     "斉藤",
+						FamilyNameKana: "さいとう",
+						Email:          "saito.aoi@example.com",
+						Password:       "aoi.pass",
+						SendingPoint:   100,
+						CreatedAt:      c.Now(),
+						UpdateAt:       c.Now(),
+					},
+					&model.User{
+						ID:             3,
+						FirstName:      "拓也",
+						FirstNameKana:  "たくや",
+						FamilyName:     "木村",
+						FamilyNameKana: "きむら",
+						Email:          "kimura.takuya@example.com",
+						Password:       "kimura.pass",
+						SendingPoint:   800,
+						CreatedAt:      c.Now(),
+						UpdateAt:       c.Now(),
+					},
+				},
+				err: nil,
+			},
 		},
-		{
-			FirstName:      "葵",
-			FirstNameKana:  "あおい",
-			FamilyName:     "斉藤",
-			FamilyNameKana: "さいとう",
-			Email:          "saito.aoi@example.com",
-		},
-		{
-			FirstName:      "拓也",
-			FirstNameKana:  "たくや",
-			FamilyName:     "木村",
-			FamilyNameKana: "きむら",
-			Email:          "kimura.takuya@example.com",
+		"カラム指定でユーザー一覧を取得する": {
+			input: input{
+				columns: []string{"first_name"},
+			},
+			want: want{
+				users: model.Users{
+					&model.User{
+						FirstName: "太郎",
+					},
+					&model.User{
+						FirstName: "葵",
+					},
+					&model.User{
+						FirstName: "拓也",
+					},
+				},
+				err: nil,
+			},
 		},
 	}
-	// 挿入データ
-	users := model.Users{
-		{
-			FirstName:      wants[0].FirstName,
-			FirstNameKana:  wants[0].FirstNameKana,
-			FamilyName:     wants[0].FamilyName,
-			FamilyNameKana: wants[0].FamilyNameKana,
-			Email:          wants[0].Email,
-			UpdateAt:       c.Now(),
-			CreatedAt:      c.Now(),
-		},
-		{
-			FirstName:      wants[1].FirstName,
-			FirstNameKana:  wants[1].FirstNameKana,
-			FamilyName:     wants[1].FamilyName,
-			FamilyNameKana: wants[1].FamilyNameKana,
-			Email:          wants[1].Email,
-			UpdateAt:       c.Now(),
-			CreatedAt:      c.Now(),
-		},
-		{
-			FirstName:      wants[2].FirstName,
-			FirstNameKana:  wants[2].FirstNameKana,
-			FamilyName:     wants[2].FamilyName,
-			FamilyNameKana: wants[2].FamilyNameKana,
-			Email:          wants[2].Email,
-			UpdateAt:       c.Now(),
-			CreatedAt:      c.Now(),
-		},
+	for n, tt := range tests {
+		tt := tt
+		t.Run(n, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(w)
+
+			tx, err := testutil.OpenDBForTest(t).BeginTxx(ctx, nil)
+			assert.NoError(t, err)
+
+			t.Cleanup(func() {
+				// 外部キー制約を有効にする
+				_, err := tx.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS=1`)
+				assert.NoError(t, err)
+				err = tx.Rollback()
+				assert.NoError(t, err)
+			})
+
+			// テストデータの挿入
+			testdata.Users(t, ctx, tx, func(users model.Users) {})
+
+			// 実行
+			r := &Repository{}
+			gots, err := r.GetAll(ctx, tx, tt.input.columns...)
+
+			// アサーション
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want.users, gots)
+		})
 	}
-	result, err := con.ExecContext(ctx,
-		`INSERT INTO users (first_name, first_name_kana, family_name, family_name_kana, email, password, sending_point, created_at, update_at)
-			VALUES
-			    (?, ?, ?, ?, ?, ?, ?, ?, ?),
-			    (?, ?, ?, ?, ?, ?, ?, ?, ?),
-			    (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-		users[0].FirstName, users[0].FirstNameKana, users[0].FamilyName, users[0].FamilyNameKana, users[0].Email, users[0].Password, users[0].SendingPoint, users[0].CreatedAt, users[0].UpdateAt,
-		users[1].FirstName, users[1].FirstNameKana, users[1].FamilyName, users[1].FamilyNameKana, users[1].Email, users[1].Password, users[1].SendingPoint, users[1].CreatedAt, users[1].UpdateAt,
-		users[2].FirstName, users[2].FirstNameKana, users[2].FamilyName, users[2].FamilyNameKana, users[2].Email, users[2].Password, users[2].SendingPoint, users[2].CreatedAt, users[2].UpdateAt,
-	)
-	assert.NoError(t, err)
-
-	id, err := result.LastInsertId()
-	assert.NoError(t, err)
-
-	wants[0].ID = model.UserID(id)
-	wants[1].ID = model.UserID(id + 1)
-	wants[2].ID = model.UserID(id + 2)
-	return wants
 }
 
-func TestRepository_FindUsers(t *testing.T) {
-	t.Parallel()
-	t.Run("ユーザ一覧を取得する", func(t *testing.T) {
-		w := httptest.NewRecorder()
-		ctx, _ := gin.CreateTestContext(w)
+func TestRepository_users_GetUserByID(t *testing.T) {
+	c := clock.FixedClocker{
+		IsAsia: true,
+	}
 
-		// model.Usersを作成する他のテストケースと混ざるとテストがフェイルする。
-		// そのため、トランザクションをはることでこのテストケースの中だけのテーブル状態にする。
-		tx, err := testutil.OpenDBForTest(t).BeginTxx(ctx, nil)
-		// このテストケースが完了したらもとに戻す
-		t.Cleanup(func() {
-			_ = tx.Rollback()
-			// 外部キー制約を有効にする
-			_, _ = tx.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS=1`)
+	type want struct {
+		user model.User
+	}
+	type input struct {
+		id model.UserID
+	}
+
+	tests := map[string]struct {
+		input input
+		want  want
+	}{
+		"ユーザーID_1のユーザー情報を取得する": {
+			input: input{
+				id: 1,
+			},
+			want: want{
+				user: model.User{
+					ID:             1,
+					FirstName:      "太郎",
+					FirstNameKana:  "タロウ",
+					FamilyName:     "本田",
+					FamilyNameKana: "ホンダ",
+					Email:          "honda.taro@sample.com",
+					Password:       "honda.pass",
+					SendingPoint:   0,
+					CreatedAt:      c.Now(),
+					UpdateAt:       c.Now(),
+				},
+			},
+		},
+	}
+
+	for n, tt := range tests {
+		t.Run(n, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(w)
+
+			tx, err := testutil.OpenDBForTest(t).BeginTxx(ctx, nil)
+			t.Cleanup(func() {
+				_, err = tx.ExecContext(ctx, `SET FOREIGN_KEY_CHECKS = 1`)
+				assert.NoError(t, err)
+				err := tx.Rollback()
+				assert.NoError(t, err)
+			})
+
+			testdata.Users(t, ctx, tx, func(users model.Users) {})
+
+			// 実行
+			r := &Repository{}
+			gots, err := r.GetUserByID(ctx, tx, tt.input.id)
+
+			// アサーション
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want.user, gots)
 		})
-		assert.NoError(t, err)
+	}
+}
 
-		wants := prepareUsers(ctx, t, tx)
+func TestRepository_users_UpdateEmail(t *testing.T) {
+	type want struct {
+		email string
+		err   error
+	}
+	type input struct {
+		email string
+		id    model.UserID
+	}
 
-		// 実行
-		r := &Repository{}
-		gots, err := r.FindUsers(ctx, tx)
+	tests := map[string]struct {
+		input input
+		want  want
+	}{
+		"ユーザーID_1のメールを更新する": {
+			input: input{
+				email: "before@sample.com",
+				id:    1,
+			},
+			want: want{
+				email: "after@sample.com",
+				err:   nil,
+			},
+		},
+	}
 
-		// アサーション
-		assert.Nil(t, err)
-		assert.Equal(t, wants, gots)
-	})
+	for n, tt := range tests {
+		t.Run(n, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(w)
+
+			tx, err := testutil.OpenDBForTest(t).BeginTxx(ctx, nil)
+			assert.NoError(t, err)
+			t.Cleanup(func() {
+				err := tx.Rollback()
+				assert.NoError(t, err)
+			})
+
+			testdata.Users(t, ctx, tx, func(users model.Users) {
+				users[0].Email = tt.input.email
+			})
+
+			// 実行
+			r := &Repository{}
+			err = r.UpdateEmail(ctx, tx, tt.input.id, tt.want.email)
+			assert.Nil(t, err)
+
+			// 確認
+			gots, err := r.GetUserByID(ctx, tx, tt.input.id)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want.email, gots.Email)
+		})
+	}
 }
 
 func TestRepository_RegisterUser(t *testing.T) {
-	t.Parallel()
 	t.Run("ユーザを登録し、ユーザIDを取得し、ユーザ情報ポインタにセットする", func(t *testing.T) {
-		c := clock.FixedClocker{}
+		c := clock.FixedClocker{
+			IsAsia: true,
+		}
 		// 登録データ
 		okUser := &model.User{
 			FirstName:      "山田",
