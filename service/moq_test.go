@@ -435,8 +435,8 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //			FindUserByEmailFunc: func(ctx context.Context, db repository.Queryer, e *string) (model.User, error) {
 //				panic("mock out the FindUserByEmail method")
 //			},
-//			FindUsersFunc: func(ctx context.Context, db repository.Queryer) (model.Users, error) {
-//				panic("mock out the FindUsers method")
+//			GetAllFunc: func(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error) {
+//				panic("mock out the GetAll method")
 //			},
 //			GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error) {
 //				panic("mock out the GetUserByID method")
@@ -466,8 +466,8 @@ type UserRepoMock struct {
 	// FindUserByEmailFunc mocks the FindUserByEmail method.
 	FindUserByEmailFunc func(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
 
-	// FindUsersFunc mocks the FindUsers method.
-	FindUsersFunc func(ctx context.Context, db repository.Queryer) (model.Users, error)
+	// GetAllFunc mocks the GetAll method.
+	GetAllFunc func(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error)
 
 	// GetUserByIDFunc mocks the GetUserByID method.
 	GetUserByIDFunc func(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error)
@@ -504,12 +504,14 @@ type UserRepoMock struct {
 			// E is the e argument value.
 			E *string
 		}
-		// FindUsers holds details about calls to the FindUsers method.
-		FindUsers []struct {
+		// GetAll holds details about calls to the GetAll method.
+		GetAll []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
 			Db repository.Queryer
+			// Columns is the columns argument value.
+			Columns []string
 		}
 		// GetUserByID holds details about calls to the GetUserByID method.
 		GetUserByID []struct {
@@ -571,7 +573,7 @@ type UserRepoMock struct {
 	}
 	lockDeleteUserByID  sync.RWMutex
 	lockFindUserByEmail sync.RWMutex
-	lockFindUsers       sync.RWMutex
+	lockGetAll          sync.RWMutex
 	lockGetUserByID     sync.RWMutex
 	lockRegisterUser    sync.RWMutex
 	lockUpdateAccount   sync.RWMutex
@@ -659,39 +661,43 @@ func (mock *UserRepoMock) FindUserByEmailCalls() []struct {
 	return calls
 }
 
-// FindUsers calls FindUsersFunc.
-func (mock *UserRepoMock) FindUsers(ctx context.Context, db repository.Queryer) (model.Users, error) {
-	if mock.FindUsersFunc == nil {
-		panic("UserRepoMock.FindUsersFunc: method is nil but UserRepo.FindUsers was just called")
+// GetAll calls GetAllFunc.
+func (mock *UserRepoMock) GetAll(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error) {
+	if mock.GetAllFunc == nil {
+		panic("UserRepoMock.GetAllFunc: method is nil but UserRepo.GetAll was just called")
 	}
 	callInfo := struct {
-		Ctx context.Context
-		Db  repository.Queryer
+		Ctx     context.Context
+		Db      repository.Queryer
+		Columns []string
 	}{
-		Ctx: ctx,
-		Db:  db,
+		Ctx:     ctx,
+		Db:      db,
+		Columns: columns,
 	}
-	mock.lockFindUsers.Lock()
-	mock.calls.FindUsers = append(mock.calls.FindUsers, callInfo)
-	mock.lockFindUsers.Unlock()
-	return mock.FindUsersFunc(ctx, db)
+	mock.lockGetAll.Lock()
+	mock.calls.GetAll = append(mock.calls.GetAll, callInfo)
+	mock.lockGetAll.Unlock()
+	return mock.GetAllFunc(ctx, db, columns...)
 }
 
-// FindUsersCalls gets all the calls that were made to FindUsers.
+// GetAllCalls gets all the calls that were made to GetAll.
 // Check the length with:
 //
-//	len(mockedUserRepo.FindUsersCalls())
-func (mock *UserRepoMock) FindUsersCalls() []struct {
-	Ctx context.Context
-	Db  repository.Queryer
+//	len(mockedUserRepo.GetAllCalls())
+func (mock *UserRepoMock) GetAllCalls() []struct {
+	Ctx     context.Context
+	Db      repository.Queryer
+	Columns []string
 } {
 	var calls []struct {
-		Ctx context.Context
-		Db  repository.Queryer
+		Ctx     context.Context
+		Db      repository.Queryer
+		Columns []string
 	}
-	mock.lockFindUsers.RLock()
-	calls = mock.calls.FindUsers
-	mock.lockFindUsers.RUnlock()
+	mock.lockGetAll.RLock()
+	calls = mock.calls.GetAll
+	mock.lockGetAll.RUnlock()
 	return calls
 }
 

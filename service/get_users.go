@@ -27,7 +27,7 @@ func NewGetUsers(db *sqlx.DB, repo domain.UserRepo, jwter domain.TokenGenerator)
 // ユーザ一覧
 func (r *GetUsers) GetUsers(ctx context.Context) (model.Users, error) {
 	// ユーザ一覧を取得する
-	users, err := r.Repo.FindUsers(ctx, r.DB)
+	users, err := r.Repo.GetAll(ctx, r.DB)
 	if err != nil {
 		return users, err
 	}
