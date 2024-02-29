@@ -133,17 +133,14 @@ test: ## テスト
 		docker compose exec app go test -cover -race -shuffle=on ./...; \
 	fi
 
-.PHONY: mc
-mc: ## make coverage カバレッジファイル作成（ホスト側）
+.PHONY: coverage
+coverage: ## make coverage カバレッジファイル作成・表示（ホスト側）
 	# テスト実行中
 	@docker compose exec app go test -cover ./... -coverprofile=cover.out
 	# HTMLに変換中
 	@docker compose exec app go tool cover -html=cover.out -o tmp/cover.html
 	@docker compose exec app rm cover.out
-
-.PHONY: wc
-wc: mc ## watch coverage カバレッジを見る（ホスト側）
-	# ブラウザで表示
+	# ブラウザ表示
 	@open ./tmp/cover.html
 
 .PHONY: wire
