@@ -15,6 +15,7 @@ services:
       DB_USER: admin
       DB_PASSWORD: password
       DB_NAME: point_app
+      DB_TEST_NAME: point_app_test
       REDIS_HOST: point-app-redis
       REDIS_PORT: 6379
       AWS_ENDPOINT: http://aws:4566
@@ -53,9 +54,11 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: point_app
+      DB_TEST_NAME: point_app_test
     volumes:
       - point-app-db-data:/var/lib/mysql
       - $PWD/_tools/mysql/conf.d:/etc/mysql/conf.d:cached
+      - $PWD/_tools/mysql/create_test_db.sh:/docker-entrypoint-initdb.d/create_test_db.sh
     ports:
       - "33306:3306"
     healthcheck:

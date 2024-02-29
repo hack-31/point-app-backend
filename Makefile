@@ -51,7 +51,10 @@ dry-migrate: ## Try migration（マイグレーション時に発行されるDDL
 
 .PHONY: migrate
 migrate:  ## Execute migration（コンテナ）
-	mysqldef -u ${DB_USER} -p ${DB_PASSWORD} -h ${DB_HOST} -P ${DB_PORT} ${DB_NAME} < ./_tools/mysql/schema.sql
+	@mysqldef -u ${DB_USER} -p ${DB_PASSWORD} -h ${DB_HOST} -P ${DB_PORT} ${DB_NAME} < ./_tools/mysql/schema.sql
+	@if [ ${GO_ENV} == development ]; then \
+		mysqldef -u ${DB_USER} -p ${DB_PASSWORD} -h ${DB_HOST} -P ${DB_PORT} ${DB_TEST_NAME} < ./_tools/mysql/schema.sql; \
+	fi
 
 .PHONY: seed
 seed: ## データ挿入（コンテナ）
