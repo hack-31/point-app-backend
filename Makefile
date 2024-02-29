@@ -60,9 +60,9 @@ seed: ## データ挿入（コンテナ）
 .PHONY: rdm
 rdm: ## 送信メールを見る
 	@if [ ${CONTAINER_ENV} ]; then \
-		curl -v http://aws:4566/_localstack/ses/ | jq . | tail -n 18 | head -n 16; \
+		curl -v http://aws:4566/_aws/ses/ | jq . | tail -n 18 | head -n 16; \
 	else \
-		curl -v http://localhost:4566/_localstack/ses/ | jq . | tail -n 18 | head -n 16; \
+		curl -v http://localhost:4566/_aws/ses/ | jq . | tail -n 18 | head -n 16; \
 	fi
 
 .PHONY: create-key
