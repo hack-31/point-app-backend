@@ -33,7 +33,8 @@ func OpenDBForTest(t *testing.T) *sqlx.DB {
 	xdb := sqlx.NewDb(db, "mysql")
 
 	// AUTO_INCREMENTをリセットする
-	xdb.Exec("ALTER TABLE `users` AUTO_INCREMENT = 1;")
+	_, err = xdb.Exec("ALTER TABLE `users` AUTO_INCREMENT = 1;")
+	assert.NoError(t, err)
 
 	return xdb
 }
