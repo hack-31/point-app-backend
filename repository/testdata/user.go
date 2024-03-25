@@ -2,7 +2,6 @@ package testdata
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/hack-31/point-app-backend/domain/model"
@@ -77,7 +76,7 @@ func Users(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users mo
 	// 自動発行されたユーザーIDを取得
 	id, err := result.LastInsertId()
 	assert.NoError(t, err)
-	fmt.Printf("id: %v\n", id)
+
 	users[0].ID = model.UserID(id)
 	users[1].ID = model.UserID(id + 1)
 	users[2].ID = model.UserID(id + 2)
