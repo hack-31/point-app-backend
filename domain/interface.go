@@ -21,6 +21,11 @@ type UserRepo interface {
 	GetAll(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error)
 }
 
+// 取引に対するインターフェース
+type TransactionRepo interface {
+	GetAquistionPoint(ctx context.Context, db repository.Queryer, userIDs []model.UserID) (map[model.UserID]int, error)
+}
+
 // ポイントに対するリポジトリインターフェース
 type PointRepo interface {
 	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId model.UserID, sendPoint int) error
