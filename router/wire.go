@@ -53,7 +53,7 @@ func InitResetPassword(db *sqlx.DB, rep domain.UserRepo) *handler.ResetPassword 
 	return &handler.ResetPassword{}
 }
 
-func InitGetUsers(db *sqlx.DB, repo domain.UserRepo, jwter domain.TokenGenerator) *handler.GetUsers {
+func InitGetUsers(db *sqlx.DB, repo *repository.Repository, jwter domain.TokenGenerator) *handler.GetUsers {
 	wire.Build(
 		handler.NewGetUsers,
 		service.NewGetUsers,
@@ -71,7 +71,7 @@ func InitDeleteUser(transacter repository.Transacter, repo domain.UserRepo, cach
 	return &handler.DeleteUser{}
 }
 
-func InitGetAccount(db *sqlx.DB, repo domain.UserRepo) *handler.GetAccount {
+func InitGetAccount(db *sqlx.DB, repo *repository.Repository) *handler.GetAccount {
 	wire.Build(
 		handler.NewGetAccount,
 		service.NewGetAccount,
