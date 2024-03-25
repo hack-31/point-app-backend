@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 )
 
@@ -14,16 +15,6 @@ type GetUsers struct {
 
 func NewGetUsers(s GetUsersService) *GetUsers {
 	return &GetUsers{Service: s}
-}
-
-type user struct {
-	AcquisitionPoint int    `json:"acquisitionPoint"`
-	Email            string `json:"email"`
-	FirstName        string `json:"firstName"`
-	FirstNameKana    string `json:"firstNameKana"`
-	FamilyName       string `json:"familyName"`
-	FamilyNameKana   string `json:"familyNameKana"`
-	ID               int    `json:"id"`
 }
 
 // ユーザ一覧取得ハンドラー
@@ -45,23 +36,35 @@ func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 		return
 	}
 
-	usersResponse := []user{}
+	// レスポンスの作成
+	type user struct {
+		AcquisitionPoint int          `json:"acquisitionPoint"`
+		Email            string       `json:"email"`
+		FirstName        string       `json:"firstName"`
+		FirstNameKana    string       `json:"firstNameKana"`
+		FamilyName       string       `json:"familyName"`
+		FamilyNameKana   string       `json:"familyNameKana"`
+		ID               model.UserID `json:"id"`
+	}
 
-	for _, u := range users {
-		usersResponse = append(usersResponse, user{
-			AcquisitionPoint: u.AcquisitionPoint,
-			Email:            u.Email,
-			FirstName:        u.FirstName,
-			FirstNameKana:    u.FirstNameKana,
-			FamilyName:       u.FamilyName,
-			FamilyNameKana:   u.FamilyNameKana,
-			ID:               int(u.ID),
+	usersRes := make([]user, 0, len(users.Users))
+	for _, v := range users.Users {
+		usersRes = append(usersRes, user{
+			ID:               v.ID,
+			AcquisitionPoint: v.AcquisitionPoint,
+			Email:            v.Email,
+			FirstName:        v.FirstName,
+			FirstNameKana:    v.FirstNameKana,
+			FamilyName:       v.FamilyName,
+			FamilyNameKana:   v.FamilyNameKana,
 		})
 	}
 
 	rsp := struct {
 		Users []user `json:"users"`
-	}{Users: usersResponse}
+	}{
+		Users: usersRes,
+	}
 
 	APIResponse(ctx, http.StatusOK, "取得成功しました。", rsp)
 }
