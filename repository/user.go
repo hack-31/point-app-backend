@@ -45,29 +45,25 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *model.User)
 // ctx context
 // db dbインスタンス
 // email email
+// columns カラム（無指定の場合は全て）
 //
 // @returns
 // model.User ユーザ情報
-func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email *string) (model.User, error) {
-	sql := `
-		SELECT 
-			u.id,
-			u.first_name, 
-			u.first_name_kana, 
-			u.family_name, 
-			u.family_name_kana, 
-			u.email,
-			u.password,
-			u.created_at,
-			u.update_at,
-			u.sending_point,
-			SUM(IFNULL(t.transaction_point, 0)) AS acquisition_point 
-		from users AS u
-		LEFT JOIN transactions AS t
-		ON u.id = t.receiving_user_id
-		WHERE u.email = ?
-		GROUP BY u.id
-		LIMIT 1`
+func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email string, columns ...string) (model.User, error) {
+	formattedColumns := "*"
+	if len(columns) > 0 {
+		// 以下のような文字列にする
+		// id, name, email, created_at, updated_at
+		formattedColumns = ""
+		formattedColumns = strings.Join(columns, ", ")
+		formattedColumns = strings.TrimSuffix(formattedColumns, ", ")
+	}
+
+	sql :=
+		`SELECT ` + formattedColumns + `
+		FROM users 
+		WHERE email = ? 
+		LIMIT 1;`
 
 	var user model.User
 
@@ -195,27 +191,22 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 // @params
 // ctx context
 // db db
+// columns 取得カラム（無指定の場合は全て）
 //
 // @returns
 // Users ユーザ一覧
 func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) (model.Users, error) {
-	var formattedColumns = "u.id, u.first_name, u.first_name_kana, u.family_name, u.family_name_kana, u.email, u.password, u.sending_point, u.created_at, u.update_at"
-	// 列名を "u.id, u.name" のような形式に変換する
+	formattedColumns := "*"
 	if len(columns) > 0 {
+		// 以下のような文字列にする
+		// id, name, email, created_at, updated_at
 		formattedColumns = ""
-		for _, column := range columns {
-			formattedColumns += fmt.Sprintf("u.%s, ", column)
-		}
+		formattedColumns = strings.Join(columns, ", ")
+		formattedColumns = strings.TrimSuffix(formattedColumns, ", ")
 	}
-	// 最後のカンマとスペースを削除する
-	formattedColumns = strings.TrimSuffix(formattedColumns, ", ")
 	sql :=
-		`SELECT ` + formattedColumns + `,
-				SUM(IFNULL(t.transaction_point, 0)) AS acquisition_point
-			from users AS u
-			LEFT JOIN transactions AS t
-			ON u.id = t.receiving_user_id
-			GROUP BY u.id;`
+		`SELECT ` + formattedColumns + `
+		 FROM users;`
 	var users model.Users
 	if err := db.SelectContext(ctx, &users, sql); err != nil {
 		return users, err

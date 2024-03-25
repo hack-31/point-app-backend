@@ -128,6 +128,7 @@ func TestRepository_users_GetAll(t *testing.T) {
 }
 
 func TestRepository_users_GetUserByID(t *testing.T) {
+	t.Parallel()
 	c := clock.FixedClocker{
 		IsAsia: true,
 	}
@@ -165,7 +166,9 @@ func TestRepository_users_GetUserByID(t *testing.T) {
 	}
 
 	for n, tt := range tests {
+		tt := tt
 		t.Run(n, func(t *testing.T) {
+			t.Parallel()
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)
 
@@ -191,6 +194,7 @@ func TestRepository_users_GetUserByID(t *testing.T) {
 }
 
 func TestRepository_users_UpdateEmail(t *testing.T) {
+	t.Parallel()
 	type want struct {
 		email string
 		err   error
@@ -217,7 +221,9 @@ func TestRepository_users_UpdateEmail(t *testing.T) {
 	}
 
 	for n, tt := range tests {
+		tt := tt
 		t.Run(n, func(t *testing.T) {
+			t.Parallel()
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)
 
