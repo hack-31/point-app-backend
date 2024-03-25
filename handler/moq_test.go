@@ -280,7 +280,7 @@ var _ GetUsersService = &GetUsersServiceMock{}
 //
 //		// make and configure a mocked GetUsersService
 //		mockedGetUsersService := &GetUsersServiceMock{
-//			GetUsersFunc: func(ctx context.Context) (model.Users, error) {
+//			GetUsersFunc: func(ctx context.Context) (service.GetUsersResponse, error) {
 //				panic("mock out the GetUsers method")
 //			},
 //		}
@@ -291,7 +291,7 @@ var _ GetUsersService = &GetUsersServiceMock{}
 //	}
 type GetUsersServiceMock struct {
 	// GetUsersFunc mocks the GetUsers method.
-	GetUsersFunc func(ctx context.Context) (model.Users, error)
+	GetUsersFunc func(ctx context.Context) (service.GetUsersResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -305,7 +305,7 @@ type GetUsersServiceMock struct {
 }
 
 // GetUsers calls GetUsersFunc.
-func (mock *GetUsersServiceMock) GetUsers(ctx context.Context) (model.Users, error) {
+func (mock *GetUsersServiceMock) GetUsers(ctx context.Context) (service.GetUsersResponse, error) {
 	if mock.GetUsersFunc == nil {
 		panic("GetUsersServiceMock.GetUsersFunc: method is nil but GetUsersService.GetUsers was just called")
 	}
@@ -730,7 +730,7 @@ var _ GetAccountService = &GetAccountServiceMock{}
 //
 //		// make and configure a mocked GetAccountService
 //		mockedGetAccountService := &GetAccountServiceMock{
-//			GetAccountFunc: func(ctx *gin.Context) (model.User, error) {
+//			GetAccountFunc: func(ctx *gin.Context) (service.GetAccountResponse, error) {
 //				panic("mock out the GetAccount method")
 //			},
 //		}
@@ -741,7 +741,7 @@ var _ GetAccountService = &GetAccountServiceMock{}
 //	}
 type GetAccountServiceMock struct {
 	// GetAccountFunc mocks the GetAccount method.
-	GetAccountFunc func(ctx *gin.Context) (model.User, error)
+	GetAccountFunc func(ctx *gin.Context) (service.GetAccountResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -755,7 +755,7 @@ type GetAccountServiceMock struct {
 }
 
 // GetAccount calls GetAccountFunc.
-func (mock *GetAccountServiceMock) GetAccount(ctx *gin.Context) (model.User, error) {
+func (mock *GetAccountServiceMock) GetAccount(ctx *gin.Context) (service.GetAccountResponse, error) {
 	if mock.GetAccountFunc == nil {
 		panic("GetAccountServiceMock.GetAccountFunc: method is nil but GetAccountService.GetAccount was just called")
 	}
