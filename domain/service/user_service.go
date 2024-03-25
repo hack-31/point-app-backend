@@ -26,7 +26,7 @@ func NewUserService(rep domain.UserRepo) *UserService {
 // @returns
 // isExist true 存在, false 存在しない
 func (us *UserService) ExistByEmail(ctx context.Context, db *repository.Queryer, email string) (bool, error) {
-	_, err := us.repository.FindUserByEmail(ctx, *db, &email)
+	_, err := us.repository.FindUserByEmail(ctx, *db, email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
