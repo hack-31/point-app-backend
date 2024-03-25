@@ -432,7 +432,7 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //			DeleteUserByIDFunc: func(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error) {
 //				panic("mock out the DeleteUserByID method")
 //			},
-//			FindUserByEmailFunc: func(ctx context.Context, db repository.Queryer, e *string) (model.User, error) {
+//			FindUserByEmailFunc: func(ctx context.Context, db repository.Queryer, e string, columns ...string) (model.User, error) {
 //				panic("mock out the FindUserByEmail method")
 //			},
 //			GetAllFunc: func(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error) {
@@ -464,7 +464,7 @@ type UserRepoMock struct {
 	DeleteUserByIDFunc func(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error)
 
 	// FindUserByEmailFunc mocks the FindUserByEmail method.
-	FindUserByEmailFunc func(ctx context.Context, db repository.Queryer, e *string) (model.User, error)
+	FindUserByEmailFunc func(ctx context.Context, db repository.Queryer, e string, columns ...string) (model.User, error)
 
 	// GetAllFunc mocks the GetAll method.
 	GetAllFunc func(ctx context.Context, db repository.Queryer, columns ...string) (model.Users, error)
@@ -502,7 +502,9 @@ type UserRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// E is the e argument value.
-			E *string
+			E string
+			// Columns is the columns argument value.
+			Columns []string
 		}
 		// GetAll holds details about calls to the GetAll method.
 		GetAll []struct {
@@ -622,23 +624,25 @@ func (mock *UserRepoMock) DeleteUserByIDCalls() []struct {
 }
 
 // FindUserByEmail calls FindUserByEmailFunc.
-func (mock *UserRepoMock) FindUserByEmail(ctx context.Context, db repository.Queryer, e *string) (model.User, error) {
+func (mock *UserRepoMock) FindUserByEmail(ctx context.Context, db repository.Queryer, e string, columns ...string) (model.User, error) {
 	if mock.FindUserByEmailFunc == nil {
 		panic("UserRepoMock.FindUserByEmailFunc: method is nil but UserRepo.FindUserByEmail was just called")
 	}
 	callInfo := struct {
-		Ctx context.Context
-		Db  repository.Queryer
-		E   *string
+		Ctx     context.Context
+		Db      repository.Queryer
+		E       string
+		Columns []string
 	}{
-		Ctx: ctx,
-		Db:  db,
-		E:   e,
+		Ctx:     ctx,
+		Db:      db,
+		E:       e,
+		Columns: columns,
 	}
 	mock.lockFindUserByEmail.Lock()
 	mock.calls.FindUserByEmail = append(mock.calls.FindUserByEmail, callInfo)
 	mock.lockFindUserByEmail.Unlock()
-	return mock.FindUserByEmailFunc(ctx, db, e)
+	return mock.FindUserByEmailFunc(ctx, db, e, columns...)
 }
 
 // FindUserByEmailCalls gets all the calls that were made to FindUserByEmail.
@@ -646,14 +650,16 @@ func (mock *UserRepoMock) FindUserByEmail(ctx context.Context, db repository.Que
 //
 //	len(mockedUserRepo.FindUserByEmailCalls())
 func (mock *UserRepoMock) FindUserByEmailCalls() []struct {
-	Ctx context.Context
-	Db  repository.Queryer
-	E   *string
+	Ctx     context.Context
+	Db      repository.Queryer
+	E       string
+	Columns []string
 } {
 	var calls []struct {
-		Ctx context.Context
-		Db  repository.Queryer
-		E   *string
+		Ctx     context.Context
+		Db      repository.Queryer
+		E       string
+		Columns []string
 	}
 	mock.lockFindUserByEmail.RLock()
 	calls = mock.calls.FindUserByEmail
