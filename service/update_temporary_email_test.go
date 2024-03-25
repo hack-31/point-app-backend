@@ -69,7 +69,7 @@ func TestUpdateTemporaryEmail(t *testing.T) {
 			moqCache.SaveFunc = func(ctx context.Context, key, value string, minute time.Duration) error {
 				return nil
 			}
-			moqRepo.FindUserByEmailFunc = func(ctx context.Context, db repository.Queryer, email *string) (model.User, error) {
+			moqRepo.FindUserByEmailFunc = func(ctx context.Context, db repository.Queryer, email string, column ...string) (model.User, error) {
 				if tt.input.email == inputEmail {
 					return model.User{}, sql.ErrNoRows
 				}
