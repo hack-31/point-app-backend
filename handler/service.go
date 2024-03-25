@@ -25,11 +25,11 @@ type SigninService interface {
 }
 
 type GetUsersService interface {
-	GetUsers(ctx context.Context) (model.Users, error)
+	GetUsers(ctx context.Context) (service.GetUsersResponse, error)
 }
 
 type GetAccountService interface {
-	GetAccount(ctx *gin.Context) (model.User, error)
+	GetAccount(ctx *gin.Context) (service.GetAccountResponse, error)
 }
 
 type SignoutService interface {
