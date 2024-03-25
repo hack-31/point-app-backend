@@ -32,7 +32,7 @@ func NewSignin(db *sqlx.DB, rep domain.UserRepo, cache domain.Cache, jwter domai
 // JWT
 func (s *Signin) Signin(ctx context.Context, email, password string) (string, error) {
 	// emailよりユーザ情報を取得
-	u, err := s.Repo.FindUserByEmail(ctx, s.DB, &email)
+	u, err := s.Repo.FindUserByEmail(ctx, s.DB, email)
 	if err != nil {
 		return "", fmt.Errorf("failed to find user : %w", repository.ErrNotMatchLogInfo)
 	}

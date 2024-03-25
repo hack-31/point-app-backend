@@ -32,7 +32,7 @@ func (up *UpdatePassword) UpdatePassword(ctx *gin.Context, oldPassword, newPassw
 	mail := utils.GetEmail(ctx)
 
 	// Emailよりユーザ情報を取得する
-	u, err := up.UserRepo.FindUserByEmail(ctx, up.QueryerDB, &mail)
+	u, err := up.UserRepo.FindUserByEmail(ctx, up.QueryerDB, mail)
 	if err != nil {
 		return err
 	}
