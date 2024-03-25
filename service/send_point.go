@@ -41,7 +41,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 
 	// 送付可能か残高を調べる
 	mail := utils.GetEmail(ctx)
-	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.Connection.DB(), &mail)
+	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.Connection.DB(), mail)
 	if err != nil {
 		return fmt.Errorf("cannot FindUserByEmail in sending point: %w ", err)
 	}
