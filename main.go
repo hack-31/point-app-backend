@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/config"
+	"github.com/hack-31/point-app-backend/middleware"
 	"github.com/hack-31/point-app-backend/repository"
 	routers "github.com/hack-31/point-app-backend/router"
 )
@@ -34,19 +34,11 @@ func run(ctx context.Context) error {
 		gin.SetMode(gin.DebugMode)
 	}
 
-	router := gin.Default()
+	r := gin.New()
 	// ミドルウェアの設定
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
-			"http://localhost*",
-			"https://*.dkjrwfcbom7qp.amplifyapp.com",
-			"https://hack-31.github.io",
-		},
-		AllowMethods:     []string{"*"},
-		AllowHeaders:     []string{"Content-Type", "Authorization"},
-		AllowWildcard:    true,
-		AllowCredentials: true,
-	}))
+	r.Use(middleware.Logger())
+	r.Use(middleware.CORSMiddleware())
+	r.Use(gin.Recovery())
 
 	// DB関係初期化
 	db, cleanup, err := repository.NewDB(ctx, cfg)
@@ -56,12 +48,12 @@ func run(ctx context.Context) error {
 	defer cleanup()
 
 	// ルーティング初期化
-	if err = routers.SetRouting(ctx, db, router, cfg); err != nil {
+	if err = routers.SetRouting(ctx, db, r, cfg); err != nil {
 		return err
 	}
 
 	// サーバー起動
 	log.Printf("Listening and serving HTTP on :%v", cfg.Port)
-	server := NewServer(router, fmt.Sprintf(":%d", cfg.Port))
+	server := NewServer(r, fmt.Sprintf(":%d", cfg.Port))
 	return server.Run(ctx)
 }
