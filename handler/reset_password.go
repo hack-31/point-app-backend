@@ -29,7 +29,7 @@ func (s *ResetPassword) ServeHTTP(ctx *gin.Context) {
 
 	const errTitle = "パスワードリセットエラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 	if err := validation.ValidateStruct(&input,
@@ -40,17 +40,17 @@ func (s *ResetPassword) ServeHTTP(ctx *gin.Context) {
 			is.Email,
 		),
 	); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
 	// パスワード再発行処理依頼
 	if err := s.Service.ResetPassword(ctx, input.Email); err != nil {
 		if errors.Is(err, repository.ErrNotExistEmail) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotExistEmail.Error())
+			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotExistEmail.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

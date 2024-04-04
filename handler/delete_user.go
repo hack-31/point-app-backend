@@ -28,21 +28,21 @@ func (du *DeleteUser) ServeHTTP(ctx *gin.Context) {
 	// バリデーション検証
 	ID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, "IDは数値を指定してください。")
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, "IDは数値を指定してください。", err)
 		return
 	}
 	userID := model.UserID(ID)
 	if err := validation.Validate(userID, validation.Min(1), validation.Required); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
 	if err := du.Service.DeleteUser(ctx, userID); err != nil {
 		if errors.Is(err, repository.ErrNotUser) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error())
+			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

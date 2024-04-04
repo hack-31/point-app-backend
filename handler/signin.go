@@ -31,7 +31,7 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 
 	const errTitle = "サインインエラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 	err := validation.ValidateStruct(&input,
@@ -50,7 +50,7 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -58,10 +58,10 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 	jwt, err := ru.Service.Signin(ctx, input.Email, input.Password)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotMatchLogInfo) {
-			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotMatchLogInfo.Error())
+			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotMatchLogInfo.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

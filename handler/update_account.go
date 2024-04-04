@@ -30,7 +30,7 @@ func (ua *UpdateAccount) ServeHTTP(ctx *gin.Context) {
 	}
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (ua *UpdateAccount) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (ua *UpdateAccount) ServeHTTP(ctx *gin.Context) {
 	err = ua.Service.UpdateAccount(ctx, input.FamilyName, input.FamilyNameKana, input.FirstName, input.FirstNameKana)
 
 	if err != nil {
-		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error(), err)
 		return
 	}
 

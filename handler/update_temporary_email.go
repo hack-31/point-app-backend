@@ -31,7 +31,7 @@ func (ute *UpdateTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 
 	// ユーザーから正しいパラメータでポストデータが送られていない
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error(), err)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (ute *UpdateTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 			is.Email,
 		))
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error(), err)
 		return
 	}
 
@@ -54,10 +54,10 @@ func (ute *UpdateTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 	// エラーレスポンスを返す
 	if err != nil {
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error())
+			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error(), err)
 		return
 	}
 

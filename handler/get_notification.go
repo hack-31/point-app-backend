@@ -28,12 +28,12 @@ func (gn *GetNotification) ServeHTTP(ctx *gin.Context) {
 	// バリデーション検証
 	ID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, "IDは数値を指定してください。")
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, "IDは数値を指定してください。", err)
 		return
 	}
 	notificationID := model.NotificationID(ID)
 	if err := validation.Validate(notificationID, validation.Min(1), validation.Required); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -41,10 +41,10 @@ func (gn *GetNotification) ServeHTTP(ctx *gin.Context) {
 	n, err := gn.Service.GetNotification(ctx, model.NotificationID(notificationID))
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error())
+			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

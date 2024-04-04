@@ -33,7 +33,7 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 
 	// ユーザーから正しいパラメータで送られているか確認
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error(), err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, paramErrTitle, err.Error(), err)
 		return
 	}
 
@@ -58,15 +58,15 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	if err := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode); err != nil {
 		// 確認コードとトークンが無効
 		if errors.Is(err, repository.ErrNotFoundSession) {
-			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, repository.ErrNotFoundSession.Error())
+			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, repository.ErrNotFoundSession.Error(), err)
 			return
 		}
 		// 登録済みのメールアドレス
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error())
+			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, serverErrTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, serverErrTitle, err.Error(), err)
 		return
 	}
 

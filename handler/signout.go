@@ -21,7 +21,7 @@ func (s *Signout) ServeHTTP(ctx *gin.Context) {
 	const errTitle = "サインアウトエラー"
 	// サインアウト処理依頼
 	if err := s.Service.Signout(ctx); err != nil {
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 
