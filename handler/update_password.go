@@ -28,7 +28,7 @@ func (rt *UpdatePassword) ServeHTTP(ctx *gin.Context) {
 		NewPassword string `json:"newpassword"`
 	}
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -46,11 +46,11 @@ func (rt *UpdatePassword) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 	if input.NewPassword == input.OldPassword {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, "古いパスワードと新しいパスワードが同じです。")
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, "古いパスワードと新しいパスワードが同じです。", err)
 		return
 	}
 
@@ -58,10 +58,10 @@ func (rt *UpdatePassword) ServeHTTP(ctx *gin.Context) {
 	err = rt.Service.UpdatePassword(ctx, input.OldPassword, input.NewPassword)
 	if err != nil {
 		if errors.Is(err, repository.ErrDifferentPassword) {
-			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrDifferentPassword.Error())
+			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrDifferentPassword.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

@@ -29,7 +29,7 @@ func (sp *SendPoint) ServeHTTP(ctx *gin.Context) {
 
 	const errTitle = "送付エラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -45,21 +45,21 @@ func (sp *SendPoint) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
 	// ポイント送付
 	if err := sp.Service.SendPoint(ctx, input.ToUserId, input.SendPoint); err != nil {
 		if errors.Is(err, repository.ErrNotUser) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotUser.Error())
+			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotUser.Error(), err)
 			return
 		}
 		if errors.Is(err, repository.ErrHasNotSendablePoint) {
-			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrHasNotSendablePoint.Error())
+			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrHasNotSendablePoint.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

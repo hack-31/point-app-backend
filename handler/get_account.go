@@ -24,7 +24,7 @@ func (gu *GetAccount) ServeHTTP(ctx *gin.Context) {
 	// エラーレスポンスを返す
 	const errTitle = "アカウントエラー"
 	if err != nil {
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

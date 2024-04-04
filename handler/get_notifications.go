@@ -45,14 +45,14 @@ func (gn *GetNotifications) ServeHTTP(ctx *gin.Context) {
 	)
 	const errTitle = "お知らせ一覧取得エラー"
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
 	// お知らせ一覧取得
 	ns, err := gn.Service.GetNotifications(ctx, queries.NextToken, queries.Size)
 	if err != nil {
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

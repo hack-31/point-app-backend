@@ -29,10 +29,10 @@ func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 	// エラーレスポンスを返す
 	if err != nil {
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error())
+			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

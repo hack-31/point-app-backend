@@ -34,7 +34,7 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 	}
 	// ユーザから正しいパラメータでポストデータが送られていない
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 			validation.Length(1, 50),
 		))
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 	// サービスにユーザ仮登録処理を依頼
@@ -81,10 +81,10 @@ func (ru *RegisterTemporaryUser) ServeHTTP(ctx *gin.Context) {
 	// エラーレスポンスを返す
 	if err != nil {
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error())
+			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 

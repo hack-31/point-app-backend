@@ -28,7 +28,7 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	}
 	const errTitle = "ユーザ登録エラー"
 	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
@@ -44,21 +44,21 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 		),
 	)
 	if err != nil {
-		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
 	u, jwt, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFoundSession) {
-			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error())
+			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error(), err)
 			return
 		}
 		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error())
+			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error(), err)
 			return
 		}
-		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error())
+		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)
 		return
 	}
 
