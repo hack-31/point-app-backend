@@ -147,6 +147,10 @@ coverage: ## make coverage カバレッジファイル作成・表示（ホス�
 wire: ## DIファイル生成
 	@wire ./router
 
+.PHONY: db
+db: ## dbに入る
+	@docker compose exec db mysql ${DB_NAME}
+
 .PHONY: help
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
