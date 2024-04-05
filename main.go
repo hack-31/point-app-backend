@@ -36,9 +36,9 @@ func run(ctx context.Context) error {
 
 	r := gin.New()
 	// ミドルウェアの設定
+	r.Use(middleware.Recovery)
 	r.Use(middleware.Logger())
 	r.Use(middleware.CORSMiddleware())
-	r.Use(gin.Recovery())
 
 	// DB関係初期化
 	db, cleanup, err := repository.NewDB(ctx, cfg)
