@@ -13,9 +13,9 @@ import (
 
 // コンテキストに保存するエラー情報のキー定義
 const (
-	err     = "err"
-	errCode = "errCodo"
-	rps     = "rps"
+	errKey     = "err"
+	errCodeKey = "errCodo"
+	rpsKey     = "rps"
 )
 
 type Log struct {
@@ -44,9 +44,9 @@ func (l *Log) Err(e error) *Log {
 
 // ログ情報を登録
 func (l *Log) Logging(ctx *gin.Context) {
-	ctx.Set(rps, l.rps)
-	ctx.Set(errCode, l.errCode)
-	ctx.Set(err, l.err)
+	ctx.Set(rpsKey, l.rps)
+	ctx.Set(errCodeKey, l.errCode)
+	ctx.Set(errKey, l.err)
 }
 
 // Logger は、ロギング処理
@@ -64,18 +64,18 @@ func Logger() gin.HandlerFunc {
 		// エラーデータ取得
 		status := ctx.Writer.Status()
 
-		gec, exist := ctx.Get(errCode)
+		gec, exist := ctx.Get(errCodeKey)
 		var ec int
 		if exist {
 			ec = gec.(int)
 		}
-		gr, exists := ctx.Get(rps)
+		gr, exists := ctx.Get(rpsKey)
 		var rps []byte
 		if exists {
 			rps = gr.([]byte)
 		}
 
-		ge, exists := ctx.Get(err)
+		ge, exists := ctx.Get(errKey)
 		var e error
 		if exists && ge != nil {
 			e = ge.(error)
