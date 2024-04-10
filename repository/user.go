@@ -54,7 +54,6 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email stri
 	if len(columns) > 0 {
 		// 以下のような文字列にする
 		// id, name, email, created_at, updated_at
-		formattedColumns = ""
 		formattedColumns = strings.Join(columns, ", ")
 		formattedColumns = strings.TrimSuffix(formattedColumns, ", ")
 	}
@@ -200,7 +199,6 @@ func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) 
 	if len(columns) > 0 {
 		// 以下のような文字列にする
 		// id, name, email, created_at, updated_at
-		formattedColumns = ""
 		formattedColumns = strings.Join(columns, ", ")
 		formattedColumns = strings.TrimSuffix(formattedColumns, ", ")
 	}
