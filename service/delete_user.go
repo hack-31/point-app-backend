@@ -22,7 +22,6 @@ func NewDeleteUser(cache domain.Cache, repo domain.UserRepo, connection reposito
 
 // ユーザー削除サービス
 func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID model.UserID) error {
-
 	// トランザクション開始
 	if err := du.Connection.Begin(ctx); err != nil {
 		return err

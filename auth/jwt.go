@@ -68,7 +68,6 @@ func parse(rawKey []byte) (jwk.Key, error) {
 // @returns
 // token アクセストークン
 func (j *JWTer) GenerateToken(ctx context.Context, u model.User) ([]byte, error) {
-
 	tok, err := jwt.NewBuilder().
 		JwtID(uuid.New().String()).
 		IssuedAt(j.Clocker.Now()).

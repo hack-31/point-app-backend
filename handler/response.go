@@ -44,7 +44,6 @@ func APIResponse(ctx *gin.Context, StatusCode int, Message string, Data interfac
 	middleware.NewLog().
 		Rsp(js).
 		Logging(ctx)
-
 }
 
 // エラーレスポンス作成

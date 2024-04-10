@@ -47,13 +47,12 @@ func (pwd *Password) CreateHash() (string, error) {
 
 // ラムダム文字列のパスワードを作成
 func (pwd *Password) CreateRandomPassword() *Password {
-	// どの文字列からランダム文字列を生成するか
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
-	rand.Seed(time.Now().UnixNano())
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	value := make([]byte, constant.RandomPasswordLength)
 	for i := range value {
-		r := rand.Int63() % int64(len(letters))
+		r := r.Int63() % int64(len(letters))
 		value[i] = letters[int(r)]
 	}
 	return &Password{value: string(value)}
