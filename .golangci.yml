@@ -1,6 +1,4 @@
 linters-settings:
-  govet:
-    check-shadowing: false
   gocyclo:
     min-complexity: 30
   misspell:
@@ -19,3 +17,4 @@ linters:
     - misspell
     - staticcheck
     - whitespace
+    - zerologlint
