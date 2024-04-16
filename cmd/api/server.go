@@ -36,6 +36,8 @@ func (s *Server) Run(ctx context.Context) error {
 			log.Printf("failed to close: %+v", err)
 			return err
 		}
+		// mispel := "hoge"
+		// fmt.Println(mispel)
 		return nil
 	})
 
