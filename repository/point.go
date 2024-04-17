@@ -55,3 +55,18 @@ func (r *Repository) UpdateSendablePoint(ctx context.Context, db Execer, fromUse
 	}
 	return nil
 }
+
+// UpdateAllSendablePoint は、全ユーザの送付可能ポイントを更新する
+func (r *Repository) UpdateAllSendablePoint(ctx context.Context, db Execer, point int) error {
+	sql := `
+	  UPDATE users SET sending_point = ?;
+	`
+	if _, err := db.ExecContext(ctx, sql, point); err != nil {
+		var mysqlErr *mysql.MySQLError
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLNoReferencedRow {
+			return fmt.Errorf("cannot : %w", ErrNotUser)
+		}
+		return err
+	}
+	return nil
+}
