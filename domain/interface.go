@@ -30,6 +30,7 @@ type TransactionRepo interface {
 type PointRepo interface {
 	RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId model.UserID, sendPoint int) error
 	UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error
+	UpdateAllSendablePoint(ctx context.Context, db repository.Execer, point int) error
 }
 
 // お知らせに対するリポジトリインターフェース
