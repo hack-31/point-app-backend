@@ -23,7 +23,8 @@ func NewResetSendablePoint(db *sqlx.DB, repo *repository.Repository) *ResetSenda
 // ResetPoint は、ポイントをリセットする
 func (rsp *ResetSendablePoint) ResetPoint(ctx context.Context, initialSendablePoint int) error {
 	tx, err := rsp.Tx.BeginTxx(ctx, nil)
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
+
 	if err != nil {
 		return err
 	}
