@@ -1,4 +1,8 @@
 coverage:
+  exclude:
+    - 'batch/wire/*.go'
+    - 'router/wire.go'
+    - 'router/wire_gen.go'
   paths:
     - coverage.out
 codeToTestRatio:
