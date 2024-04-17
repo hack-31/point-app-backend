@@ -11,8 +11,18 @@ type Clocker interface {
 
 type RealClocker struct{}
 
+func NewRealClocker() Clocker {
+	return RealClocker{}
+}
+
 func (r RealClocker) Now() time.Time {
 	return time.Now()
+}
+
+func NewFixClocker(isAsia bool) Clocker {
+	return FixedClocker{
+		IsAsia: isAsia,
+	}
 }
 
 type FixedClocker struct {
