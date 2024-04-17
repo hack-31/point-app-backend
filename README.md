@@ -109,7 +109,10 @@ $ make seed
 　DIを行う際には、[google/wire](https://github.com/google/wire)というDIツールを使用します。新しいルーティングを追加したり、既存のルーティングのIFが変更された場合は、それに合わせて更新する必要があります。以下のコマンドで更新できます。
 
 ```sh
+# api
 $ make wire
+# batch
+$ make wire-b
 ```
 
 　`router/wire.go`は定義元のファイルであり、`router/wire_gen.go`は生成されたファイルです。実際の利用では、`router/wire_gen.go`が使用されます。
@@ -124,6 +127,9 @@ $ make wire
 - `/docs`
   - ドキュメントが配置
   - swaggerなどを修正する際は`/docs/openapi.yml`で行う
+- `/cmd`
+  - コマンド
+  - main関数があるエントリーファイルの置き場
 - `/handler`
   - ハンドラー層
   - クライアントのデータをバリデーション
@@ -147,7 +153,38 @@ $ make wire
 - `/utils`
   - ユーティリティパッケージ
 
+
+# バッチ
+
+```sh
+# バッチアプリの作成
+$ make batch
+success! try batch command!
+# batchの実行
+$ batch 
+NAME:
+   batch - point app batch processing
+
+USAGE:
+   batch [global options] command [command options] 
+
+COMMANDS:
+   reset_sendable_point, rsp  Reset sendable point
+   help, h                    Shows a list of commands or help for one command
+```
+
 # モック
+
+以下の方法で実行。
+
+```sh
+$ make mock
+```
+
+各インターフェース定義書があるディレクトリに`/_mock`があり、`mock_*.go`というファイルが作成される。
+そのファイルがモックファイルになる。
+
+以下の方法は古いため、mockgenを利用した方法に書き換える。
 
 以下のコマンドでモックを作成する
 
