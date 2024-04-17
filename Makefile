@@ -124,6 +124,12 @@ moq: ## mock作成(コンテナ内)
 					NotificationRepo
 	@docker compose exec app moq -fmt goimports -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer Transacter
 
+.PHONY: mock
+mock: ## mock作成
+	mockgen -source=./batch/controller/usecase.go -destination=./batch/controller/_mock/mock_usecase.go
+	mockgen -source=./repository/repository.go -destination=./repository/_mock/mock_repository.go
+	mockgen -source=./domain/interface.go -destination=./domain/_mock/mock_interface.go
+
 .PHONY: test
 test: ## テスト
 	# テスト実行中
@@ -144,8 +150,20 @@ coverage: ## make coverage カバレッジファイル作成・表示（ホス�
 	@open ./tmp/cover.html
 
 .PHONY: wire
-wire: ## DIファイル生成
+wire: ## api用のDIファイル生成
 	@wire ./router
+
+.PHONY: wire-b
+wire-b: ## batch用のDIファイル生成
+	@wire ./batch/wire
+
+.PHONY: batch
+batch: ## バッチ用アプリケーションのビルド
+	@if [ ${CONTAINER_ENV} ]; then \
+		cd /app/cmd/batch && go install; \
+	else \
+		docker compose exec app sh -c "cd /app/cmd/batch && go install"; \
+	fi
 
 .PHONY: db
 db: ## dbに入る
