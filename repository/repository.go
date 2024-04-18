@@ -76,14 +76,6 @@ type Queryer interface {
 	SelectContext(ctx context.Context, dest interface{}, query string, args ...any) error
 }
 
-// トランザクション内で扱うメソッド群
-type Transacter interface {
-	DB() *sqlx.Tx
-	Begin(ctx context.Context) error
-	Commit() error
-	Rollback() error
-}
-
 var (
 	// インターフェースが期待通りに宣言されているか確認
 	_ Beginner = (*sqlx.DB)(nil)
