@@ -940,6 +940,9 @@ func (mock *UserRepoMock) UpdatePasswordCalls() []struct {
 //			RegisterPointTransactionFunc: func(ctx context.Context, db repository.Execer, fromUserID model.UserID, toUserId model.UserID, sendPoint int) error {
 //				panic("mock out the RegisterPointTransaction method")
 //			},
+//			UpdateAllSendablePointFunc: func(ctx context.Context, db repository.Execer, point int) error {
+//				panic("mock out the UpdateAllSendablePoint method")
+//			},
 //			UpdateSendablePointFunc: func(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error {
 //				panic("mock out the UpdateSendablePoint method")
 //			},
@@ -952,6 +955,9 @@ func (mock *UserRepoMock) UpdatePasswordCalls() []struct {
 type PointRepoMock struct {
 	// RegisterPointTransactionFunc mocks the RegisterPointTransaction method.
 	RegisterPointTransactionFunc func(ctx context.Context, db repository.Execer, fromUserID model.UserID, toUserId model.UserID, sendPoint int) error
+
+	// UpdateAllSendablePointFunc mocks the UpdateAllSendablePoint method.
+	UpdateAllSendablePointFunc func(ctx context.Context, db repository.Execer, point int) error
 
 	// UpdateSendablePointFunc mocks the UpdateSendablePoint method.
 	UpdateSendablePointFunc func(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error
@@ -971,6 +977,15 @@ type PointRepoMock struct {
 			// SendPoint is the sendPoint argument value.
 			SendPoint int
 		}
+		// UpdateAllSendablePoint holds details about calls to the UpdateAllSendablePoint method.
+		UpdateAllSendablePoint []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Execer
+			// Point is the point argument value.
+			Point int
+		}
 		// UpdateSendablePoint holds details about calls to the UpdateSendablePoint method.
 		UpdateSendablePoint []struct {
 			// Ctx is the ctx argument value.
@@ -984,6 +999,7 @@ type PointRepoMock struct {
 		}
 	}
 	lockRegisterPointTransaction sync.RWMutex
+	lockUpdateAllSendablePoint   sync.RWMutex
 	lockUpdateSendablePoint      sync.RWMutex
 }
 
@@ -1032,6 +1048,46 @@ func (mock *PointRepoMock) RegisterPointTransactionCalls() []struct {
 	mock.lockRegisterPointTransaction.RLock()
 	calls = mock.calls.RegisterPointTransaction
 	mock.lockRegisterPointTransaction.RUnlock()
+	return calls
+}
+
+// UpdateAllSendablePoint calls UpdateAllSendablePointFunc.
+func (mock *PointRepoMock) UpdateAllSendablePoint(ctx context.Context, db repository.Execer, point int) error {
+	if mock.UpdateAllSendablePointFunc == nil {
+		panic("PointRepoMock.UpdateAllSendablePointFunc: method is nil but PointRepo.UpdateAllSendablePoint was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    repository.Execer
+		Point int
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		Point: point,
+	}
+	mock.lockUpdateAllSendablePoint.Lock()
+	mock.calls.UpdateAllSendablePoint = append(mock.calls.UpdateAllSendablePoint, callInfo)
+	mock.lockUpdateAllSendablePoint.Unlock()
+	return mock.UpdateAllSendablePointFunc(ctx, db, point)
+}
+
+// UpdateAllSendablePointCalls gets all the calls that were made to UpdateAllSendablePoint.
+// Check the length with:
+//
+//	len(mockedPointRepo.UpdateAllSendablePointCalls())
+func (mock *PointRepoMock) UpdateAllSendablePointCalls() []struct {
+	Ctx   context.Context
+	Db    repository.Execer
+	Point int
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    repository.Execer
+		Point int
+	}
+	mock.lockUpdateAllSendablePoint.RLock()
+	calls = mock.calls.UpdateAllSendablePoint
+	mock.lockUpdateAllSendablePoint.RUnlock()
 	return calls
 }
 
