@@ -9,18 +9,19 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/utils"
+	"github.com/jmoiron/sqlx"
 )
 
 type SendPoint struct {
 	PointRepo        domain.PointRepo
 	UserRepo         domain.UserRepo
 	NotificationRepo domain.NotificationRepo
-	Connection       *repository.AppConnection
+	Tx               repository.Beginner
 	Cache            domain.Cache
 }
 
-func NewSendPoint(repo *repository.Repository, connection *repository.AppConnection, cache domain.Cache) *SendPoint {
-	return &SendPoint{PointRepo: repo, UserRepo: repo, NotificationRepo: repo, Connection: connection, Cache: cache}
+func NewSendPoint(repo *repository.Repository, db *sqlx.DB, cache domain.Cache) *SendPoint {
+	return &SendPoint{PointRepo: repo, UserRepo: repo, NotificationRepo: repo, Tx: db, Cache: cache}
 }
 
 // ポイント送信サービス
@@ -34,14 +35,16 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	fromUserID := utils.GetUserID(ctx)
 
 	// トランザクション開始
-	if err := sp.Connection.Begin(ctx); err != nil {
-		return fmt.Errorf("cannot trasanction: %w ", err)
+	tx, err := sp.Tx.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
 	}
-	defer func() { _ = sp.Connection.Rollback() }()
+	// ロールバック
+	defer func() { _ = tx.Rollback() }()
 
 	// 送付可能か残高を調べる
 	mail := utils.GetEmail(ctx)
-	u, err := sp.UserRepo.FindUserByEmail(ctx, sp.Connection.DB(), mail)
+	u, err := sp.UserRepo.FindUserByEmail(ctx, tx, mail)
 	if err != nil {
 		return fmt.Errorf("cannot FindUserByEmail in sending point: %w ", err)
 	}
@@ -51,17 +54,17 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 
 	// 送信相手にポイントを加算
-	if err := sp.PointRepo.RegisterPointTransaction(ctx, sp.Connection.DB(), fromUserID, model.UserID(toUserId), sendPoint); err != nil {
+	if err := sp.PointRepo.RegisterPointTransaction(ctx, tx, fromUserID, model.UserID(toUserId), sendPoint); err != nil {
 		return fmt.Errorf("cannot RegisterPointTransaction in sending point: %w ", err)
 	}
 
 	// 送信ユーザの送信可能ポイントを減らす
-	if err := sp.PointRepo.UpdateSendablePoint(ctx, sp.Connection.DB(), fromUserID, sendablePoint.CalculatePointBalance(sendPoint)); err != nil {
+	if err := sp.PointRepo.UpdateSendablePoint(ctx, tx, fromUserID, sendablePoint.CalculatePointBalance(sendPoint)); err != nil {
 		return fmt.Errorf("cannot updateSendablePoint in sending point: %w ", err)
 	}
 
 	// お知らせ内容作成
-	fromUser, err := sp.UserRepo.GetUserByID(ctx, sp.Connection.DB(), fromUserID)
+	fromUser, err := sp.UserRepo.GetUserByID(ctx, tx, fromUserID)
 	if err != nil {
 		return fmt.Errorf("cannot getUserByID in sending point: %w ", err)
 	}
@@ -73,13 +76,13 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 
 	// お知らせを新規登録
-	registeredNotif, err := sp.NotificationRepo.CreateNotification(ctx, sp.Connection.DB(), n)
+	registeredNotif, err := sp.NotificationRepo.CreateNotification(ctx, tx, n)
 	if err != nil {
 		return fmt.Errorf("cannot CreateNotification in sending point: %w ", err)
 	}
 
 	// トランザクションコミット
-	if err := sp.Connection.Commit(); err != nil {
+	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("cannot Comit in send point: %w ", err)
 	}
 

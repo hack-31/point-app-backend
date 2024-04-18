@@ -8,28 +8,30 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/utils"
+	"github.com/jmoiron/sqlx"
 )
 
 type DeleteUser struct {
-	Connection repository.Transacter
-	Cache      domain.Cache
-	UserRepo   domain.UserRepo
+	Tx       repository.Beginner
+	Cache    domain.Cache
+	UserRepo domain.UserRepo
 }
 
-func NewDeleteUser(cache domain.Cache, repo domain.UserRepo, connection repository.Transacter) *DeleteUser {
-	return &DeleteUser{Cache: cache, UserRepo: repo, Connection: connection}
+func NewDeleteUser(cache domain.Cache, repo domain.UserRepo, db *sqlx.DB) *DeleteUser {
+	return &DeleteUser{Cache: cache, UserRepo: repo, Tx: db}
 }
 
 // ユーザー削除サービス
 func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID model.UserID) error {
 	// トランザクション開始
-	if err := du.Connection.Begin(ctx); err != nil {
+	tx, err := du.Tx.BeginTxx(ctx, nil)
+	defer func() { _ = tx.Rollback() }()
+	if err != nil {
 		return err
 	}
-	defer func() { _ = du.Connection.Rollback() }()
 
 	// ユーザー削除
-	rows, err := du.UserRepo.DeleteUserByID(ctx, du.Connection.DB(), userID)
+	rows, err := du.UserRepo.DeleteUserByID(ctx, tx, userID)
 	if err != nil {
 		return fmt.Errorf("cannot delete user: %w", err)
 	}
@@ -38,7 +40,7 @@ func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID model.UserID) error {
 	}
 
 	// トランザクションコミット
-	if err := du.Connection.Commit(); err != nil {
+	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("cannot delete user: %w", err)
 	}
 

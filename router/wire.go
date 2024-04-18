@@ -62,7 +62,7 @@ func InitGetUsers(db *sqlx.DB, repo *repository.Repository, jwter domain.TokenGe
 	return &handler.GetUsers{}
 }
 
-func InitDeleteUser(transacter repository.Transacter, repo domain.UserRepo, cache domain.Cache) *handler.DeleteUser {
+func InitDeleteUser(db *sqlx.DB, repo domain.UserRepo, cache domain.Cache) *handler.DeleteUser {
 	wire.Build(
 		handler.NewDeleteUser,
 		service.NewDeleteUser,
@@ -89,7 +89,7 @@ func InitSignout(cache domain.Cache) *handler.Signout {
 	return &handler.Signout{}
 }
 
-func InitSendPoint(repo *repository.Repository, connection *repository.AppConnection, cache domain.Cache) *handler.SendPoint {
+func InitSendPoint(repo *repository.Repository, db *sqlx.DB, cache domain.Cache) *handler.SendPoint {
 	wire.Build(
 		handler.NewSendPoint,
 		service.NewSendPoint,
@@ -134,7 +134,7 @@ func InitUpdateEmail(db *sqlx.DB, cache domain.Cache, repo domain.UserRepo) *han
 	return &handler.UpdateEmail{}
 }
 
-func InitGetNotification(cache domain.Cache, repo *repository.Repository, connection repository.Transacter) *handler.GetNotification {
+func InitGetNotification(cache domain.Cache, repo *repository.Repository, db *sqlx.DB) *handler.GetNotification {
 	wire.Build(
 		handler.NewGetNotification,
 		service.NewGetNotification,

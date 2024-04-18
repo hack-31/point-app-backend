@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"net/http/httptest"
@@ -9,11 +8,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
+	mock_domain "github.com/hack-31/point-app-backend/domain/_mock"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	mock_repository "github.com/hack-31/point-app-backend/repository/_mock"
+	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
-	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 )
 
 func TestGetNotification(t *testing.T) {
@@ -26,14 +28,17 @@ func TestGetNotification(t *testing.T) {
 		err          error
 	}
 	type checkNotification struct {
-		err error
+		callCount int
+		err       error
 	}
 	type getNotificationID struct {
+		callCount    int
 		notification model.Notification
 		err          error
 	}
 	type publish struct {
-		err error
+		callCount int
+		err       error
 	}
 
 	tests := map[string]struct {
@@ -48,10 +53,12 @@ func TestGetNotification(t *testing.T) {
 				notificationID: 1,
 			},
 			checkNotification: checkNotification{
-				err: nil,
+				callCount: 1,
+				err:       nil,
 			},
 			getNotificationByID: getNotificationID{
-				err: nil,
+				callCount: 1,
+				err:       nil,
 				notification: model.Notification{
 					ID:          1,
 					Title:       "お知らせ",
@@ -59,6 +66,10 @@ func TestGetNotification(t *testing.T) {
 					IsChecked:   false,
 					CreatedAt:   clock.FixedClocker{}.Now(),
 				},
+			},
+			publish: publish{
+				callCount: 1,
+				err:       nil,
 			},
 			want: want{
 				notification: GetNotificationResponse{
@@ -76,11 +87,17 @@ func TestGetNotification(t *testing.T) {
 				notificationID: 1,
 			},
 			checkNotification: checkNotification{
-				err: sql.ErrConnDone,
+				callCount: 1,
+				err:       sql.ErrConnDone,
 			},
 			getNotificationByID: getNotificationID{
+				callCount:    0,
 				err:          nil,
 				notification: model.Notification{},
+			},
+			publish: publish{
+				callCount: 0,
+				err:       nil,
 			},
 			want: want{
 				notification: GetNotificationResponse{},
@@ -92,9 +109,11 @@ func TestGetNotification(t *testing.T) {
 				notificationID: 1,
 			},
 			checkNotification: checkNotification{
-				err: nil,
+				callCount: 1,
+				err:       nil,
 			},
 			getNotificationByID: getNotificationID{
+				callCount:    1,
 				err:          sql.ErrConnDone,
 				notification: model.Notification{},
 			},
@@ -108,10 +127,12 @@ func TestGetNotification(t *testing.T) {
 				notificationID: 1,
 			},
 			checkNotification: checkNotification{
-				err: nil,
+				callCount: 1,
+				err:       nil,
 			},
 			getNotificationByID: getNotificationID{
-				err: nil,
+				callCount: 1,
+				err:       nil,
 				notification: model.Notification{
 					ID:          1,
 					Title:       "お知らせ",
@@ -121,7 +142,8 @@ func TestGetNotification(t *testing.T) {
 				},
 			},
 			publish: publish{
-				err: repository.ErrCacheException,
+				callCount: 1,
+				err:       repository.ErrCacheException,
 			},
 			want: want{
 				notification: GetNotificationResponse{
@@ -146,43 +168,39 @@ func TestGetNotification(t *testing.T) {
 			ctx.Set(auth.UserID, model.UserID(1))
 
 			// モックの定義
-			moqCache := &CacheMock{
-				PublishFunc: func(ctx context.Context, channel, palyload string) error {
-					wantChannel := fmt.Sprintf("notification:%d", tt.input.notificationID)
-					assert.Equal(t, wantChannel, channel)
-					return tt.publish.err
-				},
-			}
-			moqTranactor := &TransacterMock{
-				BeginFunc: func(ctx context.Context) error {
-					return nil
-				},
-				CommitFunc: func() error {
-					return nil
-				},
-				RollbackFunc: func() error {
-					return nil
-				},
-				DBFunc: func() *sqlx.Tx {
-					return &sqlx.Tx{}
-				},
-			}
-			moqNotificationRepo := &NotificationRepoMock{
-				CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
-					// TODO: 引数のテストも入れる
-					return tt.checkNotification.err
-				},
-				GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (model.Notification, error) {
-					// TODO: 引数のテストも入れる
-					return tt.getNotificationByID.notification, tt.getNotificationByID.err
-				},
-			}
+			ctrl := gomock.NewController(t)
+			mockTx := testutil.NewTxForMock(t, ctx)
+
+			mockBeginner := mock_repository.NewMockBeginner(ctrl)
+			mockBeginner.
+				EXPECT().
+				BeginTxx(ctx, nil).
+				Return(mockTx, nil)
+
+			mockCache := mock_domain.NewMockCache(ctrl)
+			mockCache.
+				EXPECT().
+				Publish(ctx, fmt.Sprintf("notification:%d", tt.input.notificationID), gomock.Any()).
+				Return(tt.publish.err).
+				Times(tt.publish.callCount)
+
+			mockNotifRepo := mock_domain.NewMockNotificationRepo(ctrl)
+			mockNotifRepo.
+				EXPECT().
+				CheckNotification(ctx, mockTx, model.UserID(1), tt.input.notificationID).
+				Return(tt.checkNotification.err).
+				Times(tt.checkNotification.callCount)
+			mockNotifRepo.
+				EXPECT().
+				GetNotificationByID(ctx, mockTx, model.UserID(1), tt.input.notificationID).
+				Return(tt.getNotificationByID.notification, tt.getNotificationByID.err).
+				Times(tt.getNotificationByID.callCount)
 
 			// サービス実行
 			gn := &GetNotification{
-				Cache:      moqCache,
-				Connection: moqTranactor,
-				NotifRepo:  moqNotificationRepo,
+				Cache:     mockCache,
+				Tx:        mockBeginner,
+				NotifRepo: mockNotifRepo,
 			}
 			gotNs, gotErr := gn.GetNotification(ctx, tt.input.notificationID)
 

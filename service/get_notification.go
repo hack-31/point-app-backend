@@ -9,16 +9,17 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/utils"
+	"github.com/jmoiron/sqlx"
 )
 
 type GetNotification struct {
-	Connection repository.Transacter
-	Cache      domain.Cache
-	NotifRepo  domain.NotificationRepo
+	Tx        repository.Beginner
+	Cache     domain.Cache
+	NotifRepo domain.NotificationRepo
 }
 
-func NewGetNotification(cache domain.Cache, repo *repository.Repository, connection repository.Transacter) *GetNotification {
-	return &GetNotification{Cache: cache, NotifRepo: repo, Connection: connection}
+func NewGetNotification(cache domain.Cache, repo *repository.Repository, db *sqlx.DB) *GetNotification {
+	return &GetNotification{Cache: cache, NotifRepo: repo, Tx: db}
 }
 
 type GetNotificationResponse struct {
@@ -40,20 +41,19 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID mode
 	// ユーザID確認
 	userID := utils.GetUserID(ctx)
 
-	// トランザクション開始
-	if err := gn.Connection.Begin(ctx); err != nil {
+	tx, err := gn.Tx.BeginTxx(ctx, nil)
+	defer func() { _ = tx.Rollback() }()
+	if err != nil {
 		return GetNotificationResponse{}, err
 	}
-	// ロールバック
-	defer func() { _ = gn.Connection.Rollback() }()
 
 	// 閲覧したので、お知らせをチェック済みとする
-	if err := gn.NotifRepo.CheckNotification(ctx, gn.Connection.DB(), userID, notificationID); err != nil {
+	if err := gn.NotifRepo.CheckNotification(ctx, tx, userID, notificationID); err != nil {
 		return GetNotificationResponse{}, fmt.Errorf("cannot check notification in db: %w", err)
 	}
 
 	// お知らせ詳細取得
-	n, err := gn.NotifRepo.GetNotificationByID(ctx, gn.Connection.DB(), userID, notificationID)
+	n, err := gn.NotifRepo.GetNotificationByID(ctx, tx, userID, notificationID)
 	if err != nil {
 		return GetNotificationResponse{}, fmt.Errorf("cannot GetNotificaitonByID in db: %w", err)
 	}
@@ -66,7 +66,7 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID mode
 	}
 
 	// トランザクションコミット
-	if err := gn.Connection.Commit(); err != nil {
+	if err := tx.Commit(); err != nil {
 		return GetNotificationResponse{}, err
 	}
 
