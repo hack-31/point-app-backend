@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,25 +24,25 @@ func TestGetNotifications(t *testing.T) {
 		err error
 	}
 	type getByToUserByStartIdOrderByLatest struct {
-		startID       model.NotificationID
+		startID       entity.NotificationID
 		size          int
-		userID        model.UserID
-		notifications model.Notifications
+		userID        entity.UserID
+		notifications entity.Notifications
 		err           error
 	}
 	type getByToUserOrderByLatest struct {
 		size          int
-		userID        model.UserID
-		notifications model.Notifications
+		userID        entity.UserID
+		notifications entity.Notifications
 		err           error
 	}
 
 	type getUserByID struct {
-		user model.User
+		user entity.User
 		err  error
 	}
 
-	userID := model.UserID(1)
+	userID := entity.UserID(1)
 	tests := map[string]struct {
 		input                             input
 		getByToUserByStartIdOrderByLatest getByToUserByStartIdOrderByLatest
@@ -56,16 +56,16 @@ func TestGetNotifications(t *testing.T) {
 				size:      "5",
 			},
 			getByToUserByStartIdOrderByLatest: getByToUserByStartIdOrderByLatest{
-				startID: model.NotificationID(90),
+				startID: entity.NotificationID(90),
 				size:    5,
 				userID:  userID,
 				err:     nil,
-				notifications: model.Notifications{
-					&model.Notification{
+				notifications: entity.Notifications{
+					&entity.Notification{
 						ID:        90,
 						CreatedAt: clock.FixedClocker{}.Now(),
 					},
-					&model.Notification{
+					&entity.Notification{
 						ID:        81,
 						CreatedAt: clock.FixedClocker{}.Now(),
 					},
@@ -74,13 +74,13 @@ func TestGetNotifications(t *testing.T) {
 			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
 				err:  nil,
-				user: model.User{},
+				user: entity.User{},
 			},
 			want: want{
 				ns: GetNotificationsResponse{
 					NextToken: "80",
 					Notifications: []struct {
-						ID          model.NotificationID
+						ID          entity.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -99,22 +99,22 @@ func TestGetNotifications(t *testing.T) {
 				size:      "5",
 			},
 			getByToUserByStartIdOrderByLatest: getByToUserByStartIdOrderByLatest{
-				startID:       model.NotificationID(90),
+				startID:       entity.NotificationID(90),
 				size:          5,
 				userID:        userID,
 				err:           nil,
-				notifications: model.Notifications{},
+				notifications: entity.Notifications{},
 			},
 			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
 				err:  nil,
-				user: model.User{},
+				user: entity.User{},
 			},
 			want: want{
 				ns: GetNotificationsResponse{
 					NextToken: "0",
 					Notifications: []struct {
-						ID          model.NotificationID
+						ID          entity.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -133,12 +133,12 @@ func TestGetNotifications(t *testing.T) {
 				userID: userID,
 				size:   5,
 				err:    nil,
-				notifications: model.Notifications{
-					&model.Notification{
+				notifications: entity.Notifications{
+					&entity.Notification{
 						ID:        90,
 						CreatedAt: clock.FixedClocker{}.Now(),
 					},
-					&model.Notification{
+					&entity.Notification{
 						ID:        81,
 						CreatedAt: clock.FixedClocker{}.Now(),
 					},
@@ -146,7 +146,7 @@ func TestGetNotifications(t *testing.T) {
 			},
 			getUserByID: getUserByID{
 				err: nil,
-				user: model.User{
+				user: entity.User{
 					ID:           userID,
 					Email:        "yamada@sample.com",
 					SendingPoint: 100,
@@ -156,7 +156,7 @@ func TestGetNotifications(t *testing.T) {
 				ns: GetNotificationsResponse{
 					NextToken: "80",
 					Notifications: []struct {
-						ID          model.NotificationID
+						ID          entity.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -178,24 +178,24 @@ func TestGetNotifications(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)
-			ctx.Set(auth.UserID, model.UserID(userID))
+			ctx.Set(auth.UserID, entity.UserID(userID))
 
 			// モックの定義
 			moqQueryer := &QueryerMock{}
 			moqNotificationRepo := &NotificationRepoMock{
-				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) (model.Notifications, error) {
+				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.startID, startID)
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.size, size)
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.userID, uid)
 					return tt.getByToUserByStartIdOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},
-				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (model.Notifications, error) {
+				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, size int, columns ...string) (entity.Notifications, error) {
 					assert.Equal(t, tt.getByToUserOrderByLatest.userID, uid)
 					return tt.getByToUserOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},
 			}
 			moqUserRepo := &UserRepoMock{
-				GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (model.User, error) {
+				GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID entity.UserID) (entity.User, error) {
 					assert.Equal(t, userID, ID)
 					return tt.getUserByID.user, tt.getUserByID.err
 				},

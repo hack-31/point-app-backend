@@ -9,9 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
 	mock_domain "github.com/hack-31/point-app-backend/domain/_mock"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
 	mock_repository "github.com/hack-31/point-app-backend/repository/_mock"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +21,7 @@ import (
 func TestGetNotification(t *testing.T) {
 	t.Parallel()
 	type input struct {
-		notificationID model.NotificationID
+		notificationID entity.NotificationID
 	}
 	type want struct {
 		notification GetNotificationResponse
@@ -33,7 +33,7 @@ func TestGetNotification(t *testing.T) {
 	}
 	type getNotificationID struct {
 		callCount    int
-		notification model.Notification
+		notification entity.Notification
 		err          error
 	}
 	type publish struct {
@@ -59,7 +59,7 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount: 1,
 				err:       nil,
-				notification: model.Notification{
+				notification: entity.Notification{
 					ID:          1,
 					Title:       "お知らせ",
 					Description: "ポイント送付された",
@@ -93,7 +93,7 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount:    0,
 				err:          nil,
-				notification: model.Notification{},
+				notification: entity.Notification{},
 			},
 			publish: publish{
 				callCount: 0,
@@ -115,7 +115,7 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount:    1,
 				err:          sql.ErrConnDone,
-				notification: model.Notification{},
+				notification: entity.Notification{},
 			},
 			want: want{
 				notification: GetNotificationResponse{},
@@ -133,7 +133,7 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount: 1,
 				err:       nil,
-				notification: model.Notification{
+				notification: entity.Notification{
 					ID:          1,
 					Title:       "お知らせ",
 					Description: "ポイント送付された",
@@ -165,7 +165,7 @@ func TestGetNotification(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)
-			ctx.Set(auth.UserID, model.UserID(1))
+			ctx.Set(auth.UserID, entity.UserID(1))
 
 			// モックの定義
 			ctrl := gomock.NewController(t)
@@ -187,12 +187,12 @@ func TestGetNotification(t *testing.T) {
 			mockNotifRepo := mock_domain.NewMockNotificationRepo(ctrl)
 			mockNotifRepo.
 				EXPECT().
-				CheckNotification(ctx, mockTx, model.UserID(1), tt.input.notificationID).
+				CheckNotification(ctx, mockTx, entity.UserID(1), tt.input.notificationID).
 				Return(tt.checkNotification.err).
 				Times(tt.checkNotification.callCount)
 			mockNotifRepo.
 				EXPECT().
-				GetNotificationByID(ctx, mockTx, model.UserID(1), tt.input.notificationID).
+				GetNotificationByID(ctx, mockTx, entity.UserID(1), tt.input.notificationID).
 				Return(tt.getNotificationByID.notification, tt.getNotificationByID.err).
 				Times(tt.getNotificationByID.callCount)
 

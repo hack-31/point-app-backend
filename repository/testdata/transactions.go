@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 )
 
 // 取引テーブルにデータを挿入する
-func Transactions(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users model.Transactions)) model.Transactions {
+func Transactions(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users entity.Transactions)) entity.Transactions {
 	t.Helper()
 	if _, err := con.ExecContext(ctx, `DELETE FROM transactions;`); err != nil {
 		t.Logf("%v", err)
@@ -22,7 +22,7 @@ func Transactions(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(u
 	}
 
 	// デフォルト値
-	transactions := model.Transactions{
+	transactions := entity.Transactions{
 		{
 			ReceivingUserID:  1,
 			SendingUserID:    2,
@@ -67,10 +67,10 @@ func Transactions(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(u
 	assert.NoError(t, err)
 
 	// IDの挿入
-	transactions[0].ID = model.TransactionID(id)
-	transactions[1].ID = model.TransactionID(id + 1)
-	transactions[2].ID = model.TransactionID(id + 2)
-	transactions[3].ID = model.TransactionID(id + 2)
+	transactions[0].ID = entity.TransactionID(id)
+	transactions[1].ID = entity.TransactionID(id + 1)
+	transactions[2].ID = entity.TransactionID(id + 2)
+	transactions[3].ID = entity.TransactionID(id + 2)
 
 	return transactions
 }

@@ -122,7 +122,7 @@ moq: ## mock作成(コンテナ内)
 					UserRepo \
 					PointRepo \
 					NotificationRepo
-	@docker compose exec app moq -fmt goimports -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer Transacter
+	@docker compose exec app moq -fmt goimports -out ./service/repogitory_moq_test.go -skip-ensure -pkg service ./repository Beginner Preparer Execer Queryer
 
 .PHONY: mock
 mock: ## mock作成

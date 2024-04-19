@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -27,7 +27,7 @@ func NewGetUsers(db *sqlx.DB, repo *repository.Repository, jwter domain.TokenGen
 
 type GetUsersResponse struct {
 	Users []struct {
-		ID               model.UserID
+		ID               entity.UserID
 		FirstName        string
 		FirstNameKana    string
 		FamilyName       string
@@ -51,7 +51,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	}
 
 	// ユーザIDsを取得する
-	userIDs := make([]model.UserID, 0, len(users))
+	userIDs := make([]entity.UserID, 0, len(users))
 	for _, user := range users {
 		userIDs = append(userIDs, user.ID)
 	}
@@ -63,7 +63,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	}
 
 	res := make([]struct {
-		ID               model.UserID
+		ID               entity.UserID
 		FirstName        string
 		FirstNameKana    string
 		FamilyName       string
@@ -75,7 +75,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	// ユーザに取得ポイントを設定する
 	for _, v := range users {
 		res = append(res, struct {
-			ID               model.UserID
+			ID               entity.UserID
 			FirstName        string
 			FirstNameKana    string
 			FamilyName       string
