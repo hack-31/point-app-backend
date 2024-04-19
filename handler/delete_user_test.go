@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ func TestDeleteUser(t *testing.T) {
 	}
 
 	type deleteUserInput struct {
-		userID model.UserID
+		userID entity.UserID
 	}
 	type deleteUser struct {
 		input  deleteUserInput
@@ -91,7 +91,7 @@ func TestDeleteUser(t *testing.T) {
 
 			// サービス層のモック定義
 			moq := &DeleteUserServiceMock{
-				DeleteUserFunc: func(ctx *gin.Context, userID model.UserID) error {
+				DeleteUserFunc: func(ctx *gin.Context, userID entity.UserID) error {
 					assert.Equal(t, tt.deleteUser.input.userID, userID)
 					return tt.deleteUser.output
 				},

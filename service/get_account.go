@@ -3,8 +3,8 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +24,7 @@ func NewGetAccount(db *sqlx.DB, repo *repository.Repository) *GetAccount {
 }
 
 type GetAccountResponse struct {
-	ID               model.UserID
+	ID               entity.UserID
 	FirstName        string
 	FirstNameKana    string
 	FamilyName       string
@@ -51,7 +51,7 @@ func (ga *GetAccount) GetAccount(ctx *gin.Context) (GetAccountResponse, error) {
 
 	// 取得ポイントを取得する
 	userID := utils.GetUserID(ctx)
-	point, err := ga.TransactionRepo.GetAquistionPoint(ctx, ga.DB, []model.UserID{userID})
+	point, err := ga.TransactionRepo.GetAquistionPoint(ctx, ga.DB, []entity.UserID{userID})
 	if err != nil {
 		return GetAccountResponse{}, err
 	}

@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,8 +16,8 @@ func TestRegisterUser(t *testing.T) {
 
 	wantConfirmCode := "1234"
 	wantTemporaryUserID := "temp-user-id"
-	wantUserID := model.UserID(10)
-	wantUser := &model.User{
+	wantUserID := entity.UserID(10)
+	wantUser := &entity.User{
 		ID:             wantUserID,
 		FirstName:      "太郎",
 		FirstNameKana:  "たろう",
@@ -37,12 +37,12 @@ func TestRegisterUser(t *testing.T) {
 	}
 	// 結果
 	type want struct {
-		user  *model.User
+		user  *entity.User
 		token string
 		err   error
 	}
 	type UserAdderMockParameter struct {
-		in  *model.User
+		in  *entity.User
 		err error
 	}
 	type tempUserMockParameter struct {
@@ -155,11 +155,11 @@ func TestRegisterUser(t *testing.T) {
 				return nil
 			}
 			moqTokenGenerator := &TokenGeneratorMock{}
-			moqTokenGenerator.GenerateTokenFunc = func(pctx context.Context, u model.User) ([]byte, error) {
+			moqTokenGenerator.GenerateTokenFunc = func(pctx context.Context, u entity.User) ([]byte, error) {
 				assert.Equal(t, *wantUser, u)
 				return tt.gtmprm.rsp, tt.gtmprm.err
 			}
-			moqRepo.RegisterUserFunc = func(pctx context.Context, db repository.Execer, user *model.User) error {
+			moqRepo.RegisterUserFunc = func(pctx context.Context, db repository.Execer, user *entity.User) error {
 				user.ID = wantUserID
 				assert.Equal(t, tt.uaprm.in, user)
 				assert.Equal(t, ctx, pctx)

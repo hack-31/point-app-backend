@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
 type DeleteUser struct {
@@ -31,7 +31,7 @@ func (du *DeleteUser) ServeHTTP(ctx *gin.Context) {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, "IDは数値を指定してください。", err)
 		return
 	}
-	userID := model.UserID(ID)
+	userID := entity.UserID(ID)
 	if err := validation.Validate(userID, validation.Min(1), validation.Required); err != nil {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
@@ -48,7 +48,7 @@ func (du *DeleteUser) ServeHTTP(ctx *gin.Context) {
 
 	// レスポンス作成
 	rsp := struct {
-		ID model.UserID `json:"userId"`
+		ID entity.UserID `json:"userId"`
 	}{
 		ID: userID,
 	}

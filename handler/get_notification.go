@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
 type GetNotification struct {
@@ -31,14 +31,14 @@ func (gn *GetNotification) ServeHTTP(ctx *gin.Context) {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, "IDは数値を指定してください。", err)
 		return
 	}
-	notificationID := model.NotificationID(ID)
+	notificationID := entity.NotificationID(ID)
 	if err := validation.Validate(notificationID, validation.Min(1), validation.Required); err != nil {
 		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
 		return
 	}
 
 	//　お知らせ詳細の取得
-	n, err := gn.Service.GetNotification(ctx, model.NotificationID(notificationID))
+	n, err := gn.Service.GetNotification(ctx, entity.NotificationID(notificationID))
 	if err != nil {
 		if errors.Is(err, repository.ErrNotFound) {
 			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error(), err)
@@ -50,11 +50,11 @@ func (gn *GetNotification) ServeHTTP(ctx *gin.Context) {
 
 	// レスポンス作成
 	rsp := struct {
-		ID          model.NotificationID `json:"id"`
-		Title       string               `json:"title"`
-		Description string               `json:"description"`
-		IsChecked   bool                 `json:"isChecked"`
-		CreatedAt   string               `json:"createdAt"`
+		ID          entity.NotificationID `json:"id"`
+		Title       string                `json:"title"`
+		Description string                `json:"description"`
+		IsChecked   bool                  `json:"isChecked"`
+		CreatedAt   string                `json:"createdAt"`
 	}{
 		ID:          n.ID,
 		Title:       n.Title,

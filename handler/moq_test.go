@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/service"
 )
 
@@ -22,7 +22,7 @@ var _ RegisterUserService = &RegisterUserServiceMock{}
 //
 //		// make and configure a mocked RegisterUserService
 //		mockedRegisterUserService := &RegisterUserServiceMock{
-//			RegisterUserFunc: func(ctx context.Context, temporaryUserId string, confirmCode string) (*model.User, string, error) {
+//			RegisterUserFunc: func(ctx context.Context, temporaryUserId string, confirmCode string) (*entity.User, string, error) {
 //				panic("mock out the RegisterUser method")
 //			},
 //		}
@@ -33,7 +33,7 @@ var _ RegisterUserService = &RegisterUserServiceMock{}
 //	}
 type RegisterUserServiceMock struct {
 	// RegisterUserFunc mocks the RegisterUser method.
-	RegisterUserFunc func(ctx context.Context, temporaryUserId string, confirmCode string) (*model.User, string, error)
+	RegisterUserFunc func(ctx context.Context, temporaryUserId string, confirmCode string) (*entity.User, string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -51,7 +51,7 @@ type RegisterUserServiceMock struct {
 }
 
 // RegisterUser calls RegisterUserFunc.
-func (mock *RegisterUserServiceMock) RegisterUser(ctx context.Context, temporaryUserId string, confirmCode string) (*model.User, string, error) {
+func (mock *RegisterUserServiceMock) RegisterUser(ctx context.Context, temporaryUserId string, confirmCode string) (*entity.User, string, error) {
 	if mock.RegisterUserFunc == nil {
 		panic("RegisterUserServiceMock.RegisterUserFunc: method is nil but RegisterUserService.RegisterUser was just called")
 	}
@@ -868,7 +868,7 @@ var _ GetNotificationService = &GetNotificationServiceMock{}
 //
 //		// make and configure a mocked GetNotificationService
 //		mockedGetNotificationService := &GetNotificationServiceMock{
-//			GetNotificationFunc: func(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error) {
+//			GetNotificationFunc: func(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error) {
 //				panic("mock out the GetNotification method")
 //			},
 //		}
@@ -879,7 +879,7 @@ var _ GetNotificationService = &GetNotificationServiceMock{}
 //	}
 type GetNotificationServiceMock struct {
 	// GetNotificationFunc mocks the GetNotification method.
-	GetNotificationFunc func(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error)
+	GetNotificationFunc func(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -888,20 +888,20 @@ type GetNotificationServiceMock struct {
 			// Ctx is the ctx argument value.
 			Ctx *gin.Context
 			// NotificationID is the notificationID argument value.
-			NotificationID model.NotificationID
+			NotificationID entity.NotificationID
 		}
 	}
 	lockGetNotification sync.RWMutex
 }
 
 // GetNotification calls GetNotificationFunc.
-func (mock *GetNotificationServiceMock) GetNotification(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error) {
+func (mock *GetNotificationServiceMock) GetNotification(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error) {
 	if mock.GetNotificationFunc == nil {
 		panic("GetNotificationServiceMock.GetNotificationFunc: method is nil but GetNotificationService.GetNotification was just called")
 	}
 	callInfo := struct {
 		Ctx            *gin.Context
-		NotificationID model.NotificationID
+		NotificationID entity.NotificationID
 	}{
 		Ctx:            ctx,
 		NotificationID: notificationID,
@@ -918,11 +918,11 @@ func (mock *GetNotificationServiceMock) GetNotification(ctx *gin.Context, notifi
 //	len(mockedGetNotificationService.GetNotificationCalls())
 func (mock *GetNotificationServiceMock) GetNotificationCalls() []struct {
 	Ctx            *gin.Context
-	NotificationID model.NotificationID
+	NotificationID entity.NotificationID
 } {
 	var calls []struct {
 		Ctx            *gin.Context
-		NotificationID model.NotificationID
+		NotificationID entity.NotificationID
 	}
 	mock.lockGetNotification.RLock()
 	calls = mock.calls.GetNotification
@@ -1084,7 +1084,7 @@ var _ DeleteUserService = &DeleteUserServiceMock{}
 //
 //		// make and configure a mocked DeleteUserService
 //		mockedDeleteUserService := &DeleteUserServiceMock{
-//			DeleteUserFunc: func(ctx *gin.Context, userID model.UserID) error {
+//			DeleteUserFunc: func(ctx *gin.Context, userID entity.UserID) error {
 //				panic("mock out the DeleteUser method")
 //			},
 //		}
@@ -1095,7 +1095,7 @@ var _ DeleteUserService = &DeleteUserServiceMock{}
 //	}
 type DeleteUserServiceMock struct {
 	// DeleteUserFunc mocks the DeleteUser method.
-	DeleteUserFunc func(ctx *gin.Context, userID model.UserID) error
+	DeleteUserFunc func(ctx *gin.Context, userID entity.UserID) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -1104,20 +1104,20 @@ type DeleteUserServiceMock struct {
 			// Ctx is the ctx argument value.
 			Ctx *gin.Context
 			// UserID is the userID argument value.
-			UserID model.UserID
+			UserID entity.UserID
 		}
 	}
 	lockDeleteUser sync.RWMutex
 }
 
 // DeleteUser calls DeleteUserFunc.
-func (mock *DeleteUserServiceMock) DeleteUser(ctx *gin.Context, userID model.UserID) error {
+func (mock *DeleteUserServiceMock) DeleteUser(ctx *gin.Context, userID entity.UserID) error {
 	if mock.DeleteUserFunc == nil {
 		panic("DeleteUserServiceMock.DeleteUserFunc: method is nil but DeleteUserService.DeleteUser was just called")
 	}
 	callInfo := struct {
 		Ctx    *gin.Context
-		UserID model.UserID
+		UserID entity.UserID
 	}{
 		Ctx:    ctx,
 		UserID: userID,
@@ -1134,11 +1134,11 @@ func (mock *DeleteUserServiceMock) DeleteUser(ctx *gin.Context, userID model.Use
 //	len(mockedDeleteUserService.DeleteUserCalls())
 func (mock *DeleteUserServiceMock) DeleteUserCalls() []struct {
 	Ctx    *gin.Context
-	UserID model.UserID
+	UserID entity.UserID
 } {
 	var calls []struct {
 		Ctx    *gin.Context
-		UserID model.UserID
+		UserID entity.UserID
 	}
 	mock.lockDeleteUser.RLock()
 	calls = mock.calls.DeleteUser

@@ -6,7 +6,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/repository/testdata"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
@@ -19,7 +19,7 @@ func TestRepository_users_GetAll(t *testing.T) {
 		IsAsia: true,
 	}
 	type want struct {
-		users model.Users
+		users entity.Users
 		err   error
 	}
 	type input struct {
@@ -35,8 +35,8 @@ func TestRepository_users_GetAll(t *testing.T) {
 				columns: []string{},
 			},
 			want: want{
-				users: model.Users{
-					&model.User{
+				users: entity.Users{
+					&entity.User{
 						ID:             1,
 						FirstName:      "太郎",
 						FirstNameKana:  "タロウ",
@@ -48,7 +48,7 @@ func TestRepository_users_GetAll(t *testing.T) {
 						CreatedAt:      c.Now(),
 						UpdateAt:       c.Now(),
 					},
-					&model.User{
+					&entity.User{
 						ID:             2,
 						FirstNameKana:  "あおい",
 						FirstName:      "葵",
@@ -60,7 +60,7 @@ func TestRepository_users_GetAll(t *testing.T) {
 						CreatedAt:      c.Now(),
 						UpdateAt:       c.Now(),
 					},
-					&model.User{
+					&entity.User{
 						ID:             3,
 						FirstName:      "拓也",
 						FirstNameKana:  "たくや",
@@ -81,14 +81,14 @@ func TestRepository_users_GetAll(t *testing.T) {
 				columns: []string{"first_name"},
 			},
 			want: want{
-				users: model.Users{
-					&model.User{
+				users: entity.Users{
+					&entity.User{
 						FirstName: "太郎",
 					},
-					&model.User{
+					&entity.User{
 						FirstName: "葵",
 					},
-					&model.User{
+					&entity.User{
 						FirstName: "拓也",
 					},
 				},
@@ -114,7 +114,7 @@ func TestRepository_users_GetAll(t *testing.T) {
 			})
 
 			// テストデータの挿入
-			testdata.Users(t, ctx, tx, func(users model.Users) {})
+			testdata.Users(t, ctx, tx, func(users entity.Users) {})
 
 			// 実行
 			r := &Repository{}
@@ -134,10 +134,10 @@ func TestRepository_users_GetUserByID(t *testing.T) {
 	}
 
 	type want struct {
-		user model.User
+		user entity.User
 	}
 	type input struct {
-		id model.UserID
+		id entity.UserID
 	}
 
 	tests := map[string]struct {
@@ -149,7 +149,7 @@ func TestRepository_users_GetUserByID(t *testing.T) {
 				id: 1,
 			},
 			want: want{
-				user: model.User{
+				user: entity.User{
 					ID:             1,
 					FirstName:      "太郎",
 					FirstNameKana:  "タロウ",
@@ -180,7 +180,7 @@ func TestRepository_users_GetUserByID(t *testing.T) {
 				assert.NoError(t, err)
 			})
 
-			testdata.Users(t, ctx, tx, func(users model.Users) {})
+			testdata.Users(t, ctx, tx, func(users entity.Users) {})
 
 			// 実行
 			r := &Repository{}
@@ -201,7 +201,7 @@ func TestRepository_users_UpdateEmail(t *testing.T) {
 	}
 	type input struct {
 		email string
-		id    model.UserID
+		id    entity.UserID
 	}
 
 	tests := map[string]struct {
@@ -234,7 +234,7 @@ func TestRepository_users_UpdateEmail(t *testing.T) {
 				assert.NoError(t, err)
 			})
 
-			testdata.Users(t, ctx, tx, func(users model.Users) {
+			testdata.Users(t, ctx, tx, func(users entity.Users) {
 				users[0].Email = tt.input.email
 			})
 
@@ -257,7 +257,7 @@ func TestRepository_RegisterUser(t *testing.T) {
 			IsAsia: true,
 		}
 		// 登録データ
-		okUser := &model.User{
+		okUser := &entity.User{
 			FirstName:      "山田",
 			FirstNameKana:  "やまだ",
 			FamilyName:     "太郎",
@@ -300,6 +300,6 @@ func TestRepository_RegisterUser(t *testing.T) {
 
 		err = r.RegisterUser(ctx, xdb, okUser)
 		assert.NoError(t, err)
-		assert.Equal(t, model.UserID(wantID), okUser.ID)
+		assert.Equal(t, entity.UserID(wantID), okUser.ID)
 	})
 }

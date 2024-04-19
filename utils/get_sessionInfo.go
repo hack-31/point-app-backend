@@ -3,7 +3,7 @@ package utils
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
-	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
 // コンテキストからメールアドレスを取得
@@ -15,9 +15,9 @@ func GetEmail(ctx *gin.Context) string {
 }
 
 // コンテキストからユーザーIDを取得
-func GetUserID(ctx *gin.Context) model.UserID {
+func GetUserID(ctx *gin.Context) entity.UserID {
 	if userID, ok := ctx.Get(auth.UserID); ok {
-		return userID.(model.UserID)
+		return userID.(entity.UserID)
 	}
-	return model.UserID(0)
+	return entity.UserID(0)
 }
