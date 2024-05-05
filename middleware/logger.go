@@ -1,14 +1,13 @@
 package middleware
 
 import (
-	"fmt"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/rs/zerolog"
-	"golang.org/x/xerrors"
+	cockroachdberrors "github.com/yumemi-inc/zerolog-cockroachdb-errors"
 )
 
 // コンテキストに保存するエラー情報のキー定義
@@ -87,6 +86,7 @@ func Logger() gin.HandlerFunc {
 			startTime = gst.(time.Time)
 		}
 		elapsedTime := time.Since(startTime)
+		zerolog.ErrorStackMarshaler = cockroachdberrors.MarshalStack
 
 		logger := zerolog.New(os.Stdout).
 			With().
@@ -103,7 +103,7 @@ func Logger() gin.HandlerFunc {
 			logger.Warn().
 				// レスポンス
 				Int("status", status).
-				Bytes("response", rps).
+				RawJSON("response", rps).
 				// リクエスト
 				Str("URI", path).
 				Str("method", ctx.Request.Method).
@@ -112,7 +112,6 @@ func Logger() gin.HandlerFunc {
 				// エラー
 				Err(e).
 				Int("ErrCode", ec).
-				Str("StackTrace", fmt.Sprintf("%+v", xerrors.Errorf("%w", e))).
 				// パフォーマンス
 				Dur("latency(ms)", elapsedTime).
 				Msg("")
@@ -122,16 +121,16 @@ func Logger() gin.HandlerFunc {
 			logger.Error().
 				// レスポンス
 				Int("status", status).
-				Bytes("response", rps).
+				RawJSON("response", rps).
 				// リクエスト
 				Str("URI", path).
 				Str("method", ctx.Request.Method).
 				Str("user_agent", ctx.Request.UserAgent()).
 				Str("IP", ctx.RemoteIP()).
 				// エラー
+				Stack().
 				Err(e).
 				Int("ErrCode", ec).
-				Str("StackTrace", fmt.Sprintf("%+v", xerrors.Errorf("%w", e))).
 				// パフォーマンス
 				Dur("latency(ms)", elapsedTime).
 				Msg("")
@@ -142,9 +141,8 @@ func Logger() gin.HandlerFunc {
 		logger.Info().
 			// レスポンス
 			Int("status", status).
-			Bytes("response", rps).
+			RawJSON("response", rps).
 			// リクエスト
-			// Str("URI", ctx.Request.URL.String()).
 			Str("URI", path).
 			Str("method", ctx.Request.Method).
 			Str("user_agent", ctx.Request.UserAgent()).

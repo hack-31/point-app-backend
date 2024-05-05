@@ -60,7 +60,7 @@ func Recovery(ctx *gin.Context) {
 				Str("user_agent", ctx.Request.UserAgent()).
 				Str("IP", ctx.RemoteIP()).
 				// エラー
-				Err(fmt.Errorf("panic: %v", err)).
+				Err(fmt.Errorf("panic: %+v", err)).
 				Int("ErrCode", ec).
 				Str("StackTrace", string(debug.Stack())).
 				// パフォーマンス
