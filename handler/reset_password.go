@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type ResetPassword struct {
@@ -46,8 +46,8 @@ func (s *ResetPassword) ServeHTTP(ctx *gin.Context) {
 
 	// パスワード再発行処理依頼
 	if err := s.Service.ResetPassword(ctx, input.Email); err != nil {
-		if errors.Is(err, repository.ErrNotExistEmail) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotExistEmail.Error(), err)
+		if errors.Is(err, myerror.ErrNotExistEmail) {
+			ErrResponse(ctx, http.StatusNotFound, errTitle, myerror.ErrNotExistEmail.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

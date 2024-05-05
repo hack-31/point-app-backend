@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/constant"
@@ -40,11 +41,11 @@ func NewJWTer(s Store, c clock.Clocker) (*JWTer, error) {
 	j := &JWTer{Store: s}
 	privkey, err := parse(rawPrivKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed in NewJWTer: private key: %w", err)
+		return nil, errors.Wrap(err, "failed to parse private key")
 	}
 	pubkey, err := parse(rawPubKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed in NewJWTer: public key: %w", err)
+		return nil, errors.Wrap(err, "failed to parse public key")
 	}
 	j.PrivateKey = privkey
 	j.PublicKey = pubkey
@@ -55,7 +56,7 @@ func NewJWTer(s Store, c clock.Clocker) (*JWTer, error) {
 func parse(rawKey []byte) (jwk.Key, error) {
 	key, err := jwk.ParseKey(rawKey, jwk.WithPEM(true))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to parse key")
 	}
 	return key, nil
 }
@@ -76,16 +77,16 @@ func (j *JWTer) GenerateToken(ctx context.Context, u model.User) ([]byte, error)
 		Claim(UserID, u.ID).
 		Build()
 	if err != nil {
-		return nil, fmt.Errorf("GenerateToken: failed to build token: %w", err)
+		return nil, errors.Wrap(err, "failed to build token")
 	}
 	if err := j.Store.Save(ctx, fmt.Sprint(u.ID), tok.JwtID(), time.Duration(constant.TokenExpiration_m)); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to save token")
 	}
 
 	// 署名
 	signed, err := jwt.Sign(tok, jwt.WithKey(jwa.RS256, j.PrivateKey))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to sign token")
 	}
 	return signed, nil
 }
@@ -104,7 +105,7 @@ func (j *JWTer) GetToken(ctx context.Context, r *http.Request) (jwt.Token, error
 		jwt.WithValidate(false),
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to parse token")
 	}
 	return token, nil
 }
@@ -116,33 +117,33 @@ func (j *JWTer) FillContext(ctx *gin.Context) error {
 	// トークンを解析
 	token, err := j.GetToken(ctx.Request.Context(), ctx.Request)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get token")
 	}
 
 	// 有効期限が切れていないか確認
 	if err := jwt.Validate(token, jwt.WithClock(j.Clocker)); err != nil {
-		return fmt.Errorf("GetToken: failed to validate token: %w", err)
+		return errors.Wrap(err, "failed to validate token")
 	}
 
 	// キャッシュに対しても有効期限を確認
 	id, ok := token.Get(UserID)
 	if !ok {
-		return fmt.Errorf("not found %s", UserID)
+		return errors.Wrapf(err, "failed to get %s", UserID)
 	}
 	uid := fmt.Sprintf("%v", id)
 	jwi, err := j.Store.Load(ctx, uid)
 	if err != nil {
-		return fmt.Errorf("GetToken: %v expired: %w", id, err)
+		return errors.Wrapf(err, "failed to load %s", id)
 	}
 
 	// 他のログインを検査
 	if jwi != token.JwtID() {
-		return fmt.Errorf("expired token %s because login another", jwi)
+		return errors.Wrapf(err, "expired token %s because login another", jwi)
 	}
 
 	// 有効期限延長
 	if err = j.Store.Expire(ctx, uid, time.Duration(constant.TokenExpiration_m)); err != nil {
-		return fmt.Errorf("can not be extended : %w", err)
+		return errors.Wrap(err, "can not be extended")
 	}
 
 	// コンテキストにユーザ情報追加

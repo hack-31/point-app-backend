@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"database/sql"
-	"errors"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/repository"
 )

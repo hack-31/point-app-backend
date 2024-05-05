@@ -1,13 +1,12 @@
 package email
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/config"
 	"github.com/hack-31/point-app-backend/utils"
 )
@@ -61,11 +60,11 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 			if aerr, ok := err.(awserr.Error); ok {
 				switch aerr.Code() {
 				case ses.ErrCodeMessageRejected:
-					return nil, fmt.Errorf("message rejected: %w", aerr)
+					return nil, errors.Wrap(aerr, "message rejected")
 				case ses.ErrCodeMailFromDomainNotVerifiedException:
-					return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
+					return nil, errors.Wrap(aerr, "mail from domain not verified")
 				case ses.ErrCodeConfigurationSetDoesNotExistException:
-					return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
+					return nil, errors.Wrap(aerr, "configuration set does not exist")
 				default:
 					return nil, aerr
 				}
@@ -103,11 +102,11 @@ func SendMail(recipient string, subject string, textBody string) (*ses.SendEmail
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case ses.ErrCodeMessageRejected:
-				return nil, fmt.Errorf("message rejected: %w", aerr)
+				return nil, errors.Wrap(aerr, "message rejected")
 			case ses.ErrCodeMailFromDomainNotVerifiedException:
-				return nil, fmt.Errorf("mail from domain not verified: %w", aerr)
+				return nil, errors.Wrap(aerr, "mail from domain not verified")
 			case ses.ErrCodeConfigurationSetDoesNotExistException:
-				return nil, fmt.Errorf("configuration set does not exist: %w", aerr)
+				return nil, errors.Wrap(aerr, "configuration set does not exist")
 			default:
 				return nil, aerr
 			}

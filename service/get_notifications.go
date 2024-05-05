@@ -1,9 +1,9 @@
 package service
 
 import (
-	"fmt"
 	"strconv"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
@@ -59,7 +59,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 			"nt.title",
 		)
 		if err != nil {
-			return GetNotificationsResponse{}, fmt.Errorf("cannot GetNotifications : %w", err)
+			return GetNotificationsResponse{}, errors.Wrap(err, "failed to get notifications")
 		}
 		ns = n
 	}
@@ -83,7 +83,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 			"nt.title",
 		)
 		if err != nil {
-			return GetNotificationsResponse{}, fmt.Errorf("cannot GetNotifications : %w", err)
+			return GetNotificationsResponse{}, errors.Wrap(err, "failed to get notifications")
 		}
 	}
 

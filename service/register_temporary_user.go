@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/domain/service"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
 	utils "github.com/hack-31/point-app-backend/utils/email"
 	"github.com/jmoiron/sqlx"
@@ -45,20 +47,20 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	// 登録可能なメールか確認
 	existMail, err := userService.ExistByEmail(ctx, &r.DB, email)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed to check email in RegisterTemporaryUserService.RegisterTemporaryUser")
 	}
 	if existMail {
-		return "", fmt.Errorf("failed to register: %w", repository.ErrAlreadyEntry)
+		return "", errors.Wrap(myerror.ErrAlreadyEntry, "failed to register in RegisterTemporaryUserService.RegisterTemporaryUser")
 	}
 
 	// パスワードハッシュ化
 	pass, err := model.NewPassword(password)
 	if err != nil {
-		return "", fmt.Errorf("cannot create password object: %w", err)
+		return "", errors.Wrap(err, "failed to create password object in RegisterTemporaryUserService.RegisterTemporaryUser")
 	}
 	hashPass, err := pass.CreateHash()
 	if err != nil {
-		return "", fmt.Errorf("cannot create hash password: %w", err)
+		return "", errors.Wrap(err, "failed to create hash password in RegisterTemporaryUserService.RegisterTemporaryUser")
 	}
 
 	// ユーザ情報をキャッシュに保存
@@ -72,7 +74,7 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	// 保存
 	err = r.Cache.Save(ctx, key, userString, time.Duration(constant.ConfirmationCodeExpiration_m))
 	if err != nil {
-		return "", fmt.Errorf("failed to save in cache: %w", err)
+		return "", errors.Wrap(err, "failed to save in cache in RegisterTemporaryUserService.RegisterTemporaryUser")
 	}
 
 	// メール送信
@@ -80,7 +82,7 @@ func (r *RegisterTemporaryUser) RegisterTemporaryUser(ctx context.Context, first
 	body := fmt.Sprintf("%s %sさん\n\nポイントアプリをご利用いただきありがとうございます。\n\n確認コードは %s です。\n\nこの確認コードの有効期限は1時間です。", familyName, firstName, confirmCode)
 	_, err = utils.SendMail(email, subject, body)
 	if err != nil {
-		return "", fmt.Errorf("failed to send email: %w", err)
+		return "", errors.Wrap(err, "failed to send email in RegisterTemporaryUserService.RegisterTemporaryUser")
 	}
 
 	return uid, nil

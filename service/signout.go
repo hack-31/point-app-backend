@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/utils"
@@ -30,7 +31,7 @@ func (s *Signout) Signout(ctx *gin.Context) error {
 
 	// ユーザIDをキャッシュから削除
 	if err := s.Cache.Delete(ctx, fmt.Sprint(uid)); err != nil {
-		return fmt.Errorf("cannot delete in cache: %w", err)
+		return errors.Wrap(err, "failed to delete in cache")
 	}
 
 	return nil

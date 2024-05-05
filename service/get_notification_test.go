@@ -10,7 +10,7 @@ import (
 	"github.com/hack-31/point-app-backend/auth"
 	mock_domain "github.com/hack-31/point-app-backend/domain/_mock"
 	"github.com/hack-31/point-app-backend/domain/model"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	mock_repository "github.com/hack-31/point-app-backend/repository/_mock"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
@@ -143,7 +143,7 @@ func TestGetNotification(t *testing.T) {
 			},
 			publish: publish{
 				callCount: 1,
-				err:       repository.ErrCacheException,
+				err:       myerror.ErrCacheException,
 			},
 			want: want{
 				notification: GetNotificationResponse{
@@ -153,7 +153,7 @@ func TestGetNotification(t *testing.T) {
 					IsChecked:   false,
 					CreatedAt:   "2022/05/10 12:34:56",
 				},
-				err: repository.ErrCacheException,
+				err: myerror.ErrCacheException,
 			},
 		},
 	}

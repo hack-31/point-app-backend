@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
@@ -44,18 +45,18 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID mode
 	tx, err := gn.Tx.BeginTxx(ctx, nil)
 	defer func() { _ = tx.Rollback() }()
 	if err != nil {
-		return GetNotificationResponse{}, err
+		return GetNotificationResponse{}, errors.Wrap(err, "failed to begin transaction")
 	}
 
 	// 閲覧したので、お知らせをチェック済みとする
 	if err := gn.NotifRepo.CheckNotification(ctx, tx, userID, notificationID); err != nil {
-		return GetNotificationResponse{}, fmt.Errorf("cannot check notification in db: %w", err)
+		return GetNotificationResponse{}, errors.Wrap(err, "failed to check notification in db")
 	}
 
 	// お知らせ詳細取得
 	n, err := gn.NotifRepo.GetNotificationByID(ctx, tx, userID, notificationID)
 	if err != nil {
-		return GetNotificationResponse{}, fmt.Errorf("cannot GetNotificaitonByID in db: %w", err)
+		return GetNotificationResponse{}, errors.Wrap(err, "failed to get notification by id")
 	}
 	res := GetNotificationResponse{
 		ID:          n.ID,
@@ -67,17 +68,17 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID mode
 
 	// トランザクションコミット
 	if err := tx.Commit(); err != nil {
-		return GetNotificationResponse{}, err
+		return GetNotificationResponse{}, errors.Wrap(err, "failed to commit transaction")
 	}
 
 	// お知らせチェックしたので、お知らせを通知
 	channel := fmt.Sprintf("notification:%d", userID)
 	payload, err := json.Marshal(n)
 	if err != nil {
-		return res, fmt.Errorf("cannot marshal: %w ", err)
+		return res, errors.Wrap(err, "failed to marshal notification")
 	}
 	if err := gn.Cache.Publish(ctx, channel, string(payload)); err != nil {
-		return res, fmt.Errorf("cannot publish to %s channel: %w ", channel, err)
+		return res, errors.Wrapf(err, "failed to publish to %s channel", channel)
 	}
 	return res, nil
 }

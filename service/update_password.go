@@ -1,11 +1,11 @@
 package service
 
 import (
-	"fmt"
-
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
@@ -34,29 +34,29 @@ func (up *UpdatePassword) UpdatePassword(ctx *gin.Context, oldPassword, newPassw
 	// Emailよりユーザ情報を取得する
 	u, err := up.UserRepo.FindUserByEmail(ctx, up.QueryerDB, mail)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get user by email")
 	}
 
 	// パスワードが一致するか確認
 	oldPwd, err := model.NewPassword(oldPassword)
 	if err != nil {
-		return fmt.Errorf("cannot create password object: %w", err)
+		return errors.Wrap(err, "cannot create password object")
 	}
 	if isMatch, _ := oldPwd.IsMatch(u.Password); !isMatch {
-		return fmt.Errorf("no match password:  %w", repository.ErrDifferentPassword)
+		return errors.Wrap(myerror.ErrDifferentPassword, "no match password")
 	}
 
 	// パスワード更新
 	newPwd, err := model.NewPassword(newPassword)
 	if err != nil {
-		return fmt.Errorf("cannot create password object: %w", err)
+		return errors.Wrap(err, "cannot create password object")
 	}
 	hashNewPass, err := newPwd.CreateHash()
 	if err != nil {
-		return fmt.Errorf("cannot create hash password: %w", err)
+		return errors.Wrap(err, "cannot create hash password")
 	}
 	if err := up.UserRepo.UpdatePassword(ctx, up.ExecerDB, &mail, &hashNewPass); err != nil {
-		return fmt.Errorf("failed to update password: %w", err)
+		return errors.Wrap(err, "failed to update password")
 	}
 
 	return nil

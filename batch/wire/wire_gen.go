@@ -8,6 +8,7 @@ package wire
 
 import (
 	"context"
+
 	"github.com/hack-31/point-app-backend/batch/controller"
 	"github.com/hack-31/point-app-backend/batch/usecase"
 	"github.com/hack-31/point-app-backend/config"

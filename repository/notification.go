@@ -3,10 +3,11 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"strings"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 // お知らせ登録
@@ -117,7 +118,7 @@ func (r *Repository) GetNotificationByID(ctx context.Context, db Queryer, uid mo
 	var n model.Notification
 	if err := db.QueryRowxContext(ctx, query, nid, uid).StructScan(&n); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return n, ErrNotFound
+			return n, myerror.ErrNotFound
 		}
 		return n, err
 	}

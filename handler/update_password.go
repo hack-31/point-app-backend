@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type UpdatePassword struct {
@@ -57,8 +57,8 @@ func (rt *UpdatePassword) ServeHTTP(ctx *gin.Context) {
 	// 更新を依頼
 	err = rt.Service.UpdatePassword(ctx, input.OldPassword, input.NewPassword)
 	if err != nil {
-		if errors.Is(err, repository.ErrDifferentPassword) {
-			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrDifferentPassword.Error(), err)
+		if errors.Is(err, myerror.ErrDifferentPassword) {
+			ErrResponse(ctx, http.StatusBadRequest, errTitle, myerror.ErrDifferentPassword.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

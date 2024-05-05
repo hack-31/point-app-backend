@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/jmoiron/sqlx"
 )
@@ -34,22 +35,22 @@ func (s *Signin) Signin(ctx context.Context, email, password string) (string, er
 	// emailよりユーザ情報を取得
 	u, err := s.Repo.FindUserByEmail(ctx, s.DB, email)
 	if err != nil {
-		return "", fmt.Errorf("failed to find user : %w", repository.ErrNotMatchLogInfo)
+		return "", errors.Join(err, myerror.ErrNotMatchLogInfo)
 	}
 
 	// パスワードが一致するか確認
 	pwd, err := model.NewPassword(password)
 	if err != nil {
-		return "", fmt.Errorf("cannot create password object: %w", err)
+		return "", errors.Wrap(err, "cannot create password object")
 	}
 	if isMatch, _ := pwd.IsMatch(u.Password); !isMatch {
-		return "", fmt.Errorf("no match password:  %w", repository.ErrNotMatchLogInfo)
+		return "", errors.Wrap(myerror.ErrNotMatchLogInfo, "no match password")
 	}
 
 	// JWTを作成
 	jwt, err := s.TokenGenerator.GenerateToken(ctx, u)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate JWT: %w", err)
+		return "", errors.Wrap(err, "failed to generate JWT")
 	}
 
 	return string(jwt), nil

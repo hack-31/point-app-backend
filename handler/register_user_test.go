@@ -3,14 +3,14 @@ package handler
 import (
 	"bytes"
 	"context"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
 )
@@ -72,10 +72,10 @@ func TestRegisterUser(t *testing.T) {
 						nil
 				}
 				if tt.want.status == http.StatusConflict {
-					return nil, "", repository.ErrAlreadyEntry
+					return nil, "", myerror.ErrAlreadyEntry
 				}
 				if tt.want.status == http.StatusUnauthorized {
-					return nil, "", repository.ErrNotFoundSession
+					return nil, "", myerror.ErrNotFoundSession
 				}
 
 				return nil, "", errors.New("error from mock")

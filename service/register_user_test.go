@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/stretchr/testify/assert"
 )
@@ -93,7 +94,7 @@ func TestRegisterUser(t *testing.T) {
 				temporaryUserId: wantTemporaryUserID,
 			},
 			wants: want{
-				err:   repository.ErrNotFoundSession,
+				err:   myerror.ErrNotFoundSession,
 				user:  nil,
 				token: "",
 			},
@@ -103,7 +104,7 @@ func TestRegisterUser(t *testing.T) {
 			},
 			tumprm: tempUserMockParameter{
 				rps: "",
-				err: repository.ErrNotFoundSession,
+				err: myerror.ErrNotFoundSession,
 			},
 			gtmprm: generateTokenMockParameter{
 				rsp: []byte(wantToken),
@@ -116,13 +117,13 @@ func TestRegisterUser(t *testing.T) {
 				temporaryUserId: wantTemporaryUserID,
 			},
 			wants: want{
-				err:   repository.ErrAlreadyEntry,
+				err:   myerror.ErrAlreadyEntry,
 				user:  nil,
 				token: "",
 			},
 			uaprm: UserAdderMockParameter{
 				in:  wantUser,
-				err: repository.ErrAlreadyEntry,
+				err: myerror.ErrAlreadyEntry,
 			},
 			tumprm: tempUserMockParameter{
 				rps: wantTemporaryUser,

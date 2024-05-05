@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
@@ -47,7 +48,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	// ユーザ一覧を取得する
 	users, err := r.UserRepo.GetAll(ctx, r.DB)
 	if err != nil {
-		return GetUsersResponse{}, err
+		return GetUsersResponse{}, errors.Wrap(err, "failed to get users in GetUsersService.GetUsers")
 	}
 
 	// ユーザIDsを取得する
@@ -59,7 +60,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	// 取得ポイントを取得する
 	points, err := r.TransactionRepo.GetAquistionPoint(ctx, r.DB, userIDs)
 	if err != nil {
-		return GetUsersResponse{}, err
+		return GetUsersResponse{}, errors.Wrap(err, "failed to get points in GetUsersService.GetUsers")
 	}
 
 	res := make([]struct {
