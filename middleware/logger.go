@@ -138,6 +138,23 @@ func Logger() gin.HandlerFunc {
 		}
 
 		// 成功時
+		// プリフライトリクエストの場合はレスポンスがない
+		if rps == nil {
+			logger.Info().
+				// レスポンス
+				Int("status", status).
+				Str("response", "").
+				// リクエスト
+				Str("URI", path).
+				Str("method", ctx.Request.Method).
+				Str("user_agent", ctx.Request.UserAgent()).
+				Str("IP", ctx.RemoteIP()).
+				// パフォーマンス
+				// TODO: runtime, runtime/pprofパッケージを利用してメモリ利用率など出す
+				Dur("latency(ms)", elapsedTime).
+				Msg("")
+			return
+		}
 		logger.Info().
 			// レスポンス
 			Int("status", status).
