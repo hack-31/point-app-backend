@@ -9,6 +9,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +25,7 @@ func NewGetNotification(cache domain.Cache, repo *repository.Repository, db *sql
 }
 
 type GetNotificationResponse struct {
-	ID          model.NotificationID
+	ID          entity.NotificationID
 	Title       string
 	Description string
 	IsChecked   bool
@@ -38,7 +39,7 @@ type GetNotificationResponse struct {
 //
 // @return
 // お知らせ詳細
-func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID model.NotificationID) (GetNotificationResponse, error) {
+func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID entity.NotificationID) (GetNotificationResponse, error) {
 	// ユーザID確認
 	userID := utils.GetUserID(ctx)
 

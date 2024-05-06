@@ -8,6 +8,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +25,7 @@ func NewGetNotifications(db *sqlx.DB, repo *repository.Repository) *GetNotificat
 
 type GetNotificationsResponse struct {
 	Notifications []struct {
-		ID          model.NotificationID
+		ID          entity.NotificationID
 		Title       string
 		Description string
 		IsChecked   bool
@@ -43,7 +44,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	// ユーザID確認
 	userID := utils.GetUserID(ctx)
 
-	var ns []*model.Notification
+	var ns []*entity.Notification
 	// 初回時
 	if nextToken == "" {
 		s, _ := strconv.Atoi(size)
@@ -74,7 +75,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 			ctx,
 			gn.DB,
 			userID,
-			model.NotificationID(nt),
+			entity.NotificationID(nt),
 			s,
 			"n.id",
 			"n.is_checked",
@@ -90,7 +91,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	// レスポンス作成
 	res := GetNotificationsResponse{
 		Notifications: []struct {
-			ID          model.NotificationID
+			ID          entity.NotificationID
 			Title       string
 			Description string
 			IsChecked   bool
@@ -99,7 +100,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	}
 	for _, n := range ns {
 		res.Notifications = append(res.Notifications, struct {
-			ID          model.NotificationID
+			ID          entity.NotificationID
 			Title       string
 			Description string
 			IsChecked   bool

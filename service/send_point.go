@@ -10,6 +10,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -56,7 +57,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 
 	// 送信相手にポイントを加算
-	if err := sp.PointRepo.RegisterPointTransaction(ctx, tx, fromUserID, model.UserID(toUserId), sendPoint); err != nil {
+	if err := sp.PointRepo.RegisterPointTransaction(ctx, tx, fromUserID, entity.UserID(toUserId), sendPoint); err != nil {
 		return errors.Wrap(err, "failed to register point transaction")
 	}
 
@@ -70,9 +71,9 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	if err != nil {
 		return errors.Wrap(err, "failed to get user by id")
 	}
-	n := model.Notification{
+	n := entity.Notification{
 		TypeID:      model.NotificationTypeSendingPoint,
-		ToUserID:    model.UserID(toUserId),
+		ToUserID:    entity.UserID(toUserId),
 		FromUserID:  fromUserID,
 		Description: fmt.Sprintf("%s%sさんから%dポイント送付されました。", fromUser.FamilyName, fromUser.FirstName, sendPoint),
 	}

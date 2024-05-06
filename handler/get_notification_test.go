@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/service"
 	"github.com/hack-31/point-app-backend/testutil"
 )
@@ -86,7 +86,7 @@ func TestGetNotification(t *testing.T) {
 
 			// サービス層のモック定義
 			moq := &GetNotificationServiceMock{
-				GetNotificationFunc: func(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error) {
+				GetNotificationFunc: func(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error) {
 					return tt.getNotification.res, tt.getNotification.err
 				},
 			}

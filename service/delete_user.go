@@ -6,9 +6,9 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -24,7 +24,7 @@ func NewDeleteUser(cache domain.Cache, repo domain.UserRepo, db *sqlx.DB) *Delet
 }
 
 // ユーザー削除サービス
-func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID model.UserID) error {
+func (du *DeleteUser) DeleteUser(ctx *gin.Context, userID entity.UserID) error {
 	// トランザクション開始
 	tx, err := du.Tx.BeginTxx(ctx, nil)
 	defer func() { _ = tx.Rollback() }()

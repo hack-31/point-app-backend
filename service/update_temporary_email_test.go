@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,8 +18,8 @@ func TestUpdateTemporaryEmail(t *testing.T) {
 	t.Parallel()
 	inputEmail := "yamada.tarotestetst@sample.com"
 	inputExistEmail := "yamada@sample.com"
-	wantUserID := model.UserID(10)
-	wantUser := &model.User{
+	wantUserID := entity.UserID(10)
+	wantUser := &entity.User{
 		ID:             wantUserID,
 		FirstName:      "太郎",
 		FirstNameKana:  "たろう",
@@ -70,9 +70,9 @@ func TestUpdateTemporaryEmail(t *testing.T) {
 			moqCache.SaveFunc = func(ctx context.Context, key, value string, minute time.Duration) error {
 				return nil
 			}
-			moqRepo.FindUserByEmailFunc = func(ctx context.Context, db repository.Queryer, email string, column ...string) (model.User, error) {
+			moqRepo.FindUserByEmailFunc = func(ctx context.Context, db repository.Queryer, email string, column ...string) (entity.User, error) {
 				if tt.input.email == inputEmail {
-					return model.User{}, sql.ErrNoRows
+					return entity.User{}, sql.ErrNoRows
 				}
 				if tt.input.email == inputExistEmail {
 					return *wantUser, nil
