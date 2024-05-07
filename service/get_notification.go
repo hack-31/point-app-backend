@@ -67,11 +67,6 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID enti
 		CreatedAt:   model.NewTime(n.CreatedAt).Format(),
 	}
 
-	// トランザクションコミット
-	if err := tx.Commit(); err != nil {
-		return GetNotificationResponse{}, errors.Wrap(err, "failed to commit transaction")
-	}
-
 	// お知らせチェックしたので、お知らせを通知
 	channel := fmt.Sprintf("notification:%d", userID)
 	payload, err := json.Marshal(n)
@@ -81,5 +76,11 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID enti
 	if err := gn.Cache.Publish(ctx, channel, string(payload)); err != nil {
 		return res, errors.Wrapf(err, "failed to publish to %s channel", channel)
 	}
+
+	// トランザクションコミット
+	if err := tx.Commit(); err != nil {
+		return GetNotificationResponse{}, errors.Wrap(err, "failed to commit transaction")
+	}
+
 	return res, nil
 }
