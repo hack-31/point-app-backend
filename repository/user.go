@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"strings"
 
+	"github.com/cockroachdb/errors"
 	"github.com/go-sql-driver/mysql"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
@@ -28,13 +28,13 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLDuplicateEntry {
-			return fmt.Errorf("cannot create same email user: %w", ErrAlreadyEntry)
+			return errors.Wrap(myerror.ErrAlreadyEntry, "failed to register user")
 		}
-		return err
+		return errors.Wrap(err, "failed to register user")
 	}
 	id, err := result.LastInsertId()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to get last insert id in user repo")
 	}
 	u.ID = entity.UserID(id)
 	return nil
@@ -71,7 +71,7 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email stri
 		// 見つけられない時のエラーは利用側で
 		// errors.Is(err, sql.ErrNoRows)
 		// で判断する
-		return user, err
+		return user, errors.Wrap(err, "failed to find user by email in user repo")
 	}
 	return user, nil
 }
@@ -98,7 +98,7 @@ func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID entity.User
 		// 見つけられない時のエラーは利用側で
 		// errors.Is(err, sql.ErrNoRows)
 		// で判断する
-		return user, err
+		return user, errors.Wrap(err, "failed to get user by id in user repo")
 	}
 	return user, nil
 }
@@ -109,7 +109,7 @@ func (r *Repository) DeleteUserByID(ctx context.Context, db Execer, ID entity.Us
 		"WHERE `id` = ?"
 	res, err := db.ExecContext(ctx, sql, ID)
 	if err != nil {
-		return 0, err
+		return 0, errors.Wrap(err, "failed to delete user by id in user repo")
 	}
 	return res.RowsAffected()
 }
@@ -128,7 +128,7 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 
 	_, err := db.ExecContext(ctx, sql, pass, email)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to update password in user repo")
 	}
 	return err
 }
@@ -147,7 +147,7 @@ func (r *Repository) UpdateEmail(ctx context.Context, db Execer, userID entity.U
 
 	_, err := db.ExecContext(ctx, sql, newEmail, userID)
 	if err != nil {
-		return fmt.Errorf("failed to update DB: %w", err)
+		return errors.Wrap(err, "failed to update email in user repo")
 	}
 	return nil
 }
@@ -180,7 +180,7 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 		firstNameKana,
 		email)
 	if err != nil {
-		return fmt.Errorf("failed to update DB: %w", err)
+		return errors.Wrap(err, "failed to update account in user repo")
 	}
 	return nil
 }
@@ -207,7 +207,7 @@ func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) 
 		 FROM users;`
 	var users entity.Users
 	if err := db.SelectContext(ctx, &users, sql); err != nil {
-		return users, err
+		return users, errors.Wrap(err, "failed to get all users in user repo")
 	}
 	return users, nil
 }

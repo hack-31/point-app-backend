@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/service"
 	"github.com/hack-31/point-app-backend/testutil"
@@ -60,7 +60,7 @@ func TestGetNotification(t *testing.T) {
 				rspFile: "testdata/get_notification/404_rsp.json.golden",
 			},
 			getNotification: getNotification{
-				err: repository.ErrNotFound,
+				err: myerror.ErrNotFound,
 				res: service.GetNotificationResponse{},
 			},
 		},

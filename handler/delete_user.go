@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
@@ -38,8 +38,8 @@ func (du *DeleteUser) ServeHTTP(ctx *gin.Context) {
 	}
 
 	if err := du.Service.DeleteUser(ctx, userID); err != nil {
-		if errors.Is(err, repository.ErrNotUser) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error(), err)
+		if errors.Is(err, myerror.ErrNotUser) {
+			ErrResponse(ctx, http.StatusNotFound, errTitle, myerror.ErrNotFound.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

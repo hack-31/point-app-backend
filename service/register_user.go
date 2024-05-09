@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/constant"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
@@ -33,12 +34,12 @@ func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId, confir
 	key := fmt.Sprintf("user:%s:%s", confirmCode, temporaryUserId)
 	u, err := r.Cache.Load(ctx, key)
 	if err != nil {
-		return nil, "", fmt.Errorf("cannot load user in cache: %w", err)
+		return nil, "", errors.Wrap(err, "failed to load in cache")
 	}
 
 	// 復元が成功したら一時ユーザ情報除削
 	if err := r.Cache.Delete(ctx, key); err != nil {
-		return nil, "", fmt.Errorf("cannot delete in cache: %w", err)
+		return nil, "", errors.Wrap(err, "failed to delete in cache")
 	}
 
 	// 復元したユーザ情報を解析
@@ -56,13 +57,13 @@ func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId, confir
 		SendingPoint:   constant.DefaultSendingPoint,
 	}
 	if err := r.Repo.RegisterUser(ctx, r.DB, user); err != nil {
-		return nil, "", fmt.Errorf("failed to register: %w", err)
+		return nil, "", errors.Wrap(err, "failed to register")
 	}
 
 	// JWTを作成
 	jwt, err := r.TokenGenerator.GenerateToken(ctx, *user)
 	if err != nil {
-		return nil, "", fmt.Errorf("failed to generate JWT: %w", err)
+		return nil, "", errors.Wrap(err, "failed to generate JWT")
 	}
 
 	return user, string(jwt), nil

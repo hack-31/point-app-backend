@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/repository"
@@ -34,7 +35,7 @@ func (gunc *GetUncheckedNotificationCount) GetUncheckedNotificationCount(ctx *gi
 	notificationCntChan := make(chan int)
 	cnt, err := gunc.NotifRepo.GetUncheckedNotificationCount(ctx, gunc.DB, userID)
 	if err != nil {
-		return notificationCntChan, fmt.Errorf("faild to get unchecked notification count from db: %w", err)
+		return notificationCntChan, errors.Wrap(err, "faild to get unchecked notification count from db")
 	}
 
 	// お知らせ通知をサブスクライブ

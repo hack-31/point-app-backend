@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
 	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/stretchr/testify/assert"
@@ -49,7 +50,7 @@ func TestUpdateTemporaryEmail(t *testing.T) {
 			},
 			wants: want{
 				temporaryEmailId: "",
-				err:              repository.ErrAlreadyEntry,
+				err:              myerror.ErrAlreadyEntry,
 			},
 		},
 	}

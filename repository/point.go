@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"github.com/go-sql-driver/mysql"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
@@ -25,7 +25,7 @@ func (r *Repository) RegisterPointTransaction(ctx context.Context, db Execer, fr
 	if _, err := db.ExecContext(ctx, sql, fromUserID, toUserId, sendPoint, r.Clocker.Now()); err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLNoReferencedRow {
-			return fmt.Errorf("cannot send point: %w", ErrNotUser)
+			return errors.Join(myerror.ErrNotUser, err)
 		}
 		return err
 	}
@@ -49,7 +49,7 @@ func (r *Repository) UpdateSendablePoint(ctx context.Context, db Execer, fromUse
 	if _, err := db.ExecContext(ctx, sql, point, fromUserID); err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLNoReferencedRow {
-			return fmt.Errorf("cannot send point: %w", ErrNotUser)
+			return errors.Join(myerror.ErrNotUser, err)
 		}
 		return err
 	}
@@ -64,7 +64,7 @@ func (r *Repository) UpdateAllSendablePoint(ctx context.Context, db Execer, poin
 	if _, err := db.ExecContext(ctx, sql, point); err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLNoReferencedRow {
-			return fmt.Errorf("cannot : %w", ErrNotUser)
+			return errors.Join(myerror.ErrNotUser, err)
 		}
 		return err
 	}

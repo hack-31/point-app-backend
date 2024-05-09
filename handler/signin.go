@@ -1,14 +1,14 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 	"regexp"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type Signin struct {
@@ -57,8 +57,8 @@ func (ru *Signin) ServeHTTP(ctx *gin.Context) {
 	// サインイン処理依頼
 	jwt, err := ru.Service.Signin(ctx, input.Email, input.Password)
 	if err != nil {
-		if errors.Is(err, repository.ErrNotMatchLogInfo) {
-			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotMatchLogInfo.Error(), err)
+		if errors.Is(err, myerror.ErrNotMatchLogInfo) {
+			ErrResponse(ctx, http.StatusUnauthorized, errTitle, myerror.ErrNotMatchLogInfo.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

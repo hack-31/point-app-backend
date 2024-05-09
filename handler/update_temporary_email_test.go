@@ -2,13 +2,13 @@ package handler
 
 import (
 	"bytes"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/testutil"
 )
 
@@ -60,7 +60,7 @@ func TestUpdateTemporaryEmail(t *testing.T) {
 				}
 
 				if tt.want.status == http.StatusConflict {
-					return "", repository.ErrAlreadyEntry
+					return "", myerror.ErrAlreadyEntry
 				}
 
 				if tt.want.status == http.StatusBadRequest {

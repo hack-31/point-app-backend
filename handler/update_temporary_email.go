@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type UpdateTemporaryEmail struct {
@@ -53,8 +53,8 @@ func (ute *UpdateTemporaryEmail) ServeHTTP(ctx *gin.Context) {
 
 	// エラーレスポンスを返す
 	if err != nil {
-		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error(), err)
+		if errors.Is(err, myerror.ErrAlreadyEntry) {
+			ErrResponse(ctx, http.StatusConflict, mailErrTitle, myerror.ErrAlreadyEntry.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, "サーバーエラー", err.Error(), err)

@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
@@ -50,12 +50,12 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 
 	u, jwt, err := ru.Service.RegisterUser(ctx, input.TemporaryUserId, input.ConfirmCode)
 	if err != nil {
-		if errors.Is(err, repository.ErrNotFoundSession) {
-			ErrResponse(ctx, http.StatusUnauthorized, errTitle, repository.ErrNotFoundSession.Error(), err)
+		if errors.Is(err, myerror.ErrNotFoundSession) {
+			ErrResponse(ctx, http.StatusUnauthorized, errTitle, myerror.ErrNotFoundSession.Error(), err)
 			return
 		}
-		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, errTitle, repository.ErrAlreadyEntry.Error(), err)
+		if errors.Is(err, myerror.ErrAlreadyEntry) {
+			ErrResponse(ctx, http.StatusConflict, errTitle, myerror.ErrAlreadyEntry.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

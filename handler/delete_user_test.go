@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/stretchr/testify/assert"
@@ -75,7 +75,7 @@ func TestDeleteUser(t *testing.T) {
 				input: deleteUserInput{
 					userID: 1,
 				},
-				output: repository.ErrNotUser,
+				output: myerror.ErrNotUser,
 			},
 			want: want{
 				status:  http.StatusNotFound,

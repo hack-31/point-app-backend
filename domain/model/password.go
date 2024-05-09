@@ -1,11 +1,11 @@
 package model
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 	"unicode/utf8"
 
+	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/constant"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +24,7 @@ type Password struct {
 // @return パスワードオブジェクト
 func NewPassword(pwd string) (*Password, error) {
 	if 50 < utf8.RuneCountInString(pwd) {
-		return nil, fmt.Errorf("cannot use password over 51 char")
+		return nil, errors.Wrap(errors.New("cannot use password over 51 char"), "NewPassword")
 	}
 	return &Password{value: pwd}, nil
 }

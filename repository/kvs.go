@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
 	"github.com/hack-31/point-app-backend/config"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type CacheType int
@@ -52,7 +54,7 @@ func (k *KVS) Save(ctx context.Context, key, value string, minute time.Duration)
 func (k *KVS) Load(ctx context.Context, key string) (string, error) {
 	value, err := k.Cli.Get(ctx, key).Result()
 	if err != nil {
-		return "", fmt.Errorf("failed to get by %q: %w", key, ErrNotFoundSession)
+		return "", errors.Wrap(err, fmt.Sprintf("failed to get by %q", key))
 	}
 	return value, nil
 }
@@ -65,7 +67,7 @@ func (k *KVS) Load(ctx context.Context, key string) (string, error) {
 func (k *KVS) Delete(ctx context.Context, key string) error {
 	_, err := k.Cli.Del(ctx, key).Result()
 	if err != nil {
-		return fmt.Errorf("failed to delete by %q: %w", key, ErrNotFoundSession)
+		return errors.Join(errors.Wrapf(err, "failed to delete by %q", key), myerror.ErrNotFoundSession)
 	}
 	return nil
 }
@@ -74,7 +76,7 @@ func (k *KVS) Delete(ctx context.Context, key string) error {
 func (k *KVS) Expire(ctx context.Context, key string, minitue time.Duration) error {
 	_, err := k.Cli.Expire(ctx, key, minitue*time.Minute).Result()
 	if err != nil {
-		return fmt.Errorf("failed to expire by %q: %w", key, ErrNotFoundSession)
+		return errors.Join(errors.Wrapf(err, "failed to expire by %q", key), myerror.ErrNotFoundSession)
 	}
 	return nil
 }
@@ -86,7 +88,7 @@ func (k *KVS) Expire(ctx context.Context, key string, minitue time.Duration) err
 // payload 送信するデータ
 func (k *KVS) Publish(ctx context.Context, channel, palyload string) error {
 	if err := k.Cli.Publish(ctx, channel, palyload).Err(); err != nil {
-		return fmt.Errorf("failed to publish by %q: %w", channel, err)
+		return errors.Wrapf(err, "failed to publish by %q", channel)
 	}
 	return nil
 }

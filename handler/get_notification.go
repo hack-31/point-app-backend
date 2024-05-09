@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
@@ -40,8 +40,8 @@ func (gn *GetNotification) ServeHTTP(ctx *gin.Context) {
 	//　お知らせ詳細の取得
 	n, err := gn.Service.GetNotification(ctx, entity.NotificationID(notificationID))
 	if err != nil {
-		if errors.Is(err, repository.ErrNotFound) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotFound.Error(), err)
+		if errors.Is(err, myerror.ErrNotFound) {
+			ErrResponse(ctx, http.StatusNotFound, errTitle, myerror.ErrNotFound.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

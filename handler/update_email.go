@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type UpdateEmail struct {
@@ -57,13 +57,13 @@ func (ue *UpdateEmail) ServeHTTP(ctx *gin.Context) {
 	// サービス層に依頼する
 	if err := ue.Service.UpdateEmail(ctx, input.TemporaryEmailID, input.ConfirmCode); err != nil {
 		// 確認コードとトークンが無効
-		if errors.Is(err, repository.ErrNotFoundSession) {
-			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, repository.ErrNotFoundSession.Error(), err)
+		if errors.Is(err, myerror.ErrNotFoundSession) {
+			ErrResponse(ctx, http.StatusUnauthorized, mailErrTitle, myerror.ErrNotFoundSession.Error(), err)
 			return
 		}
 		// 登録済みのメールアドレス
-		if errors.Is(err, repository.ErrAlreadyEntry) {
-			ErrResponse(ctx, http.StatusConflict, mailErrTitle, repository.ErrAlreadyEntry.Error(), err)
+		if errors.Is(err, myerror.ErrAlreadyEntry) {
+			ErrResponse(ctx, http.StatusConflict, mailErrTitle, myerror.ErrAlreadyEntry.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, serverErrTitle, err.Error(), err)

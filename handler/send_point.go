@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 )
 
 type SendPoint struct {
@@ -51,12 +51,12 @@ func (sp *SendPoint) ServeHTTP(ctx *gin.Context) {
 
 	// ポイント送付
 	if err := sp.Service.SendPoint(ctx, input.ToUserId, input.SendPoint); err != nil {
-		if errors.Is(err, repository.ErrNotUser) {
-			ErrResponse(ctx, http.StatusNotFound, errTitle, repository.ErrNotUser.Error(), err)
+		if errors.Is(err, myerror.ErrNotUser) {
+			ErrResponse(ctx, http.StatusNotFound, errTitle, myerror.ErrNotUser.Error(), err)
 			return
 		}
-		if errors.Is(err, repository.ErrHasNotSendablePoint) {
-			ErrResponse(ctx, http.StatusBadRequest, errTitle, repository.ErrHasNotSendablePoint.Error(), err)
+		if errors.Is(err, myerror.ErrHasNotSendablePoint) {
+			ErrResponse(ctx, http.StatusBadRequest, errTitle, myerror.ErrHasNotSendablePoint.Error(), err)
 			return
 		}
 		ErrResponse(ctx, http.StatusInternalServerError, errTitle, err.Error(), err)

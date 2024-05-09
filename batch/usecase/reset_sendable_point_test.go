@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	mock_domain "github.com/hack-31/point-app-backend/domain/_mock"
-	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/myerror"
 	mock_repository "github.com/hack-31/point-app-backend/repository/_mock"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/stretchr/testify/assert"
@@ -55,10 +55,10 @@ func TestResetPoint(t *testing.T) {
 				point: 1000,
 			},
 			updateAllSendablePointOutput: updateAllSendablePointOutput{
-				err: repository.ErrDBException,
+				err: myerror.ErrDBException,
 			},
 			want: want{
-				err: repository.ErrDBException,
+				err: myerror.ErrDBException,
 			},
 		},
 	}

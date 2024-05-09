@@ -1,8 +1,7 @@
 package service
 
 import (
-	"fmt"
-
+	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/repository"
@@ -33,7 +32,7 @@ func (ua *UpdateAccount) UpdateAccount(ctx *gin.Context, familyName, familyNameK
 	mail := utils.GetEmail(ctx)
 	// アカウント情報更新
 	if err := ua.UserRepo.UpdateAccount(ctx, ua.ExecerDB, &mail, &familyName, &familyNameKana, &firstName, &firstNameKana); err != nil {
-		return fmt.Errorf("failed to update account: %w", err)
+		return errors.Wrap(err, "failed to update account")
 	}
 
 	return nil
