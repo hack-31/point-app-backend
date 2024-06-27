@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/repository/testdata"
 	"github.com/hack-31/point-app-backend/testutil"
@@ -14,10 +15,10 @@ import (
 func TestRepository_GetAquistionPoint(t *testing.T) {
 	t.Parallel()
 	type want struct {
-		users map[entity.UserID]int
+		users map[model.UserID]int
 	}
 	type input struct {
-		userIDs []entity.UserID
+		userIDs []model.UserID
 	}
 
 	tests := map[string]struct {
@@ -26,10 +27,10 @@ func TestRepository_GetAquistionPoint(t *testing.T) {
 	}{
 		"指定ユーザーの獲得ポイントを取得する": {
 			input: input{
-				userIDs: []entity.UserID{1, 2, 3},
+				userIDs: []model.UserID{1, 2, 3},
 			},
 			want: want{
-				users: map[entity.UserID]int{
+				users: map[model.UserID]int{
 					1: 1200,
 					2: 500,
 					3: 300,

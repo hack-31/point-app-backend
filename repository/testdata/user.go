@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 )
 
 // ユーザーテーブルにデータを挿入する
-func Users(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users entity.Users)) entity.Users {
+func Users(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users []*entities.User)) []*entities.User {
 	t.Helper()
 	// ユーザ一覧を削除する
 	if _, err := con.ExecContext(ctx, `DELETE FROM delete_users;`); err != nil {
@@ -26,7 +26,7 @@ func Users(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users en
 	}
 
 	// ユーザーデータのデフォルト値
-	users := entity.Users{
+	users := []*entities.User{
 		{
 			FirstName:      "太郎",
 			FirstNameKana:  "タロウ",
@@ -77,9 +77,9 @@ func Users(t *testing.T, ctx context.Context, con *sqlx.Tx, setter func(users en
 	id, err := result.LastInsertId()
 	assert.NoError(t, err)
 
-	users[0].ID = entity.UserID(id)
-	users[1].ID = entity.UserID(id + 1)
-	users[2].ID = entity.UserID(id + 2)
+	users[0].ID = id
+	users[1].ID = id + 1
+	users[2].ID = id + 2
 
 	return users
 }

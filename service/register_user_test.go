@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,9 +18,9 @@ func TestRegisterUser(t *testing.T) {
 
 	wantConfirmCode := "1234"
 	wantTemporaryUserID := "temp-user-id"
-	wantUserID := entity.UserID(10)
-	wantUser := &entity.User{
-		ID:             wantUserID,
+	wantUserID := model.UserID(10)
+	wantUser := &entities.User{
+		ID:             int64(wantUserID),
 		FirstName:      "太郎",
 		FirstNameKana:  "たろう",
 		FamilyName:     "山田",
@@ -38,12 +39,12 @@ func TestRegisterUser(t *testing.T) {
 	}
 	// 結果
 	type want struct {
-		user  *entity.User
+		user  *entities.User
 		token string
 		err   error
 	}
 	type UserAdderMockParameter struct {
-		in  *entity.User
+		in  *entities.User
 		err error
 	}
 	type tempUserMockParameter struct {
@@ -156,12 +157,12 @@ func TestRegisterUser(t *testing.T) {
 				return nil
 			}
 			moqTokenGenerator := &TokenGeneratorMock{}
-			moqTokenGenerator.GenerateTokenFunc = func(pctx context.Context, u entity.User) ([]byte, error) {
+			moqTokenGenerator.GenerateTokenFunc = func(pctx context.Context, u entities.User) ([]byte, error) {
 				assert.Equal(t, *wantUser, u)
 				return tt.gtmprm.rsp, tt.gtmprm.err
 			}
-			moqRepo.RegisterUserFunc = func(pctx context.Context, db repository.Execer, user *entity.User) error {
-				user.ID = wantUserID
+			moqRepo.RegisterUserFunc = func(pctx context.Context, db repository.Execer, user *entities.User) error {
+				user.ID = int64(wantUserID)
 				assert.Equal(t, tt.uaprm.in, user)
 				assert.Equal(t, ctx, pctx)
 				assert.Equal(t, moqDB, db)

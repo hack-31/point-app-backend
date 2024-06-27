@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 )
 
 type GetUsers struct {
@@ -32,13 +32,13 @@ func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 
 	// レスポンスの作成
 	type user struct {
-		AcquisitionPoint int           `json:"acquisitionPoint"`
-		Email            string        `json:"email"`
-		FirstName        string        `json:"firstName"`
-		FirstNameKana    string        `json:"firstNameKana"`
-		FamilyName       string        `json:"familyName"`
-		FamilyNameKana   string        `json:"familyNameKana"`
-		ID               entity.UserID `json:"id"`
+		AcquisitionPoint int          `json:"acquisitionPoint"`
+		Email            string       `json:"email"`
+		FirstName        string       `json:"firstName"`
+		FirstNameKana    string       `json:"firstNameKana"`
+		FamilyName       string       `json:"familyName"`
+		FamilyNameKana   string       `json:"familyNameKana"`
+		ID               model.UserID `json:"id"`
 	}
 
 	usersRes := make([]user, 0, len(users.Users))

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 )
 
 type GetAccount struct {
@@ -29,14 +29,14 @@ func (gu *GetAccount) ServeHTTP(ctx *gin.Context) {
 	}
 
 	rsp := struct {
-		AcquisitionPoint int           `json:"acquisitionPoint"`
-		Email            string        `json:"email"`
-		FamilyName       string        `json:"familyName"`
-		FamilyNameKana   string        `json:"familyNameKana"`
-		FirstName        string        `json:"firstName"`
-		FirstNameKana    string        `json:"firstNameKana"`
-		SendablePoint    int           `json:"sendablePoint"`
-		UserID           entity.UserID `json:"userId"`
+		AcquisitionPoint int          `json:"acquisitionPoint"`
+		Email            string       `json:"email"`
+		FamilyName       string       `json:"familyName"`
+		FamilyNameKana   string       `json:"familyNameKana"`
+		FirstName        string       `json:"firstName"`
+		FirstNameKana    string       `json:"firstNameKana"`
+		SendablePoint    int          `json:"sendablePoint"`
+		UserID           model.UserID `json:"userId"`
 	}{
 		AcquisitionPoint: user.AcquisitionPoint,
 		Email:            user.Email,

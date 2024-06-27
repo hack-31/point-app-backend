@@ -9,7 +9,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,7 +29,7 @@ func NewRegisterUser(db *sqlx.DB, rep domain.UserRepo, cache domain.Cache, jwter
 // @params ctx コンテキスト, temporaryUserId 一時保存ユーザid
 //
 // @return ユーザ情報
-func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId, confirmCode string) (*entity.User, string, error) {
+func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId, confirmCode string) (*entities.User, string, error) {
 	// 一時ユーザ情報を復元
 	key := fmt.Sprintf("user:%s:%s", confirmCode, temporaryUserId)
 	u, err := r.Cache.Load(ctx, key)
@@ -47,7 +47,7 @@ func (r *RegisterUser) RegisterUser(ctx context.Context, temporaryUserId, confir
 	firstName, firstNameKana, familyName, familyNameKana, email, hashPass := temporyUser.Split()
 
 	// DBに保存
-	user := &entity.User{
+	user := &entities.User{
 		FirstName:      firstName,
 		FirstNameKana:  firstNameKana,
 		FamilyName:     familyName,

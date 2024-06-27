@@ -57,7 +57,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 
 	// 送信相手にポイントを加算
-	if err := sp.PointRepo.RegisterPointTransaction(ctx, tx, fromUserID, entity.UserID(toUserId), sendPoint); err != nil {
+	if err := sp.PointRepo.RegisterPointTransaction(ctx, tx, fromUserID, model.UserID(toUserId), sendPoint); err != nil {
 		return errors.Wrap(err, "failed to register point transaction")
 	}
 
@@ -73,7 +73,7 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	}
 	n := entity.Notification{
 		TypeID:      model.NotificationTypeSendingPoint,
-		ToUserID:    entity.UserID(toUserId),
+		ToUserID:    model.UserID(toUserId),
 		FromUserID:  fromUserID,
 		Description: fmt.Sprintf("%s%sさんから%dポイント送付されました。", fromUser.FamilyName, fromUser.FirstName, sendPoint),
 	}

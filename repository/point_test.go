@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/repository/testdata"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestRepository_users_UpdateSendablePoint(t *testing.T) {
 	}
 	type input struct {
 		beforePoint int
-		id          entity.UserID
+		id          model.UserID
 	}
 
 	tests := map[string]struct {
@@ -49,7 +50,7 @@ func TestRepository_users_UpdateSendablePoint(t *testing.T) {
 				assert.NoError(t, err)
 			})
 
-			testdata.Users(t, ctx, tx, func(users entity.Users) {
+			testdata.Users(t, ctx, tx, func(users []*entities.User) {
 				users[tt.input.id-1].SendingPoint = tt.input.beforePoint
 			})
 

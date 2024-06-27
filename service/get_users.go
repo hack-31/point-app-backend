@@ -5,8 +5,8 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/domain"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -28,7 +28,7 @@ func NewGetUsers(db *sqlx.DB, repo *repository.Repository, jwter domain.TokenGen
 
 type GetUsersResponse struct {
 	Users []struct {
-		ID               entity.UserID
+		ID               model.UserID
 		FirstName        string
 		FirstNameKana    string
 		FamilyName       string
@@ -52,9 +52,9 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	}
 
 	// ユーザIDsを取得する
-	userIDs := make([]entity.UserID, 0, len(users))
+	userIDs := make([]model.UserID, 0, len(users))
 	for _, user := range users {
-		userIDs = append(userIDs, user.ID)
+		userIDs = append(userIDs, model.UserID(user.ID))
 	}
 
 	// 取得ポイントを取得する
@@ -64,7 +64,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	}
 
 	res := make([]struct {
-		ID               entity.UserID
+		ID               model.UserID
 		FirstName        string
 		FirstNameKana    string
 		FamilyName       string
@@ -76,7 +76,7 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 	// ユーザに取得ポイントを設定する
 	for _, v := range users {
 		res = append(res, struct {
-			ID               entity.UserID
+			ID               model.UserID
 			FirstName        string
 			FirstNameKana    string
 			FamilyName       string
@@ -84,13 +84,13 @@ func (r *GetUsers) GetUsers(ctx context.Context) (GetUsersResponse, error) {
 			Email            string
 			AcquisitionPoint int
 		}{
-			ID:               v.ID,
+			ID:               model.UserID(v.ID),
 			FirstName:        v.FirstName,
 			FirstNameKana:    v.FirstNameKana,
 			FamilyName:       v.FamilyName,
 			FamilyNameKana:   v.FamilyNameKana,
 			Email:            v.Email,
-			AcquisitionPoint: points[v.ID],
+			AcquisitionPoint: points[model.UserID(v.ID)],
 		})
 	}
 	return GetUsersResponse{

@@ -10,7 +10,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/myerror"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
 )
@@ -56,10 +56,10 @@ func TestRegisterUser(t *testing.T) {
 
 			// サービス層のモック定義
 			moq := &RegisterUserServiceMock{}
-			moq.RegisterUserFunc = func(ctx context.Context, temporaryUserId, confirmCode string) (*entity.User, string, error) {
+			moq.RegisterUserFunc = func(ctx context.Context, temporaryUserId, confirmCode string) (*entities.User, string, error) {
 				clocker := clock.FixedClocker{}
 				if tt.want.status == http.StatusCreated {
-					return &entity.User{
+					return &entities.User{
 							ID:             24,
 							FirstName:      "山田",
 							FirstNameKana:  "やまだ",

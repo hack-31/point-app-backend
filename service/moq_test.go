@@ -9,7 +9,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
@@ -361,7 +363,7 @@ func (mock *CacheMock) SubscribeCalls() []struct {
 //
 //		// make and configure a mocked domain.TokenGenerator
 //		mockedTokenGenerator := &TokenGeneratorMock{
-//			GenerateTokenFunc: func(ctx context.Context, u entity.User) ([]byte, error) {
+//			GenerateTokenFunc: func(ctx context.Context, u entities.User) ([]byte, error) {
 //				panic("mock out the GenerateToken method")
 //			},
 //		}
@@ -372,7 +374,7 @@ func (mock *CacheMock) SubscribeCalls() []struct {
 //	}
 type TokenGeneratorMock struct {
 	// GenerateTokenFunc mocks the GenerateToken method.
-	GenerateTokenFunc func(ctx context.Context, u entity.User) ([]byte, error)
+	GenerateTokenFunc func(ctx context.Context, u entities.User) ([]byte, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -381,20 +383,20 @@ type TokenGeneratorMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// U is the u argument value.
-			U entity.User
+			U entities.User
 		}
 	}
 	lockGenerateToken sync.RWMutex
 }
 
 // GenerateToken calls GenerateTokenFunc.
-func (mock *TokenGeneratorMock) GenerateToken(ctx context.Context, u entity.User) ([]byte, error) {
+func (mock *TokenGeneratorMock) GenerateToken(ctx context.Context, u entities.User) ([]byte, error) {
 	if mock.GenerateTokenFunc == nil {
 		panic("TokenGeneratorMock.GenerateTokenFunc: method is nil but TokenGenerator.GenerateToken was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		U   entity.User
+		U   entities.User
 	}{
 		Ctx: ctx,
 		U:   u,
@@ -411,11 +413,11 @@ func (mock *TokenGeneratorMock) GenerateToken(ctx context.Context, u entity.User
 //	len(mockedTokenGenerator.GenerateTokenCalls())
 func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 	Ctx context.Context
-	U   entity.User
+	U   entities.User
 } {
 	var calls []struct {
 		Ctx context.Context
-		U   entity.User
+		U   entities.User
 	}
 	mock.lockGenerateToken.RLock()
 	calls = mock.calls.GenerateToken
@@ -429,25 +431,25 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //
 //		// make and configure a mocked domain.UserRepo
 //		mockedUserRepo := &UserRepoMock{
-//			DeleteUserByIDFunc: func(ctx context.Context, db repository.Execer, ID entity.UserID) (int64, error) {
+//			DeleteUserByIDFunc: func(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error) {
 //				panic("mock out the DeleteUserByID method")
 //			},
-//			FindUserByEmailFunc: func(ctx context.Context, db repository.Queryer, e string, columns ...string) (entity.User, error) {
+//			FindUserByEmailFunc: func(ctx context.Context, db repository.Queryer, e string, columns ...string) (entities.User, error) {
 //				panic("mock out the FindUserByEmail method")
 //			},
-//			GetAllFunc: func(ctx context.Context, db repository.Queryer, columns ...string) (entity.Users, error) {
+//			GetAllFunc: func(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error) {
 //				panic("mock out the GetAll method")
 //			},
-//			GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID entity.UserID) (entity.User, error) {
+//			GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error) {
 //				panic("mock out the GetUserByID method")
 //			},
-//			RegisterUserFunc: func(ctx context.Context, db repository.Execer, u *entity.User) error {
+//			RegisterUserFunc: func(ctx context.Context, db repository.Execer, u *entities.User) error {
 //				panic("mock out the RegisterUser method")
 //			},
 //			UpdateAccountFunc: func(ctx context.Context, db repository.Execer, email *string, familyName *string, familyNameKana *string, firstName *string, firstNameKana *string) error {
 //				panic("mock out the UpdateAccount method")
 //			},
-//			UpdateEmailFunc: func(ctx context.Context, db repository.Execer, userID entity.UserID, newEmail string) error {
+//			UpdateEmailFunc: func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 //				panic("mock out the UpdateEmail method")
 //			},
 //			UpdatePasswordFunc: func(ctx context.Context, db repository.Execer, email *string, pass *string) error {
@@ -461,25 +463,25 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //	}
 type UserRepoMock struct {
 	// DeleteUserByIDFunc mocks the DeleteUserByID method.
-	DeleteUserByIDFunc func(ctx context.Context, db repository.Execer, ID entity.UserID) (int64, error)
+	DeleteUserByIDFunc func(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error)
 
 	// FindUserByEmailFunc mocks the FindUserByEmail method.
-	FindUserByEmailFunc func(ctx context.Context, db repository.Queryer, e string, columns ...string) (entity.User, error)
+	FindUserByEmailFunc func(ctx context.Context, db repository.Queryer, e string, columns ...string) (entities.User, error)
 
 	// GetAllFunc mocks the GetAll method.
-	GetAllFunc func(ctx context.Context, db repository.Queryer, columns ...string) (entity.Users, error)
+	GetAllFunc func(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error)
 
 	// GetUserByIDFunc mocks the GetUserByID method.
-	GetUserByIDFunc func(ctx context.Context, db repository.Queryer, ID entity.UserID) (entity.User, error)
+	GetUserByIDFunc func(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error)
 
 	// RegisterUserFunc mocks the RegisterUser method.
-	RegisterUserFunc func(ctx context.Context, db repository.Execer, u *entity.User) error
+	RegisterUserFunc func(ctx context.Context, db repository.Execer, u *entities.User) error
 
 	// UpdateAccountFunc mocks the UpdateAccount method.
 	UpdateAccountFunc func(ctx context.Context, db repository.Execer, email *string, familyName *string, familyNameKana *string, firstName *string, firstNameKana *string) error
 
 	// UpdateEmailFunc mocks the UpdateEmail method.
-	UpdateEmailFunc func(ctx context.Context, db repository.Execer, userID entity.UserID, newEmail string) error
+	UpdateEmailFunc func(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 
 	// UpdatePasswordFunc mocks the UpdatePassword method.
 	UpdatePasswordFunc func(ctx context.Context, db repository.Execer, email *string, pass *string) error
@@ -493,7 +495,7 @@ type UserRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// ID is the ID argument value.
-			ID entity.UserID
+			ID model.UserID
 		}
 		// FindUserByEmail holds details about calls to the FindUserByEmail method.
 		FindUserByEmail []struct {
@@ -522,7 +524,7 @@ type UserRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// ID is the ID argument value.
-			ID entity.UserID
+			ID model.UserID
 		}
 		// RegisterUser holds details about calls to the RegisterUser method.
 		RegisterUser []struct {
@@ -531,7 +533,7 @@ type UserRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// U is the u argument value.
-			U *entity.User
+			U *entities.User
 		}
 		// UpdateAccount holds details about calls to the UpdateAccount method.
 		UpdateAccount []struct {
@@ -557,7 +559,7 @@ type UserRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// UserID is the userID argument value.
-			UserID entity.UserID
+			UserID model.UserID
 			// NewEmail is the newEmail argument value.
 			NewEmail string
 		}
@@ -584,14 +586,14 @@ type UserRepoMock struct {
 }
 
 // DeleteUserByID calls DeleteUserByIDFunc.
-func (mock *UserRepoMock) DeleteUserByID(ctx context.Context, db repository.Execer, ID entity.UserID) (int64, error) {
+func (mock *UserRepoMock) DeleteUserByID(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error) {
 	if mock.DeleteUserByIDFunc == nil {
 		panic("UserRepoMock.DeleteUserByIDFunc: method is nil but UserRepo.DeleteUserByID was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
 		Db  repository.Execer
-		ID  entity.UserID
+		ID  model.UserID
 	}{
 		Ctx: ctx,
 		Db:  db,
@@ -610,12 +612,12 @@ func (mock *UserRepoMock) DeleteUserByID(ctx context.Context, db repository.Exec
 func (mock *UserRepoMock) DeleteUserByIDCalls() []struct {
 	Ctx context.Context
 	Db  repository.Execer
-	ID  entity.UserID
+	ID  model.UserID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Execer
-		ID  entity.UserID
+		ID  model.UserID
 	}
 	mock.lockDeleteUserByID.RLock()
 	calls = mock.calls.DeleteUserByID
@@ -624,7 +626,7 @@ func (mock *UserRepoMock) DeleteUserByIDCalls() []struct {
 }
 
 // FindUserByEmail calls FindUserByEmailFunc.
-func (mock *UserRepoMock) FindUserByEmail(ctx context.Context, db repository.Queryer, e string, columns ...string) (entity.User, error) {
+func (mock *UserRepoMock) FindUserByEmail(ctx context.Context, db repository.Queryer, e string, columns ...string) (entities.User, error) {
 	if mock.FindUserByEmailFunc == nil {
 		panic("UserRepoMock.FindUserByEmailFunc: method is nil but UserRepo.FindUserByEmail was just called")
 	}
@@ -668,7 +670,7 @@ func (mock *UserRepoMock) FindUserByEmailCalls() []struct {
 }
 
 // GetAll calls GetAllFunc.
-func (mock *UserRepoMock) GetAll(ctx context.Context, db repository.Queryer, columns ...string) (entity.Users, error) {
+func (mock *UserRepoMock) GetAll(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error) {
 	if mock.GetAllFunc == nil {
 		panic("UserRepoMock.GetAllFunc: method is nil but UserRepo.GetAll was just called")
 	}
@@ -708,14 +710,14 @@ func (mock *UserRepoMock) GetAllCalls() []struct {
 }
 
 // GetUserByID calls GetUserByIDFunc.
-func (mock *UserRepoMock) GetUserByID(ctx context.Context, db repository.Queryer, ID entity.UserID) (entity.User, error) {
+func (mock *UserRepoMock) GetUserByID(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error) {
 	if mock.GetUserByIDFunc == nil {
 		panic("UserRepoMock.GetUserByIDFunc: method is nil but UserRepo.GetUserByID was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
 		Db  repository.Queryer
-		ID  entity.UserID
+		ID  model.UserID
 	}{
 		Ctx: ctx,
 		Db:  db,
@@ -734,12 +736,12 @@ func (mock *UserRepoMock) GetUserByID(ctx context.Context, db repository.Queryer
 func (mock *UserRepoMock) GetUserByIDCalls() []struct {
 	Ctx context.Context
 	Db  repository.Queryer
-	ID  entity.UserID
+	ID  model.UserID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Queryer
-		ID  entity.UserID
+		ID  model.UserID
 	}
 	mock.lockGetUserByID.RLock()
 	calls = mock.calls.GetUserByID
@@ -748,14 +750,14 @@ func (mock *UserRepoMock) GetUserByIDCalls() []struct {
 }
 
 // RegisterUser calls RegisterUserFunc.
-func (mock *UserRepoMock) RegisterUser(ctx context.Context, db repository.Execer, u *entity.User) error {
+func (mock *UserRepoMock) RegisterUser(ctx context.Context, db repository.Execer, u *entities.User) error {
 	if mock.RegisterUserFunc == nil {
 		panic("UserRepoMock.RegisterUserFunc: method is nil but UserRepo.RegisterUser was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
 		Db  repository.Execer
-		U   *entity.User
+		U   *entities.User
 	}{
 		Ctx: ctx,
 		Db:  db,
@@ -774,12 +776,12 @@ func (mock *UserRepoMock) RegisterUser(ctx context.Context, db repository.Execer
 func (mock *UserRepoMock) RegisterUserCalls() []struct {
 	Ctx context.Context
 	Db  repository.Execer
-	U   *entity.User
+	U   *entities.User
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Execer
-		U   *entity.User
+		U   *entities.User
 	}
 	mock.lockRegisterUser.RLock()
 	calls = mock.calls.RegisterUser
@@ -844,14 +846,14 @@ func (mock *UserRepoMock) UpdateAccountCalls() []struct {
 }
 
 // UpdateEmail calls UpdateEmailFunc.
-func (mock *UserRepoMock) UpdateEmail(ctx context.Context, db repository.Execer, userID entity.UserID, newEmail string) error {
+func (mock *UserRepoMock) UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 	if mock.UpdateEmailFunc == nil {
 		panic("UserRepoMock.UpdateEmailFunc: method is nil but UserRepo.UpdateEmail was just called")
 	}
 	callInfo := struct {
 		Ctx      context.Context
 		Db       repository.Execer
-		UserID   entity.UserID
+		UserID   model.UserID
 		NewEmail string
 	}{
 		Ctx:      ctx,
@@ -872,13 +874,13 @@ func (mock *UserRepoMock) UpdateEmail(ctx context.Context, db repository.Execer,
 func (mock *UserRepoMock) UpdateEmailCalls() []struct {
 	Ctx      context.Context
 	Db       repository.Execer
-	UserID   entity.UserID
+	UserID   model.UserID
 	NewEmail string
 } {
 	var calls []struct {
 		Ctx      context.Context
 		Db       repository.Execer
-		UserID   entity.UserID
+		UserID   model.UserID
 		NewEmail string
 	}
 	mock.lockUpdateEmail.RLock()
@@ -937,13 +939,13 @@ func (mock *UserRepoMock) UpdatePasswordCalls() []struct {
 //
 //		// make and configure a mocked domain.PointRepo
 //		mockedPointRepo := &PointRepoMock{
-//			RegisterPointTransactionFunc: func(ctx context.Context, db repository.Execer, fromUserID entity.UserID, toUserId entity.UserID, sendPoint int) error {
+//			RegisterPointTransactionFunc: func(ctx context.Context, db repository.Execer, fromUserID model.UserID, toUserId model.UserID, sendPoint int) error {
 //				panic("mock out the RegisterPointTransaction method")
 //			},
 //			UpdateAllSendablePointFunc: func(ctx context.Context, db repository.Execer, point int) error {
 //				panic("mock out the UpdateAllSendablePoint method")
 //			},
-//			UpdateSendablePointFunc: func(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error {
+//			UpdateSendablePointFunc: func(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error {
 //				panic("mock out the UpdateSendablePoint method")
 //			},
 //		}
@@ -954,13 +956,13 @@ func (mock *UserRepoMock) UpdatePasswordCalls() []struct {
 //	}
 type PointRepoMock struct {
 	// RegisterPointTransactionFunc mocks the RegisterPointTransaction method.
-	RegisterPointTransactionFunc func(ctx context.Context, db repository.Execer, fromUserID entity.UserID, toUserId entity.UserID, sendPoint int) error
+	RegisterPointTransactionFunc func(ctx context.Context, db repository.Execer, fromUserID model.UserID, toUserId model.UserID, sendPoint int) error
 
 	// UpdateAllSendablePointFunc mocks the UpdateAllSendablePoint method.
 	UpdateAllSendablePointFunc func(ctx context.Context, db repository.Execer, point int) error
 
 	// UpdateSendablePointFunc mocks the UpdateSendablePoint method.
-	UpdateSendablePointFunc func(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error
+	UpdateSendablePointFunc func(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -971,9 +973,9 @@ type PointRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// FromUserID is the fromUserID argument value.
-			FromUserID entity.UserID
+			FromUserID model.UserID
 			// ToUserId is the toUserId argument value.
-			ToUserId entity.UserID
+			ToUserId model.UserID
 			// SendPoint is the sendPoint argument value.
 			SendPoint int
 		}
@@ -993,7 +995,7 @@ type PointRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// FromUserID is the fromUserID argument value.
-			FromUserID entity.UserID
+			FromUserID model.UserID
 			// SendPoint is the sendPoint argument value.
 			SendPoint int
 		}
@@ -1004,15 +1006,15 @@ type PointRepoMock struct {
 }
 
 // RegisterPointTransaction calls RegisterPointTransactionFunc.
-func (mock *PointRepoMock) RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID entity.UserID, toUserId entity.UserID, sendPoint int) error {
+func (mock *PointRepoMock) RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID model.UserID, toUserId model.UserID, sendPoint int) error {
 	if mock.RegisterPointTransactionFunc == nil {
 		panic("PointRepoMock.RegisterPointTransactionFunc: method is nil but PointRepo.RegisterPointTransaction was just called")
 	}
 	callInfo := struct {
 		Ctx        context.Context
 		Db         repository.Execer
-		FromUserID entity.UserID
-		ToUserId   entity.UserID
+		FromUserID model.UserID
+		ToUserId   model.UserID
 		SendPoint  int
 	}{
 		Ctx:        ctx,
@@ -1034,15 +1036,15 @@ func (mock *PointRepoMock) RegisterPointTransaction(ctx context.Context, db repo
 func (mock *PointRepoMock) RegisterPointTransactionCalls() []struct {
 	Ctx        context.Context
 	Db         repository.Execer
-	FromUserID entity.UserID
-	ToUserId   entity.UserID
+	FromUserID model.UserID
+	ToUserId   model.UserID
 	SendPoint  int
 } {
 	var calls []struct {
 		Ctx        context.Context
 		Db         repository.Execer
-		FromUserID entity.UserID
-		ToUserId   entity.UserID
+		FromUserID model.UserID
+		ToUserId   model.UserID
 		SendPoint  int
 	}
 	mock.lockRegisterPointTransaction.RLock()
@@ -1092,14 +1094,14 @@ func (mock *PointRepoMock) UpdateAllSendablePointCalls() []struct {
 }
 
 // UpdateSendablePoint calls UpdateSendablePointFunc.
-func (mock *PointRepoMock) UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error {
+func (mock *PointRepoMock) UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error {
 	if mock.UpdateSendablePointFunc == nil {
 		panic("PointRepoMock.UpdateSendablePointFunc: method is nil but PointRepo.UpdateSendablePoint was just called")
 	}
 	callInfo := struct {
 		Ctx        context.Context
 		Db         repository.Execer
-		FromUserID entity.UserID
+		FromUserID model.UserID
 		SendPoint  int
 	}{
 		Ctx:        ctx,
@@ -1120,13 +1122,13 @@ func (mock *PointRepoMock) UpdateSendablePoint(ctx context.Context, db repositor
 func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 	Ctx        context.Context
 	Db         repository.Execer
-	FromUserID entity.UserID
+	FromUserID model.UserID
 	SendPoint  int
 } {
 	var calls []struct {
 		Ctx        context.Context
 		Db         repository.Execer
-		FromUserID entity.UserID
+		FromUserID model.UserID
 		SendPoint  int
 	}
 	mock.lockUpdateSendablePoint.RLock()
@@ -1141,22 +1143,22 @@ func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 //
 //		// make and configure a mocked domain.NotificationRepo
 //		mockedNotificationRepo := &NotificationRepoMock{
-//			CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid entity.UserID, nid entity.NotificationID) error {
+//			CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error {
 //				panic("mock out the CheckNotification method")
 //			},
 //			CreateNotificationFunc: func(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error) {
 //				panic("mock out the CreateNotification method")
 //			},
-//			GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+//			GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
 //				panic("mock out the GetByToUserByStartIdOrderByLatest method")
 //			},
-//			GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, size int, columns ...string) (entity.Notifications, error) {
+//			GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
 //				panic("mock out the GetByToUserOrderByLatest method")
 //			},
-//			GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, nid entity.NotificationID) (entity.Notification, error) {
+//			GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
 //				panic("mock out the GetNotificationByID method")
 //			},
-//			GetUncheckedNotificationCountFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID) (int, error) {
+//			GetUncheckedNotificationCountFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
 //				panic("mock out the GetUncheckedNotificationCount method")
 //			},
 //		}
@@ -1167,22 +1169,22 @@ func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 //	}
 type NotificationRepoMock struct {
 	// CheckNotificationFunc mocks the CheckNotification method.
-	CheckNotificationFunc func(ctx context.Context, db repository.Execer, uid entity.UserID, nid entity.NotificationID) error
+	CheckNotificationFunc func(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error
 
 	// CreateNotificationFunc mocks the CreateNotification method.
 	CreateNotificationFunc func(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error)
 
 	// GetByToUserByStartIdOrderByLatestFunc mocks the GetByToUserByStartIdOrderByLatest method.
-	GetByToUserByStartIdOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid entity.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error)
+	GetByToUserByStartIdOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error)
 
 	// GetByToUserOrderByLatestFunc mocks the GetByToUserOrderByLatest method.
-	GetByToUserOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid entity.UserID, size int, columns ...string) (entity.Notifications, error)
+	GetByToUserOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error)
 
 	// GetNotificationByIDFunc mocks the GetNotificationByID method.
-	GetNotificationByIDFunc func(ctx context.Context, db repository.Queryer, uid entity.UserID, nid entity.NotificationID) (entity.Notification, error)
+	GetNotificationByIDFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error)
 
 	// GetUncheckedNotificationCountFunc mocks the GetUncheckedNotificationCount method.
-	GetUncheckedNotificationCountFunc func(ctx context.Context, db repository.Queryer, uid entity.UserID) (int, error)
+	GetUncheckedNotificationCountFunc func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -1193,7 +1195,7 @@ type NotificationRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// UID is the uid argument value.
-			UID entity.UserID
+			UID model.UserID
 			// Nid is the nid argument value.
 			Nid entity.NotificationID
 		}
@@ -1213,7 +1215,7 @@ type NotificationRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// UID is the uid argument value.
-			UID entity.UserID
+			UID model.UserID
 			// StartID is the startID argument value.
 			StartID entity.NotificationID
 			// Size is the size argument value.
@@ -1228,7 +1230,7 @@ type NotificationRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// UID is the uid argument value.
-			UID entity.UserID
+			UID model.UserID
 			// Size is the size argument value.
 			Size int
 			// Columns is the columns argument value.
@@ -1241,7 +1243,7 @@ type NotificationRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// UID is the uid argument value.
-			UID entity.UserID
+			UID model.UserID
 			// Nid is the nid argument value.
 			Nid entity.NotificationID
 		}
@@ -1252,7 +1254,7 @@ type NotificationRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// UID is the uid argument value.
-			UID entity.UserID
+			UID model.UserID
 		}
 	}
 	lockCheckNotification                 sync.RWMutex
@@ -1264,14 +1266,14 @@ type NotificationRepoMock struct {
 }
 
 // CheckNotification calls CheckNotificationFunc.
-func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repository.Execer, uid entity.UserID, nid entity.NotificationID) error {
+func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error {
 	if mock.CheckNotificationFunc == nil {
 		panic("NotificationRepoMock.CheckNotificationFunc: method is nil but NotificationRepo.CheckNotification was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
 		Db  repository.Execer
-		UID entity.UserID
+		UID model.UserID
 		Nid entity.NotificationID
 	}{
 		Ctx: ctx,
@@ -1292,13 +1294,13 @@ func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repo
 func (mock *NotificationRepoMock) CheckNotificationCalls() []struct {
 	Ctx context.Context
 	Db  repository.Execer
-	UID entity.UserID
+	UID model.UserID
 	Nid entity.NotificationID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Execer
-		UID entity.UserID
+		UID model.UserID
 		Nid entity.NotificationID
 	}
 	mock.lockCheckNotification.RLock()
@@ -1348,14 +1350,14 @@ func (mock *NotificationRepoMock) CreateNotificationCalls() []struct {
 }
 
 // GetByToUserByStartIdOrderByLatest calls GetByToUserByStartIdOrderByLatestFunc.
-func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid entity.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
 	if mock.GetByToUserByStartIdOrderByLatestFunc == nil {
 		panic("NotificationRepoMock.GetByToUserByStartIdOrderByLatestFunc: method is nil but NotificationRepo.GetByToUserByStartIdOrderByLatest was just called")
 	}
 	callInfo := struct {
 		Ctx     context.Context
 		Db      repository.Queryer
-		UID     entity.UserID
+		UID     model.UserID
 		StartID entity.NotificationID
 		Size    int
 		Columns []string
@@ -1380,7 +1382,7 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.
 func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []struct {
 	Ctx     context.Context
 	Db      repository.Queryer
-	UID     entity.UserID
+	UID     model.UserID
 	StartID entity.NotificationID
 	Size    int
 	Columns []string
@@ -1388,7 +1390,7 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []str
 	var calls []struct {
 		Ctx     context.Context
 		Db      repository.Queryer
-		UID     entity.UserID
+		UID     model.UserID
 		StartID entity.NotificationID
 		Size    int
 		Columns []string
@@ -1400,14 +1402,14 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []str
 }
 
 // GetByToUserOrderByLatest calls GetByToUserOrderByLatestFunc.
-func (mock *NotificationRepoMock) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid entity.UserID, size int, columns ...string) (entity.Notifications, error) {
+func (mock *NotificationRepoMock) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
 	if mock.GetByToUserOrderByLatestFunc == nil {
 		panic("NotificationRepoMock.GetByToUserOrderByLatestFunc: method is nil but NotificationRepo.GetByToUserOrderByLatest was just called")
 	}
 	callInfo := struct {
 		Ctx     context.Context
 		Db      repository.Queryer
-		UID     entity.UserID
+		UID     model.UserID
 		Size    int
 		Columns []string
 	}{
@@ -1430,14 +1432,14 @@ func (mock *NotificationRepoMock) GetByToUserOrderByLatest(ctx context.Context, 
 func (mock *NotificationRepoMock) GetByToUserOrderByLatestCalls() []struct {
 	Ctx     context.Context
 	Db      repository.Queryer
-	UID     entity.UserID
+	UID     model.UserID
 	Size    int
 	Columns []string
 } {
 	var calls []struct {
 		Ctx     context.Context
 		Db      repository.Queryer
-		UID     entity.UserID
+		UID     model.UserID
 		Size    int
 		Columns []string
 	}
@@ -1448,14 +1450,14 @@ func (mock *NotificationRepoMock) GetByToUserOrderByLatestCalls() []struct {
 }
 
 // GetNotificationByID calls GetNotificationByIDFunc.
-func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db repository.Queryer, uid entity.UserID, nid entity.NotificationID) (entity.Notification, error) {
+func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
 	if mock.GetNotificationByIDFunc == nil {
 		panic("NotificationRepoMock.GetNotificationByIDFunc: method is nil but NotificationRepo.GetNotificationByID was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
 		Db  repository.Queryer
-		UID entity.UserID
+		UID model.UserID
 		Nid entity.NotificationID
 	}{
 		Ctx: ctx,
@@ -1476,13 +1478,13 @@ func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db re
 func (mock *NotificationRepoMock) GetNotificationByIDCalls() []struct {
 	Ctx context.Context
 	Db  repository.Queryer
-	UID entity.UserID
+	UID model.UserID
 	Nid entity.NotificationID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Queryer
-		UID entity.UserID
+		UID model.UserID
 		Nid entity.NotificationID
 	}
 	mock.lockGetNotificationByID.RLock()
@@ -1492,14 +1494,14 @@ func (mock *NotificationRepoMock) GetNotificationByIDCalls() []struct {
 }
 
 // GetUncheckedNotificationCount calls GetUncheckedNotificationCountFunc.
-func (mock *NotificationRepoMock) GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid entity.UserID) (int, error) {
+func (mock *NotificationRepoMock) GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
 	if mock.GetUncheckedNotificationCountFunc == nil {
 		panic("NotificationRepoMock.GetUncheckedNotificationCountFunc: method is nil but NotificationRepo.GetUncheckedNotificationCount was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
 		Db  repository.Queryer
-		UID entity.UserID
+		UID model.UserID
 	}{
 		Ctx: ctx,
 		Db:  db,
@@ -1518,12 +1520,12 @@ func (mock *NotificationRepoMock) GetUncheckedNotificationCount(ctx context.Cont
 func (mock *NotificationRepoMock) GetUncheckedNotificationCountCalls() []struct {
 	Ctx context.Context
 	Db  repository.Queryer
-	UID entity.UserID
+	UID model.UserID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Queryer
-		UID entity.UserID
+		UID model.UserID
 	}
 	mock.lockGetUncheckedNotificationCount.RLock()
 	calls = mock.calls.GetUncheckedNotificationCount

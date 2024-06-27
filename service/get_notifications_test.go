@@ -7,7 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/stretchr/testify/assert"
@@ -26,23 +28,23 @@ func TestGetNotifications(t *testing.T) {
 	type getByToUserByStartIdOrderByLatest struct {
 		startID       entity.NotificationID
 		size          int
-		userID        entity.UserID
+		userID        model.UserID
 		notifications entity.Notifications
 		err           error
 	}
 	type getByToUserOrderByLatest struct {
 		size          int
-		userID        entity.UserID
+		userID        model.UserID
 		notifications entity.Notifications
 		err           error
 	}
 
 	type getUserByID struct {
-		user entity.User
+		user entities.User
 		err  error
 	}
 
-	userID := entity.UserID(1)
+	userID := model.UserID(1)
 	tests := map[string]struct {
 		input                             input
 		getByToUserByStartIdOrderByLatest getByToUserByStartIdOrderByLatest
@@ -74,7 +76,7 @@ func TestGetNotifications(t *testing.T) {
 			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
 				err:  nil,
-				user: entity.User{},
+				user: entities.User{},
 			},
 			want: want{
 				ns: GetNotificationsResponse{
@@ -108,7 +110,7 @@ func TestGetNotifications(t *testing.T) {
 			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
 				err:  nil,
-				user: entity.User{},
+				user: entities.User{},
 			},
 			want: want{
 				ns: GetNotificationsResponse{
@@ -146,8 +148,8 @@ func TestGetNotifications(t *testing.T) {
 			},
 			getUserByID: getUserByID{
 				err: nil,
-				user: entity.User{
-					ID:           userID,
+				user: entities.User{
+					ID:           int64(userID),
 					Email:        "yamada@sample.com",
 					SendingPoint: 100,
 				},
@@ -178,24 +180,24 @@ func TestGetNotifications(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)
-			ctx.Set(auth.UserID, entity.UserID(userID))
+			ctx.Set(auth.UserID, model.UserID(userID))
 
 			// モックの定義
 			moqQueryer := &QueryerMock{}
 			moqNotificationRepo := &NotificationRepoMock{
-				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.startID, startID)
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.size, size)
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.userID, uid)
 					return tt.getByToUserByStartIdOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},
-				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid entity.UserID, size int, columns ...string) (entity.Notifications, error) {
+				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
 					assert.Equal(t, tt.getByToUserOrderByLatest.userID, uid)
 					return tt.getByToUserOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},
 			}
 			moqUserRepo := &UserRepoMock{
-				GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID entity.UserID) (entity.User, error) {
+				GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error) {
 					assert.Equal(t, userID, ID)
 					return tt.getUserByID.user, tt.getUserByID.err
 				},

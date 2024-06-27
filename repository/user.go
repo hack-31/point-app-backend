@@ -6,8 +6,9 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/go-sql-driver/mysql"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/repository/entities"
 )
 
 // ユーザ情報永続化
@@ -16,7 +17,7 @@ import (
 // ctx コンテキスト
 // db dbの値(インスタンス)
 // u ユーザエンティティ
-func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User) error {
+func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entities.User) error {
 	u.CreatedAt = r.Clocker.Now()
 	u.UpdateAt = r.Clocker.Now()
 
@@ -36,7 +37,7 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 	if err != nil {
 		return errors.Wrap(err, "failed to get last insert id in user repo")
 	}
-	u.ID = entity.UserID(id)
+	u.ID = id
 	return nil
 }
 
@@ -48,8 +49,8 @@ func (r *Repository) RegisterUser(ctx context.Context, db Execer, u *entity.User
 // columns カラム（無指定の場合は全て）
 //
 // @returns
-// entity.User ユーザ情報
-func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email string, columns ...string) (entity.User, error) {
+// entities.User ユーザ情報
+func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email string, columns ...string) (entities.User, error) {
 	formattedColumns := "*"
 	if len(columns) > 0 {
 		// 以下のような文字列にする
@@ -64,7 +65,7 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email stri
 		WHERE email = ? 
 		LIMIT 1;`
 
-	var user entity.User
+	var user entities.User
 
 	if err := db.GetContext(ctx, &user, sql, email); err != nil {
 		// 見つけられない時(その他のエラーも含む)
@@ -83,8 +84,8 @@ func (r *Repository) FindUserByEmail(ctx context.Context, db Queryer, email stri
 // ID ユーザID
 //
 // @returns
-// entity.User ユーザ情報
-func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID entity.UserID) (entity.User, error) {
+// entities.User ユーザ情報
+func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID model.UserID) (entities.User, error) {
 	sql := `
 		SELECT *
 		FROM users
@@ -92,7 +93,7 @@ func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID entity.User
 		LIMIT 1
 	`
 
-	var user entity.User
+	var user entities.User
 	if err := db.GetContext(ctx, &user, sql, ID); err != nil {
 		// 見つけられない時(その他のエラーも含む)
 		// 見つけられない時のエラーは利用側で
@@ -104,7 +105,7 @@ func (r *Repository) GetUserByID(ctx context.Context, db Queryer, ID entity.User
 }
 
 // 削除
-func (r *Repository) DeleteUserByID(ctx context.Context, db Execer, ID entity.UserID) (int64, error) {
+func (r *Repository) DeleteUserByID(ctx context.Context, db Execer, ID model.UserID) (int64, error) {
 	sql := "DELETE FROM `users`" +
 		"WHERE `id` = ?"
 	res, err := db.ExecContext(ctx, sql, ID)
@@ -142,7 +143,7 @@ func (r *Repository) UpdatePassword(ctx context.Context, db Execer, email, pass 
 //
 // @returns
 // error
-func (r *Repository) UpdateEmail(ctx context.Context, db Execer, userID entity.UserID, newEmail string) error {
+func (r *Repository) UpdateEmail(ctx context.Context, db Execer, userID model.UserID, newEmail string) error {
 	sql := `UPDATE users SET email = ? WHERE id = ?`
 
 	_, err := db.ExecContext(ctx, sql, newEmail, userID)
@@ -194,7 +195,7 @@ func (r *Repository) UpdateAccount(ctx context.Context, db Execer, email, family
 //
 // @returns
 // Users ユーザ一覧
-func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) (entity.Users, error) {
+func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) ([]*entities.User, error) {
 	formattedColumns := "*"
 	if len(columns) > 0 {
 		// 以下のような文字列にする
@@ -205,7 +206,7 @@ func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) 
 	sql :=
 		`SELECT ` + formattedColumns + `
 		 FROM users;`
-	var users entity.Users
+	var users []*entities.User
 	if err := db.SelectContext(ctx, &users, sql); err != nil {
 		return users, errors.Wrap(err, "failed to get all users in user repo")
 	}

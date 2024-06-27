@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/auth"
 	mock_domain "github.com/hack-31/point-app-backend/domain/_mock"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	mock_repository "github.com/hack-31/point-app-backend/repository/_mock"
 	"github.com/hack-31/point-app-backend/repository/entity"
@@ -165,7 +166,7 @@ func TestGetNotification(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			ctx, _ := gin.CreateTestContext(w)
-			ctx.Set(auth.UserID, entity.UserID(1))
+			ctx.Set(auth.UserID, model.UserID(1))
 
 			// モックの定義
 			ctrl := gomock.NewController(t)
@@ -187,12 +188,12 @@ func TestGetNotification(t *testing.T) {
 			mockNotifRepo := mock_domain.NewMockNotificationRepo(ctrl)
 			mockNotifRepo.
 				EXPECT().
-				CheckNotification(ctx, mockTx, entity.UserID(1), tt.input.notificationID).
+				CheckNotification(ctx, mockTx, model.UserID(1), tt.input.notificationID).
 				Return(tt.checkNotification.err).
 				Times(tt.checkNotification.callCount)
 			mockNotifRepo.
 				EXPECT().
-				GetNotificationByID(ctx, mockTx, entity.UserID(1), tt.input.notificationID).
+				GetNotificationByID(ctx, mockTx, model.UserID(1), tt.input.notificationID).
 				Return(tt.getNotificationByID.notification, tt.getNotificationByID.err).
 				Times(tt.getNotificationByID.callCount)
 

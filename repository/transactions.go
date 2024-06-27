@@ -3,12 +3,12 @@ package repository
 import (
 	"context"
 
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/jmoiron/sqlx"
 )
 
 // GetAquistionPoint は、指定ユーザーの取得ポイントを取得する
-func (r *Repository) GetAquistionPoint(ctx context.Context, db Queryer, userIDs []entity.UserID) (map[entity.UserID]int, error) {
+func (r *Repository) GetAquistionPoint(ctx context.Context, db Queryer, userIDs []model.UserID) (map[model.UserID]int, error) {
 	query := `
 		SELECT
 			receiving_user_id,
@@ -29,15 +29,15 @@ func (r *Repository) GetAquistionPoint(ctx context.Context, db Queryer, userIDs 
 
 	// 取得
 	var users []struct {
-		ID               entity.UserID `db:"receiving_user_id"`
-		AcquisitionPoint int           `db:"acquisition_point"`
+		ID               model.UserID `db:"receiving_user_id"`
+		AcquisitionPoint int          `db:"acquisition_point"`
 	}
 	if err := db.SelectContext(ctx, &users, query, params...); err != nil {
 		return nil, err
 	}
 
 	// データ整形
-	acquistionPoints := make(map[entity.UserID]int, len(users))
+	acquistionPoints := make(map[model.UserID]int, len(users))
 	for _, v := range users {
 		acquistionPoints[v.ID] = v.AcquisitionPoint
 	}
