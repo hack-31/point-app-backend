@@ -60,6 +60,9 @@ migrate:  ## Execute migration（コンテナ）
 seed: ## データ挿入（コンテナ）
 	mysql ${DB_NAME} -h ${DB_HOST} -u ${DB_USER} -p${DB_PASSWORD} < ./_tools/mysql/seed.sql 
 
+model: ## model作成
+	xo schema 'mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?parseTime=true&sql_mode=ansi' -o ./repository/entities --go-field-tag='json:"{{ .SQLName }}" db:"{{ .SQLName }}"'
+
 .PHONY: rdm
 rdm: ## 送信メールを見る
 	@if [ ${CONTAINER_ENV} ]; then \
