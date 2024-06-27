@@ -9,7 +9,7 @@ import (
 
 // User represents a row from 'point_app.users'.
 type User struct {
-	ID             uint64    `json:"id" db:"id"`                             // ユーザーの識別子
+	ID             int64     `json:"id" db:"id"`                             // ユーザーの識別子
 	FamilyName     string    `json:"family_name" db:"family_name"`           // 苗字
 	FamilyNameKana string    `json:"family_name_kana" db:"family_name_kana"` // 苗字カナ
 	FirstName      string    `json:"first_name" db:"first_name"`             // 名前
@@ -59,7 +59,7 @@ func (u *User) Insert(ctx context.Context, db DB) error {
 	if err != nil {
 		return logerror(err)
 	} // set primary key
-	u.ID = uint64(id)
+	u.ID = int64(id)
 	// set exists
 	u._exists = true
 	return nil
@@ -161,7 +161,7 @@ func UserByEmail(ctx context.Context, db DB, email string) (*User, error) {
 // UserByID retrieves a row from 'point_app.users' as a [User].
 //
 // Generated from index 'users_id_pkey'.
-func UserByID(ctx context.Context, db DB, id uint64) (*User, error) {
+func UserByID(ctx context.Context, db DB, id int64) (*User, error) {
 	// query
 	const sqlstr = `SELECT ` +
 		`id, family_name, family_name_kana, first_name, first_name_kana, email, password, sending_point, created_at, update_at ` +

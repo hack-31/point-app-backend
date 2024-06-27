@@ -15,8 +15,10 @@ import (
 	time "time"
 
 	gin "github.com/gin-gonic/gin"
+	model "github.com/hack-31/point-app-backend/domain/model"
 	repository "github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	entities "github.com/hack-31/point-app-backend/repository/entities"
+	entity "github.com/hack-31/point-app-backend/repository/entity"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -44,7 +46,7 @@ func (m *MockUserRepo) EXPECT() *MockUserRepoMockRecorder {
 }
 
 // DeleteUserByID mocks base method.
-func (m *MockUserRepo) DeleteUserByID(ctx context.Context, db repository.Execer, ID entity.UserID) (int64, error) {
+func (m *MockUserRepo) DeleteUserByID(ctx context.Context, db repository.Execer, ID model.UserID) (int64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserByID", ctx, db, ID)
 	ret0, _ := ret[0].(int64)
@@ -59,14 +61,14 @@ func (mr *MockUserRepoMockRecorder) DeleteUserByID(ctx, db, ID any) *gomock.Call
 }
 
 // FindUserByEmail mocks base method.
-func (m *MockUserRepo) FindUserByEmail(ctx context.Context, db repository.Queryer, e string, columns ...string) (entity.User, error) {
+func (m *MockUserRepo) FindUserByEmail(ctx context.Context, db repository.Queryer, e string, columns ...string) (entities.User, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, db, e}
 	for _, a := range columns {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "FindUserByEmail", varargs...)
-	ret0, _ := ret[0].(entity.User)
+	ret0, _ := ret[0].(entities.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -79,14 +81,14 @@ func (mr *MockUserRepoMockRecorder) FindUserByEmail(ctx, db, e any, columns ...a
 }
 
 // GetAll mocks base method.
-func (m *MockUserRepo) GetAll(ctx context.Context, db repository.Queryer, columns ...string) (entity.Users, error) {
+func (m *MockUserRepo) GetAll(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, db}
 	for _, a := range columns {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetAll", varargs...)
-	ret0, _ := ret[0].(entity.Users)
+	ret0, _ := ret[0].([]*entities.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -99,10 +101,10 @@ func (mr *MockUserRepoMockRecorder) GetAll(ctx, db any, columns ...any) *gomock.
 }
 
 // GetUserByID mocks base method.
-func (m *MockUserRepo) GetUserByID(ctx context.Context, db repository.Queryer, ID entity.UserID) (entity.User, error) {
+func (m *MockUserRepo) GetUserByID(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserByID", ctx, db, ID)
-	ret0, _ := ret[0].(entity.User)
+	ret0, _ := ret[0].(entities.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -114,7 +116,7 @@ func (mr *MockUserRepoMockRecorder) GetUserByID(ctx, db, ID any) *gomock.Call {
 }
 
 // RegisterUser mocks base method.
-func (m *MockUserRepo) RegisterUser(ctx context.Context, db repository.Execer, u *entity.User) error {
+func (m *MockUserRepo) RegisterUser(ctx context.Context, db repository.Execer, u *entities.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterUser", ctx, db, u)
 	ret0, _ := ret[0].(error)
@@ -142,7 +144,7 @@ func (mr *MockUserRepoMockRecorder) UpdateAccount(ctx, db, email, familyName, fa
 }
 
 // UpdateEmail mocks base method.
-func (m *MockUserRepo) UpdateEmail(ctx context.Context, db repository.Execer, userID entity.UserID, newEmail string) error {
+func (m *MockUserRepo) UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateEmail", ctx, db, userID, newEmail)
 	ret0, _ := ret[0].(error)
@@ -193,10 +195,10 @@ func (m *MockTransactionRepo) EXPECT() *MockTransactionRepoMockRecorder {
 }
 
 // GetAquistionPoint mocks base method.
-func (m *MockTransactionRepo) GetAquistionPoint(ctx context.Context, db repository.Queryer, userIDs []entity.UserID) (map[entity.UserID]int, error) {
+func (m *MockTransactionRepo) GetAquistionPoint(ctx context.Context, db repository.Queryer, userIDs []model.UserID) (map[model.UserID]int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAquistionPoint", ctx, db, userIDs)
-	ret0, _ := ret[0].(map[entity.UserID]int)
+	ret0, _ := ret[0].(map[model.UserID]int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -231,7 +233,7 @@ func (m *MockPointRepo) EXPECT() *MockPointRepoMockRecorder {
 }
 
 // RegisterPointTransaction mocks base method.
-func (m *MockPointRepo) RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId entity.UserID, sendPoint int) error {
+func (m *MockPointRepo) RegisterPointTransaction(ctx context.Context, db repository.Execer, fromUserID, toUserId model.UserID, sendPoint int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RegisterPointTransaction", ctx, db, fromUserID, toUserId, sendPoint)
 	ret0, _ := ret[0].(error)
@@ -259,7 +261,7 @@ func (mr *MockPointRepoMockRecorder) UpdateAllSendablePoint(ctx, db, point any) 
 }
 
 // UpdateSendablePoint mocks base method.
-func (m *MockPointRepo) UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID entity.UserID, sendPoint int) error {
+func (m *MockPointRepo) UpdateSendablePoint(ctx context.Context, db repository.Execer, fromUserID model.UserID, sendPoint int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateSendablePoint", ctx, db, fromUserID, sendPoint)
 	ret0, _ := ret[0].(error)
@@ -296,7 +298,7 @@ func (m *MockNotificationRepo) EXPECT() *MockNotificationRepoMockRecorder {
 }
 
 // CheckNotification mocks base method.
-func (m *MockNotificationRepo) CheckNotification(ctx context.Context, db repository.Execer, uid entity.UserID, nid entity.NotificationID) error {
+func (m *MockNotificationRepo) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckNotification", ctx, db, uid, nid)
 	ret0, _ := ret[0].(error)
@@ -325,7 +327,7 @@ func (mr *MockNotificationRepoMockRecorder) CreateNotification(ctx, db, notifica
 }
 
 // GetByToUserByStartIdOrderByLatest mocks base method.
-func (m *MockNotificationRepo) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid entity.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+func (m *MockNotificationRepo) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, db, uid, startID, size}
 	for _, a := range columns {
@@ -345,7 +347,7 @@ func (mr *MockNotificationRepoMockRecorder) GetByToUserByStartIdOrderByLatest(ct
 }
 
 // GetByToUserOrderByLatest mocks base method.
-func (m *MockNotificationRepo) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid entity.UserID, size int, columns ...string) (entity.Notifications, error) {
+func (m *MockNotificationRepo) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, db, uid, size}
 	for _, a := range columns {
@@ -365,7 +367,7 @@ func (mr *MockNotificationRepoMockRecorder) GetByToUserOrderByLatest(ctx, db, ui
 }
 
 // GetNotificationByID mocks base method.
-func (m *MockNotificationRepo) GetNotificationByID(ctx context.Context, db repository.Queryer, uid entity.UserID, nid entity.NotificationID) (entity.Notification, error) {
+func (m *MockNotificationRepo) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNotificationByID", ctx, db, uid, nid)
 	ret0, _ := ret[0].(entity.Notification)
@@ -380,7 +382,7 @@ func (mr *MockNotificationRepoMockRecorder) GetNotificationByID(ctx, db, uid, ni
 }
 
 // GetUncheckedNotificationCount mocks base method.
-func (m *MockNotificationRepo) GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid entity.UserID) (int, error) {
+func (m *MockNotificationRepo) GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUncheckedNotificationCount", ctx, db, uid)
 	ret0, _ := ret[0].(int)
@@ -418,7 +420,7 @@ func (m *MockTokenGenerator) EXPECT() *MockTokenGeneratorMockRecorder {
 }
 
 // GenerateToken mocks base method.
-func (m *MockTokenGenerator) GenerateToken(ctx context.Context, u entity.User) ([]byte, error) {
+func (m *MockTokenGenerator) GenerateToken(ctx context.Context, u entities.User) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GenerateToken", ctx, u)
 	ret0, _ := ret[0].([]byte)

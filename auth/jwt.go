@@ -12,7 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/hack-31/point-app-backend/constant"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	"github.com/lestrrat-go/jwx/v2/jwk"
@@ -68,7 +69,7 @@ func parse(rawKey []byte) (jwk.Key, error) {
 //
 // @returns
 // token アクセストークン
-func (j *JWTer) GenerateToken(ctx context.Context, u entity.User) ([]byte, error) {
+func (j *JWTer) GenerateToken(ctx context.Context, u entities.User) ([]byte, error) {
 	tok, err := jwt.NewBuilder().
 		JwtID(uuid.New().String()).
 		IssuedAt(j.Clocker.Now()).
@@ -148,7 +149,7 @@ func (j *JWTer) FillContext(ctx *gin.Context) error {
 
 	// コンテキストにユーザ情報追加
 	intUid, _ := strconv.ParseInt(uid, 10, 64)
-	ctx.Set(UserID, entity.UserID(intUid))
+	ctx.Set(UserID, model.UserID(intUid))
 	SetEmail(ctx, token)
 
 	return nil

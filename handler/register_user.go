@@ -6,8 +6,8 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
-	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
 type RegisterUser struct {
@@ -63,8 +63,11 @@ func (ru *RegisterUser) ServeHTTP(ctx *gin.Context) {
 	}
 
 	rsp := struct {
-		ID    entity.UserID `json:"userId"`
-		Token string        `json:"accessToken"`
-	}{ID: u.ID, Token: jwt}
+		ID    model.UserID `json:"userId"`
+		Token string       `json:"accessToken"`
+	}{
+		ID:    model.UserID(u.ID),
+		Token: jwt,
+	}
 	APIResponse(ctx, http.StatusCreated, "本登録が完了しました。", rsp)
 }
