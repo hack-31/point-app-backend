@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/repository/testdata"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/stretchr/testify/assert"
@@ -54,7 +54,7 @@ func TestRepository_GetAquistionPoint(t *testing.T) {
 				assert.NoError(t, err)
 			})
 
-			testdata.Transactions(t, ctx, tx, func(users entity.Transactions) {})
+			testdata.Transactions(t, ctx, tx, func(users []*entities.Transaction) {})
 
 			// 実行
 			r := &Repository{}
