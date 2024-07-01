@@ -12,7 +12,8 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	mock_repository "github.com/hack-31/point-app-backend/repository/_mock"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/testutil"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,7 @@ import (
 func TestGetNotification(t *testing.T) {
 	t.Parallel()
 	type input struct {
-		notificationID entity.NotificationID
+		notificationID model.NotificationID
 	}
 	type want struct {
 		notification GetNotificationResponse
@@ -34,7 +35,7 @@ func TestGetNotification(t *testing.T) {
 	}
 	type getNotificationID struct {
 		callCount    int
-		notification entity.Notification
+		notification customentities.Notification
 		err          error
 	}
 	type publish struct {
@@ -60,12 +61,16 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount: 1,
 				err:       nil,
-				notification: entity.Notification{
-					ID:          1,
-					Title:       "お知らせ",
-					Description: "ポイント送付された",
-					IsChecked:   false,
-					CreatedAt:   clock.FixedClocker{}.Now(),
+				notification: customentities.Notification{
+					Notification: entities.Notification{
+						ID:          1,
+						Description: "ポイント送付された",
+						IsChecked:   false,
+						CreatedAt:   clock.FixedClocker{}.Now(),
+					},
+					Type: entities.NotificationType{
+						Title: "お知らせ",
+					},
 				},
 			},
 			publish: publish{
@@ -94,7 +99,7 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount:    0,
 				err:          nil,
-				notification: entity.Notification{},
+				notification: customentities.Notification{},
 			},
 			publish: publish{
 				callCount: 0,
@@ -116,7 +121,7 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount:    1,
 				err:          sql.ErrConnDone,
-				notification: entity.Notification{},
+				notification: customentities.Notification{},
 			},
 			want: want{
 				notification: GetNotificationResponse{},
@@ -134,12 +139,16 @@ func TestGetNotification(t *testing.T) {
 			getNotificationByID: getNotificationID{
 				callCount: 1,
 				err:       nil,
-				notification: entity.Notification{
-					ID:          1,
-					Title:       "お知らせ",
-					Description: "ポイント送付された",
-					IsChecked:   false,
-					CreatedAt:   clock.FixedClocker{}.Now(),
+				notification: customentities.Notification{
+					Notification: entities.Notification{
+						ID:          1,
+						Description: "ポイント送付された",
+						IsChecked:   false,
+						CreatedAt:   clock.FixedClocker{}.Now(),
+					},
+					Type: entities.NotificationType{
+						Title: "お知らせ",
+					},
 				},
 			},
 			publish: publish{

@@ -9,8 +9,8 @@ import (
 	"github.com/hack-31/point-app-backend/auth"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
 	"github.com/hack-31/point-app-backend/repository/entities"
-	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils/clock"
 	"github.com/stretchr/testify/assert"
 )
@@ -26,16 +26,16 @@ func TestGetNotifications(t *testing.T) {
 		err error
 	}
 	type getByToUserByStartIdOrderByLatest struct {
-		startID       entity.NotificationID
+		startID       model.NotificationID
 		size          int
 		userID        model.UserID
-		notifications entity.Notifications
+		notifications []*customentities.Notification
 		err           error
 	}
 	type getByToUserOrderByLatest struct {
 		size          int
 		userID        model.UserID
-		notifications entity.Notifications
+		notifications []*customentities.Notification
 		err           error
 	}
 
@@ -58,18 +58,22 @@ func TestGetNotifications(t *testing.T) {
 				size:      "5",
 			},
 			getByToUserByStartIdOrderByLatest: getByToUserByStartIdOrderByLatest{
-				startID: entity.NotificationID(90),
+				startID: model.NotificationID(90),
 				size:    5,
 				userID:  userID,
 				err:     nil,
-				notifications: entity.Notifications{
-					&entity.Notification{
-						ID:        90,
-						CreatedAt: clock.FixedClocker{}.Now(),
+				notifications: []*customentities.Notification{
+					{
+						Notification: entities.Notification{
+							ID:        90,
+							CreatedAt: clock.FixedClocker{}.Now(),
+						},
 					},
-					&entity.Notification{
-						ID:        81,
-						CreatedAt: clock.FixedClocker{}.Now(),
+					{
+						Notification: entities.Notification{
+							ID:        81,
+							CreatedAt: clock.FixedClocker{}.Now(),
+						},
 					},
 				},
 			},
@@ -82,7 +86,7 @@ func TestGetNotifications(t *testing.T) {
 				ns: GetNotificationsResponse{
 					NextToken: "80",
 					Notifications: []struct {
-						ID          entity.NotificationID
+						ID          model.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -101,11 +105,11 @@ func TestGetNotifications(t *testing.T) {
 				size:      "5",
 			},
 			getByToUserByStartIdOrderByLatest: getByToUserByStartIdOrderByLatest{
-				startID:       entity.NotificationID(90),
+				startID:       model.NotificationID(90),
 				size:          5,
 				userID:        userID,
 				err:           nil,
-				notifications: entity.Notifications{},
+				notifications: []*customentities.Notification{},
 			},
 			getByToUserOrderByLatest: getByToUserOrderByLatest{},
 			getUserByID: getUserByID{
@@ -116,7 +120,7 @@ func TestGetNotifications(t *testing.T) {
 				ns: GetNotificationsResponse{
 					NextToken: "0",
 					Notifications: []struct {
-						ID          entity.NotificationID
+						ID          model.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -135,14 +139,18 @@ func TestGetNotifications(t *testing.T) {
 				userID: userID,
 				size:   5,
 				err:    nil,
-				notifications: entity.Notifications{
-					&entity.Notification{
-						ID:        90,
-						CreatedAt: clock.FixedClocker{}.Now(),
+				notifications: []*customentities.Notification{
+					{
+						Notification: entities.Notification{
+							ID:        90,
+							CreatedAt: clock.FixedClocker{}.Now(),
+						},
 					},
-					&entity.Notification{
-						ID:        81,
-						CreatedAt: clock.FixedClocker{}.Now(),
+					{
+						Notification: entities.Notification{
+							ID:        81,
+							CreatedAt: clock.FixedClocker{}.Now(),
+						},
 					},
 				},
 			},
@@ -158,7 +166,7 @@ func TestGetNotifications(t *testing.T) {
 				ns: GetNotificationsResponse{
 					NextToken: "80",
 					Notifications: []struct {
-						ID          entity.NotificationID
+						ID          model.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -185,13 +193,13 @@ func TestGetNotifications(t *testing.T) {
 			// モックの定義
 			moqQueryer := &QueryerMock{}
 			moqNotificationRepo := &NotificationRepoMock{
-				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+				GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error) {
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.startID, startID)
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.size, size)
 					assert.Equal(t, tt.getByToUserByStartIdOrderByLatest.userID, uid)
 					return tt.getByToUserByStartIdOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},
-				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
+				GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error) {
 					assert.Equal(t, tt.getByToUserOrderByLatest.userID, uid)
 					return tt.getByToUserOrderByLatest.notifications, tt.getByToUserByStartIdOrderByLatest.err
 				},

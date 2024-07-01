@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 )
 
 type GetNotifications struct {
@@ -58,10 +58,10 @@ func (gn *GetNotifications) ServeHTTP(ctx *gin.Context) {
 
 	// レスポンス作成
 	type notification struct {
-		ID          entity.NotificationID `json:"id"`
-		Title       string                `json:"title"`
-		Description string                `json:"description"`
-		IsChecked   bool                  `json:"isChecked"`
+		ID          model.NotificationID `json:"id"`
+		Title       string               `json:"title"`
+		Description string               `json:"description"`
+		IsChecked   bool                 `json:"isChecked"`
 	}
 	notifications := []notification{}
 	for _, n := range ns.Notifications {

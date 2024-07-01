@@ -8,7 +8,7 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -25,7 +25,7 @@ func NewGetNotifications(db *sqlx.DB, repo *repository.Repository) *GetNotificat
 
 type GetNotificationsResponse struct {
 	Notifications []struct {
-		ID          entity.NotificationID
+		ID          model.NotificationID
 		Title       string
 		Description string
 		IsChecked   bool
@@ -44,7 +44,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	// ユーザID確認
 	userID := utils.GetUserID(ctx)
 
-	var ns []*entity.Notification
+	var ns []*customentities.Notification
 	// 初回時
 	if nextToken == "" {
 		s, _ := strconv.Atoi(size)
@@ -75,7 +75,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 			ctx,
 			gn.DB,
 			userID,
-			entity.NotificationID(nt),
+			model.NotificationID(nt),
 			s,
 			"n.id",
 			"n.is_checked",
@@ -91,7 +91,7 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	// レスポンス作成
 	res := GetNotificationsResponse{
 		Notifications: []struct {
-			ID          entity.NotificationID
+			ID          model.NotificationID
 			Title       string
 			Description string
 			IsChecked   bool
@@ -100,17 +100,17 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 	}
 	for _, n := range ns {
 		res.Notifications = append(res.Notifications, struct {
-			ID          entity.NotificationID
+			ID          model.NotificationID
 			Title       string
 			Description string
 			IsChecked   bool
 			CreatedAt   string
 		}{
-			ID:          n.ID,
-			Title:       n.Title,
-			Description: n.Description,
-			IsChecked:   n.IsChecked,
-			CreatedAt:   model.NewTime(n.CreatedAt).Format(),
+			ID:          model.NotificationID(n.Notification.ID),
+			Title:       n.Type.Title,
+			Description: n.Notification.Description,
+			IsChecked:   n.Notification.IsChecked,
+			CreatedAt:   model.NewTime(n.Notification.CreatedAt).Format(),
 		})
 	}
 
@@ -122,6 +122,6 @@ func (gn *GetNotifications) GetNotifications(ctx *gin.Context, nextToken, size s
 
 	// 次開始のお知らせIDを設定
 	last := ns[len(ns)-1]
-	res.NextToken = strconv.Itoa(int(last.ID) - 1)
+	res.NextToken = strconv.Itoa(int(last.Notification.ID) - 1)
 	return res, nil
 }

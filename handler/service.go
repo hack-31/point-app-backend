@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository/entities"
-	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/service"
 )
 
@@ -63,7 +62,7 @@ type UpdateEmailService interface {
 }
 
 type GetNotificationService interface {
-	GetNotification(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error)
+	GetNotification(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error)
 }
 
 type GetNotificationsService interface {
