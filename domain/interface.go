@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
 	"github.com/hack-31/point-app-backend/repository/entities"
-	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
 // Userに対するインターフェース
@@ -37,12 +37,12 @@ type PointRepo interface {
 
 // お知らせに対するリポジトリインターフェース
 type NotificationRepo interface {
-	CreateNotification(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error)
-	GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error)
-	GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error)
-	GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error)
+	CreateNotification(ctx context.Context, db repository.Execer, notification customentities.Notification) (customentities.Notification, error)
+	GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error)
+	GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error)
+	GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (customentities.Notification, error)
 	GetUncheckedNotificationCount(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
-	CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error
+	CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error
 }
 
 // トークンに対するインターフェース

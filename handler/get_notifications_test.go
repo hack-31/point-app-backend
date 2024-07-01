@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/service"
 	"github.com/hack-31/point-app-backend/testutil"
 )
@@ -45,7 +45,7 @@ func TestGetNotifications(t *testing.T) {
 				res: service.GetNotificationsResponse{
 					NextToken: "100",
 					Notifications: []struct {
-						ID          entity.NotificationID
+						ID          model.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool
@@ -70,7 +70,7 @@ func TestGetNotifications(t *testing.T) {
 				res: service.GetNotificationsResponse{
 					NextToken: "0",
 					Notifications: []struct {
-						ID          entity.NotificationID
+						ID          model.NotificationID
 						Title       string
 						Description string
 						IsChecked   bool

@@ -10,7 +10,8 @@ import (
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
+	"github.com/hack-31/point-app-backend/repository/entities"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -71,11 +72,16 @@ func (sp *SendPoint) SendPoint(ctx *gin.Context, toUserId, sendPoint int) error 
 	if err != nil {
 		return errors.Wrap(err, "failed to get user by id")
 	}
-	n := entity.Notification{
-		TypeID:      model.NotificationTypeSendingPoint,
-		ToUserID:    model.UserID(toUserId),
-		FromUserID:  fromUserID,
-		Description: fmt.Sprintf("%s%sさんから%dポイント送付されました。", fromUser.FamilyName, fromUser.FirstName, sendPoint),
+
+	n := customentities.Notification{
+		Notification: entities.Notification{
+			ToUserID:    uint64(toUserId),
+			FromUserID:  uint64(fromUserID),
+			Description: fmt.Sprintf("%s%sさんから%dポイント送付されました。", fromUser.FamilyName, fromUser.FirstName, sendPoint),
+		},
+		Type: entities.NotificationType{
+			ID: model.NotificationTypeSendingPoint,
+		},
 	}
 
 	// お知らせを新規登録

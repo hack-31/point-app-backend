@@ -17,8 +17,8 @@ import (
 	gin "github.com/gin-gonic/gin"
 	model "github.com/hack-31/point-app-backend/domain/model"
 	repository "github.com/hack-31/point-app-backend/repository"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
 	entities "github.com/hack-31/point-app-backend/repository/entities"
-	entity "github.com/hack-31/point-app-backend/repository/entity"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -298,7 +298,7 @@ func (m *MockNotificationRepo) EXPECT() *MockNotificationRepoMockRecorder {
 }
 
 // CheckNotification mocks base method.
-func (m *MockNotificationRepo) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error {
+func (m *MockNotificationRepo) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckNotification", ctx, db, uid, nid)
 	ret0, _ := ret[0].(error)
@@ -312,10 +312,10 @@ func (mr *MockNotificationRepoMockRecorder) CheckNotification(ctx, db, uid, nid 
 }
 
 // CreateNotification mocks base method.
-func (m *MockNotificationRepo) CreateNotification(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error) {
+func (m *MockNotificationRepo) CreateNotification(ctx context.Context, db repository.Execer, notification customentities.Notification) (customentities.Notification, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateNotification", ctx, db, notification)
-	ret0, _ := ret[0].(entity.Notification)
+	ret0, _ := ret[0].(customentities.Notification)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -327,14 +327,14 @@ func (mr *MockNotificationRepoMockRecorder) CreateNotification(ctx, db, notifica
 }
 
 // GetByToUserByStartIdOrderByLatest mocks base method.
-func (m *MockNotificationRepo) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+func (m *MockNotificationRepo) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, db, uid, startID, size}
 	for _, a := range columns {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetByToUserByStartIdOrderByLatest", varargs...)
-	ret0, _ := ret[0].(entity.Notifications)
+	ret0, _ := ret[0].([]*customentities.Notification)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -347,14 +347,14 @@ func (mr *MockNotificationRepoMockRecorder) GetByToUserByStartIdOrderByLatest(ct
 }
 
 // GetByToUserOrderByLatest mocks base method.
-func (m *MockNotificationRepo) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
+func (m *MockNotificationRepo) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, db, uid, size}
 	for _, a := range columns {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetByToUserOrderByLatest", varargs...)
-	ret0, _ := ret[0].(entity.Notifications)
+	ret0, _ := ret[0].([]*customentities.Notification)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -367,10 +367,10 @@ func (mr *MockNotificationRepoMockRecorder) GetByToUserOrderByLatest(ctx, db, ui
 }
 
 // GetNotificationByID mocks base method.
-func (m *MockNotificationRepo) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
+func (m *MockNotificationRepo) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (customentities.Notification, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNotificationByID", ctx, db, uid, nid)
-	ret0, _ := ret[0].(entity.Notification)
+	ret0, _ := ret[0].(customentities.Notification)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

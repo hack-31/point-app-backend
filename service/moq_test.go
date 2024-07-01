@@ -11,8 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
 	"github.com/hack-31/point-app-backend/repository/entities"
-	"github.com/hack-31/point-app-backend/repository/entity"
 )
 
 // CacheMock is a mock implementation of domain.Cache.
@@ -1143,19 +1143,19 @@ func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 //
 //		// make and configure a mocked domain.NotificationRepo
 //		mockedNotificationRepo := &NotificationRepoMock{
-//			CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error {
+//			CheckNotificationFunc: func(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
 //				panic("mock out the CheckNotification method")
 //			},
-//			CreateNotificationFunc: func(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error) {
+//			CreateNotificationFunc: func(ctx context.Context, db repository.Execer, notification customentities.Notification) (customentities.Notification, error) {
 //				panic("mock out the CreateNotification method")
 //			},
-//			GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+//			GetByToUserByStartIdOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error) {
 //				panic("mock out the GetByToUserByStartIdOrderByLatest method")
 //			},
-//			GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
+//			GetByToUserOrderByLatestFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error) {
 //				panic("mock out the GetByToUserOrderByLatest method")
 //			},
-//			GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
+//			GetNotificationByIDFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (customentities.Notification, error) {
 //				panic("mock out the GetNotificationByID method")
 //			},
 //			GetUncheckedNotificationCountFunc: func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error) {
@@ -1169,19 +1169,19 @@ func (mock *PointRepoMock) UpdateSendablePointCalls() []struct {
 //	}
 type NotificationRepoMock struct {
 	// CheckNotificationFunc mocks the CheckNotification method.
-	CheckNotificationFunc func(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error
+	CheckNotificationFunc func(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error
 
 	// CreateNotificationFunc mocks the CreateNotification method.
-	CreateNotificationFunc func(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error)
+	CreateNotificationFunc func(ctx context.Context, db repository.Execer, notification customentities.Notification) (customentities.Notification, error)
 
 	// GetByToUserByStartIdOrderByLatestFunc mocks the GetByToUserByStartIdOrderByLatest method.
-	GetByToUserByStartIdOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error)
+	GetByToUserByStartIdOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error)
 
 	// GetByToUserOrderByLatestFunc mocks the GetByToUserOrderByLatest method.
-	GetByToUserOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error)
+	GetByToUserOrderByLatestFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error)
 
 	// GetNotificationByIDFunc mocks the GetNotificationByID method.
-	GetNotificationByIDFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error)
+	GetNotificationByIDFunc func(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (customentities.Notification, error)
 
 	// GetUncheckedNotificationCountFunc mocks the GetUncheckedNotificationCount method.
 	GetUncheckedNotificationCountFunc func(ctx context.Context, db repository.Queryer, uid model.UserID) (int, error)
@@ -1197,7 +1197,7 @@ type NotificationRepoMock struct {
 			// UID is the uid argument value.
 			UID model.UserID
 			// Nid is the nid argument value.
-			Nid entity.NotificationID
+			Nid model.NotificationID
 		}
 		// CreateNotification holds details about calls to the CreateNotification method.
 		CreateNotification []struct {
@@ -1206,7 +1206,7 @@ type NotificationRepoMock struct {
 			// Db is the db argument value.
 			Db repository.Execer
 			// Notification is the notification argument value.
-			Notification entity.Notification
+			Notification customentities.Notification
 		}
 		// GetByToUserByStartIdOrderByLatest holds details about calls to the GetByToUserByStartIdOrderByLatest method.
 		GetByToUserByStartIdOrderByLatest []struct {
@@ -1217,7 +1217,7 @@ type NotificationRepoMock struct {
 			// UID is the uid argument value.
 			UID model.UserID
 			// StartID is the startID argument value.
-			StartID entity.NotificationID
+			StartID model.NotificationID
 			// Size is the size argument value.
 			Size int
 			// Columns is the columns argument value.
@@ -1245,7 +1245,7 @@ type NotificationRepoMock struct {
 			// UID is the uid argument value.
 			UID model.UserID
 			// Nid is the nid argument value.
-			Nid entity.NotificationID
+			Nid model.NotificationID
 		}
 		// GetUncheckedNotificationCount holds details about calls to the GetUncheckedNotificationCount method.
 		GetUncheckedNotificationCount []struct {
@@ -1266,7 +1266,7 @@ type NotificationRepoMock struct {
 }
 
 // CheckNotification calls CheckNotificationFunc.
-func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid entity.NotificationID) error {
+func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repository.Execer, uid model.UserID, nid model.NotificationID) error {
 	if mock.CheckNotificationFunc == nil {
 		panic("NotificationRepoMock.CheckNotificationFunc: method is nil but NotificationRepo.CheckNotification was just called")
 	}
@@ -1274,7 +1274,7 @@ func (mock *NotificationRepoMock) CheckNotification(ctx context.Context, db repo
 		Ctx context.Context
 		Db  repository.Execer
 		UID model.UserID
-		Nid entity.NotificationID
+		Nid model.NotificationID
 	}{
 		Ctx: ctx,
 		Db:  db,
@@ -1295,13 +1295,13 @@ func (mock *NotificationRepoMock) CheckNotificationCalls() []struct {
 	Ctx context.Context
 	Db  repository.Execer
 	UID model.UserID
-	Nid entity.NotificationID
+	Nid model.NotificationID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Execer
 		UID model.UserID
-		Nid entity.NotificationID
+		Nid model.NotificationID
 	}
 	mock.lockCheckNotification.RLock()
 	calls = mock.calls.CheckNotification
@@ -1310,14 +1310,14 @@ func (mock *NotificationRepoMock) CheckNotificationCalls() []struct {
 }
 
 // CreateNotification calls CreateNotificationFunc.
-func (mock *NotificationRepoMock) CreateNotification(ctx context.Context, db repository.Execer, notification entity.Notification) (entity.Notification, error) {
+func (mock *NotificationRepoMock) CreateNotification(ctx context.Context, db repository.Execer, notification customentities.Notification) (customentities.Notification, error) {
 	if mock.CreateNotificationFunc == nil {
 		panic("NotificationRepoMock.CreateNotificationFunc: method is nil but NotificationRepo.CreateNotification was just called")
 	}
 	callInfo := struct {
 		Ctx          context.Context
 		Db           repository.Execer
-		Notification entity.Notification
+		Notification customentities.Notification
 	}{
 		Ctx:          ctx,
 		Db:           db,
@@ -1336,12 +1336,12 @@ func (mock *NotificationRepoMock) CreateNotification(ctx context.Context, db rep
 func (mock *NotificationRepoMock) CreateNotificationCalls() []struct {
 	Ctx          context.Context
 	Db           repository.Execer
-	Notification entity.Notification
+	Notification customentities.Notification
 } {
 	var calls []struct {
 		Ctx          context.Context
 		Db           repository.Execer
-		Notification entity.Notification
+		Notification customentities.Notification
 	}
 	mock.lockCreateNotification.RLock()
 	calls = mock.calls.CreateNotification
@@ -1350,7 +1350,7 @@ func (mock *NotificationRepoMock) CreateNotificationCalls() []struct {
 }
 
 // GetByToUserByStartIdOrderByLatest calls GetByToUserByStartIdOrderByLatestFunc.
-func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error) {
 	if mock.GetByToUserByStartIdOrderByLatestFunc == nil {
 		panic("NotificationRepoMock.GetByToUserByStartIdOrderByLatestFunc: method is nil but NotificationRepo.GetByToUserByStartIdOrderByLatest was just called")
 	}
@@ -1358,7 +1358,7 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatest(ctx context.
 		Ctx     context.Context
 		Db      repository.Queryer
 		UID     model.UserID
-		StartID entity.NotificationID
+		StartID model.NotificationID
 		Size    int
 		Columns []string
 	}{
@@ -1383,7 +1383,7 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []str
 	Ctx     context.Context
 	Db      repository.Queryer
 	UID     model.UserID
-	StartID entity.NotificationID
+	StartID model.NotificationID
 	Size    int
 	Columns []string
 } {
@@ -1391,7 +1391,7 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []str
 		Ctx     context.Context
 		Db      repository.Queryer
 		UID     model.UserID
-		StartID entity.NotificationID
+		StartID model.NotificationID
 		Size    int
 		Columns []string
 	}
@@ -1402,7 +1402,7 @@ func (mock *NotificationRepoMock) GetByToUserByStartIdOrderByLatestCalls() []str
 }
 
 // GetByToUserOrderByLatest calls GetByToUserOrderByLatestFunc.
-func (mock *NotificationRepoMock) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
+func (mock *NotificationRepoMock) GetByToUserOrderByLatest(ctx context.Context, db repository.Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error) {
 	if mock.GetByToUserOrderByLatestFunc == nil {
 		panic("NotificationRepoMock.GetByToUserOrderByLatestFunc: method is nil but NotificationRepo.GetByToUserOrderByLatest was just called")
 	}
@@ -1450,7 +1450,7 @@ func (mock *NotificationRepoMock) GetByToUserOrderByLatestCalls() []struct {
 }
 
 // GetNotificationByID calls GetNotificationByIDFunc.
-func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
+func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db repository.Queryer, uid model.UserID, nid model.NotificationID) (customentities.Notification, error) {
 	if mock.GetNotificationByIDFunc == nil {
 		panic("NotificationRepoMock.GetNotificationByIDFunc: method is nil but NotificationRepo.GetNotificationByID was just called")
 	}
@@ -1458,7 +1458,7 @@ func (mock *NotificationRepoMock) GetNotificationByID(ctx context.Context, db re
 		Ctx context.Context
 		Db  repository.Queryer
 		UID model.UserID
-		Nid entity.NotificationID
+		Nid model.NotificationID
 	}{
 		Ctx: ctx,
 		Db:  db,
@@ -1479,13 +1479,13 @@ func (mock *NotificationRepoMock) GetNotificationByIDCalls() []struct {
 	Ctx context.Context
 	Db  repository.Queryer
 	UID model.UserID
-	Nid entity.NotificationID
+	Nid model.NotificationID
 } {
 	var calls []struct {
 		Ctx context.Context
 		Db  repository.Queryer
 		UID model.UserID
-		Nid entity.NotificationID
+		Nid model.NotificationID
 	}
 	mock.lockGetNotificationByID.RLock()
 	calls = mock.calls.GetNotificationByID

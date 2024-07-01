@@ -9,7 +9,6 @@ import (
 	"github.com/hack-31/point-app-backend/domain"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository"
-	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/utils"
 	"github.com/jmoiron/sqlx"
 )
@@ -25,7 +24,7 @@ func NewGetNotification(cache domain.Cache, repo *repository.Repository, db *sql
 }
 
 type GetNotificationResponse struct {
-	ID          entity.NotificationID
+	ID          model.NotificationID
 	Title       string
 	Description string
 	IsChecked   bool
@@ -39,7 +38,7 @@ type GetNotificationResponse struct {
 //
 // @return
 // お知らせ詳細
-func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID entity.NotificationID) (GetNotificationResponse, error) {
+func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID model.NotificationID) (GetNotificationResponse, error) {
 	// ユーザID確認
 	userID := utils.GetUserID(ctx)
 
@@ -60,11 +59,16 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID enti
 		return GetNotificationResponse{}, errors.Wrap(err, "failed to get notification by id")
 	}
 	res := GetNotificationResponse{
-		ID:          n.ID,
-		Title:       n.Title,
-		IsChecked:   n.IsChecked,
-		Description: n.Description,
-		CreatedAt:   model.NewTime(n.CreatedAt).Format(),
+		ID:          model.NotificationID(n.Notification.ID),
+		Title:       n.Type.Title,
+		IsChecked:   n.Notification.IsChecked,
+		Description: n.Notification.Description,
+		CreatedAt:   model.NewTime(n.Notification.CreatedAt).Format(),
+	}
+
+	// トランザクションコミット
+	if err := tx.Commit(); err != nil {
+		return GetNotificationResponse{}, errors.Wrap(err, "failed to commit transaction")
 	}
 
 	// お知らせチェックしたので、お知らせを通知
@@ -75,11 +79,6 @@ func (gn *GetNotification) GetNotification(ctx *gin.Context, notificationID enti
 	}
 	if err := gn.Cache.Publish(ctx, channel, string(payload)); err != nil {
 		return res, errors.Wrapf(err, "failed to publish to %s channel", channel)
-	}
-
-	// トランザクションコミット
-	if err := tx.Commit(); err != nil {
-		return GetNotificationResponse{}, errors.Wrap(err, "failed to commit transaction")
 	}
 
 	return res, nil

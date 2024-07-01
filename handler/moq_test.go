@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/repository/entities"
-	"github.com/hack-31/point-app-backend/repository/entity"
 	"github.com/hack-31/point-app-backend/service"
 )
 
@@ -870,7 +869,7 @@ var _ GetNotificationService = &GetNotificationServiceMock{}
 //
 //		// make and configure a mocked GetNotificationService
 //		mockedGetNotificationService := &GetNotificationServiceMock{
-//			GetNotificationFunc: func(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error) {
+//			GetNotificationFunc: func(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error) {
 //				panic("mock out the GetNotification method")
 //			},
 //		}
@@ -881,7 +880,7 @@ var _ GetNotificationService = &GetNotificationServiceMock{}
 //	}
 type GetNotificationServiceMock struct {
 	// GetNotificationFunc mocks the GetNotification method.
-	GetNotificationFunc func(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error)
+	GetNotificationFunc func(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -890,20 +889,20 @@ type GetNotificationServiceMock struct {
 			// Ctx is the ctx argument value.
 			Ctx *gin.Context
 			// NotificationID is the notificationID argument value.
-			NotificationID entity.NotificationID
+			NotificationID model.NotificationID
 		}
 	}
 	lockGetNotification sync.RWMutex
 }
 
 // GetNotification calls GetNotificationFunc.
-func (mock *GetNotificationServiceMock) GetNotification(ctx *gin.Context, notificationID entity.NotificationID) (service.GetNotificationResponse, error) {
+func (mock *GetNotificationServiceMock) GetNotification(ctx *gin.Context, notificationID model.NotificationID) (service.GetNotificationResponse, error) {
 	if mock.GetNotificationFunc == nil {
 		panic("GetNotificationServiceMock.GetNotificationFunc: method is nil but GetNotificationService.GetNotification was just called")
 	}
 	callInfo := struct {
 		Ctx            *gin.Context
-		NotificationID entity.NotificationID
+		NotificationID model.NotificationID
 	}{
 		Ctx:            ctx,
 		NotificationID: notificationID,
@@ -920,11 +919,11 @@ func (mock *GetNotificationServiceMock) GetNotification(ctx *gin.Context, notifi
 //	len(mockedGetNotificationService.GetNotificationCalls())
 func (mock *GetNotificationServiceMock) GetNotificationCalls() []struct {
 	Ctx            *gin.Context
-	NotificationID entity.NotificationID
+	NotificationID model.NotificationID
 } {
 	var calls []struct {
 		Ctx            *gin.Context
-		NotificationID entity.NotificationID
+		NotificationID model.NotificationID
 	}
 	mock.lockGetNotification.RLock()
 	calls = mock.calls.GetNotification

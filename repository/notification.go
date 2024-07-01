@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"strings"
+	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/hack-31/point-app-backend/domain/model"
 	"github.com/hack-31/point-app-backend/myerror"
-	"github.com/hack-31/point-app-backend/repository/entity"
+	customentities "github.com/hack-31/point-app-backend/repository/custom_entities"
+	"github.com/hack-31/point-app-backend/repository/entities"
 )
 
 // お知らせ登録
@@ -19,7 +21,7 @@ import (
 //
 // @returns
 // お知らせ
-func (r *Repository) CreateNotification(ctx context.Context, db Execer, n entity.Notification) (entity.Notification, error) {
+func (r *Repository) CreateNotification(ctx context.Context, db Execer, n customentities.Notification) (customentities.Notification, error) {
 	sql := `
 		INSERT INTO notifications (
 			to_user_id,
@@ -30,12 +32,12 @@ func (r *Repository) CreateNotification(ctx context.Context, db Execer, n entity
 		)
 		VALUES (?,?,?,?,?)
 	`
-	result, err := db.ExecContext(ctx, sql, n.ToUserID, n.FromUserID, n.TypeID, n.Description, r.Clocker.Now())
+	result, err := db.ExecContext(ctx, sql, n.Notification.ToUserID, n.Notification.FromUserID, n.Type.ID, n.Notification.Description, r.Clocker.Now())
 	if err != nil {
 		return n, err
 	}
 	ID, _ := result.LastInsertId()
-	n.ID = entity.NotificationID(ID)
+	n.Notification.ID = uint64(ID)
 	return n, nil
 }
 
@@ -49,7 +51,7 @@ func (r *Repository) CreateNotification(ctx context.Context, db Execer, n entity
 //
 // @returns
 // お知らせ一覧
-func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, startID entity.NotificationID, size int, columns ...string) (entity.Notifications, error) {
+func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, startID model.NotificationID, size int, columns ...string) ([]*customentities.Notification, error) {
 	column := "n.id, n.is_checked, n.to_user_id, n.from_user_id, n.description, n.created_at, nt.title"
 	if len(columns) > 0 {
 		column = strings.Join(columns, ", ")
@@ -62,15 +64,42 @@ func (r *Repository) GetByToUserByStartIdOrderByLatest(ctx context.Context, db Q
 		"WHERE n.to_user_id = ? AND n.id <= ? " +
 		"ORDER BY n.id DESC " +
 		"LIMIT ?;"
-	var n entity.Notifications
-	if err := db.SelectContext(ctx, &n, sql, uid, startID, size); err != nil {
-		return n, err
+
+	var n []*struct {
+		ID          uint64       `json:"id" db:"id"`
+		TypeID      int          `json:"notificationTypeId" db:"notification_type_id"`
+		Title       string       `json:"title" db:"title"`
+		Description string       `json:"description" db:"description"`
+		ToUserID    model.UserID `json:"toUserId" db:"to_user_id"`
+		FromUserID  model.UserID `json:"fromUserId" db:"from_user_id"`
+		IsChecked   bool         `json:"isChecked" db:"is_checked"`
+		CreatedAt   time.Time    `json:"createdAt" db:"created_at"`
 	}
-	return n, nil
+	if err := db.SelectContext(ctx, &n, sql, uid, startID, size); err != nil {
+		return []*customentities.Notification{}, err
+	}
+	var res []*customentities.Notification
+	for _, v := range n {
+		res = append(res, &customentities.Notification{
+			Notification: entities.Notification{
+				ID:                 v.ID,
+				Description:        v.Description,
+				NotificationTypeID: uint64(v.TypeID),
+				ToUserID:           uint64(v.ToUserID),
+				FromUserID:         uint64(v.FromUserID),
+				IsChecked:          v.IsChecked,
+				CreatedAt:          v.CreatedAt,
+			},
+			Type: entities.NotificationType{
+				Title: v.Title,
+			},
+		})
+	}
+	return res, nil
 }
 
 // 指定した受信者ユーザーIDを元にお知らせ一覧を取得
-func (r *Repository) GetByToUserOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, size int, columns ...string) (entity.Notifications, error) {
+func (r *Repository) GetByToUserOrderByLatest(ctx context.Context, db Queryer, uid model.UserID, size int, columns ...string) ([]*customentities.Notification, error) {
 	column := "n.id, n.is_checked, n.to_user_id, n.from_user_id, n.description, n.created_at, nt.title"
 	if len(columns) > 0 {
 		column = strings.Join(columns, ", ")
@@ -83,11 +112,37 @@ func (r *Repository) GetByToUserOrderByLatest(ctx context.Context, db Queryer, u
 		"WHERE n.to_user_id = ? " +
 		"ORDER BY n.id DESC " +
 		"LIMIT ?;"
-	var n entity.Notifications
-	if err := db.SelectContext(ctx, &n, sql, uid, size); err != nil {
-		return n, err
+
+	var n []*struct {
+		ID          uint64       `json:"id" db:"id"`
+		TypeID      int          `json:"notificationTypeId" db:"notification_type_id"`
+		Title       string       `json:"title" db:"title"`
+		Description string       `json:"description" db:"description"`
+		ToUserID    model.UserID `json:"toUserId" db:"to_user_id"`
+		FromUserID  model.UserID `json:"fromUserId" db:"from_user_id"`
+		IsChecked   bool         `json:"isChecked" db:"is_checked"`
+		CreatedAt   time.Time    `json:"createdAt" db:"created_at"`
 	}
-	return n, nil
+	if err := db.SelectContext(ctx, &n, sql, uid, size); err != nil {
+		return []*customentities.Notification{}, err
+	}
+	var res []*customentities.Notification
+	for _, v := range n {
+		res = append(res, &customentities.Notification{
+			Notification: entities.Notification{
+				ID:          v.ID,
+				Description: v.Description,
+				ToUserID:    uint64(v.ToUserID),
+				FromUserID:  uint64(v.FromUserID),
+				IsChecked:   v.IsChecked,
+				CreatedAt:   v.CreatedAt,
+			},
+			Type: entities.NotificationType{
+				Title: v.Title,
+			},
+		})
+	}
+	return res, nil
 }
 
 // お知らせ詳細取得
@@ -98,8 +153,8 @@ func (r *Repository) GetByToUserOrderByLatest(ctx context.Context, db Queryer, u
 // nid お知らせID
 //
 // @returns
-// entity.Notification お知らせ
-func (r *Repository) GetNotificationByID(ctx context.Context, db Queryer, uid model.UserID, nid entity.NotificationID) (entity.Notification, error) {
+// entities.Notification お知らせ
+func (r *Repository) GetNotificationByID(ctx context.Context, db Queryer, uid model.UserID, nid model.NotificationID) (customentities.Notification, error) {
 	query := `
 		SELECT 
 			n.id,
@@ -116,14 +171,38 @@ func (r *Repository) GetNotificationByID(ctx context.Context, db Queryer, uid mo
 		LIMIT 1
 	`
 
-	var n entity.Notification
+	var n struct {
+		ID          uint64       `json:"id" db:"id"`
+		TypeID      int          `json:"notificationTypeId" db:"notification_type_id"`
+		Title       string       `json:"title" db:"title"`
+		Description string       `json:"description" db:"description"`
+		ToUserID    model.UserID `json:"toUserId" db:"to_user_id"`
+		FromUserID  model.UserID `json:"fromUserId" db:"from_user_id"`
+		IsChecked   bool         `json:"isChecked" db:"is_checked"`
+		CreatedAt   time.Time    `json:"createdAt" db:"created_at"`
+	}
+	var res customentities.Notification
 	if err := db.QueryRowxContext(ctx, query, nid, uid).StructScan(&n); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return n, myerror.ErrNotFound
+			return res, myerror.ErrNotFound
 		}
-		return n, err
+		return res, err
 	}
-	return n, nil
+
+	return customentities.Notification{
+		Notification: entities.Notification{
+			ID:                 n.ID,
+			Description:        n.Description,
+			NotificationTypeID: uint64(n.TypeID),
+			ToUserID:           uint64(n.ToUserID),
+			FromUserID:         uint64(n.FromUserID),
+			IsChecked:          n.IsChecked,
+			CreatedAt:          n.CreatedAt,
+		},
+		Type: entities.NotificationType{
+			Title: n.Title,
+		},
+	}, nil
 }
 
 // チェックしていないお知らせ総数
@@ -158,7 +237,7 @@ func (r *Repository) GetUncheckedNotificationCount(ctx context.Context, db Query
 // db dbインスタンス
 // uid ユーザID
 // nie お知らせID
-func (r *Repository) CheckNotification(ctx context.Context, db Execer, uid model.UserID, nid entity.NotificationID) error {
+func (r *Repository) CheckNotification(ctx context.Context, db Execer, uid model.UserID, nid model.NotificationID) error {
 	query := `
 		UPDATE notifications
 		SET is_checked = true
