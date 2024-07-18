@@ -94,6 +94,18 @@ get:
   summary: ユーザ一覧情報取得
   description: |
     - ユーザ情報一覧を取得する
+  parameters:
+    - in: query
+      name: size
+      schema:
+        type: integer
+        example: 5
+    - in: nextToken
+      name: nextToken
+      schema:
+        type: string
+        example: "eyJ0b2tlbiI6IjEwMCJ9"
+
   responses:
     '200':
       description: 成功
