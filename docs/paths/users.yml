@@ -124,6 +124,9 @@ get:
               data:
                 type: object
                 properties:
+                  nextToken:
+                    type: string
+                    example: "eyJ0b2tlbi"
                   users:
                     type: array
                     items:
