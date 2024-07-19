@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/go-sql-driver/mysql"
@@ -210,5 +211,90 @@ func (r *Repository) GetAll(ctx context.Context, db Queryer, columns ...string) 
 	if err := db.SelectContext(ctx, &users, sql); err != nil {
 		return users, errors.Wrap(err, "failed to get all users in user repo")
 	}
+	return users, nil
+}
+
+type GetAllWithCursorParam struct {
+	Size            int          `db:"size"`
+	CursorPoint     int          `db:"point"`
+	CursorUserID    model.UserID `db:"user_id"`
+	CursorCreatedAt time.Time    `db:"created_at"`
+}
+
+// GetAllWithCursor ポイント順にユーザを取得する
+// カーソルページネーションを使用して取得する
+// ソート順は以下の通り
+//
+// 1. ポイントが多い順
+// 2. ポイントが同じ場合は登録日が古い順
+// 3. ポイントと登録日が同じ場合はユーザIDが大きい順
+func (r *Repository) GetAllWithCursor(ctx context.Context, db Queryer, param GetAllWithCursorParam) ([]*entities.User, error) {
+	sql := `
+		WITH points AS (
+			SELECT receiving_user_id AS user_id, SUM(transaction_point) AS point
+			FROM transactions
+			GROUP BY receiving_user_id
+		)
+		SELECT u.*
+		FROM users AS u
+		INNER JOIN points AS p
+		ON u.id = p.user_id
+		WHERE 
+		  p.point < ? 
+			OR (p.point = ? AND u.created_at > ?) 
+			OR (p.point = ? AND u.created_at = ? AND u.id > ?)
+		ORDER BY p.point DESC, u.created_at ASC, u.id ASC
+		LIMIT ?;`
+
+	var users []*entities.User
+	err := db.SelectContext(ctx, &users, sql,
+		param.CursorPoint,
+		param.CursorPoint,
+		param.CursorCreatedAt,
+		param.CursorPoint,
+		param.CursorCreatedAt,
+		param.CursorUserID,
+		param.Size,
+	)
+	if err != nil {
+		return users, errors.Wrap(err, "failed to get all users in user repo")
+	}
+
+	return users, nil
+}
+
+type GetUsersParam struct {
+	Size int
+}
+
+// GetUsers ポイント順にユーザを取得する
+//
+// ソート順は以下の通り
+//
+// 1. ポイントが多い順
+// 2. ポイントが同じ場合は登録日が古い順
+// 3. ポイントと登録日が同じ場合はユーザIDが大きい順
+func (r *Repository) GetUsers(ctx context.Context, db Queryer, param GetUsersParam) ([]*entities.User, error) {
+	sql := `
+		WITH points AS (
+			SELECT receiving_user_id AS user_id, SUM(transaction_point) AS point
+			FROM transactions
+			GROUP BY receiving_user_id
+		)
+		SELECT u.*
+		FROM users AS u
+		INNER JOIN points AS p
+		ON u.id = p.user_id
+		ORDER BY p.point DESC, u.created_at ASC, u.id ASC
+		LIMIT ?;`
+
+	var users []*entities.User
+	err := db.SelectContext(ctx, &users, sql,
+		param.Size,
+	)
+	if err != nil {
+		return users, errors.Wrap(err, "failed to get all users in user repo")
+	}
+
 	return users, nil
 }

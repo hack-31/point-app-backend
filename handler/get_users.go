@@ -2,9 +2,13 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/hack-31/point-app-backend/domain/model"
+	"github.com/hack-31/point-app-backend/service"
 )
 
 type GetUsers struct {
@@ -21,8 +25,38 @@ func NewGetUsers(s GetUsersService) *GetUsers {
 func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 	const errTitle = "ユーザ一覧取得エラー"
 
+	// クエリの取得
+	queries := struct {
+		Size      string `json:"size"`
+		NextToken string `json:"nextToken"`
+	}{
+		Size:      ctx.Query("size"),
+		NextToken: ctx.Query("nextToken"),
+	}
+
+	// バリデーション
+	err := validation.ValidateStruct(&queries,
+		validation.Field(
+			&queries.Size,
+			is.Int.Error("数値で入力してください"),
+			validation.Min(1).Error("1以上の数値で入力してください"),
+		),
+		validation.Field(
+			&queries.NextToken,
+			is.Base64.Error("base64形式で入力してください"),
+		),
+	)
+	if err != nil {
+		ErrResponse(ctx, http.StatusBadRequest, errTitle, err.Error(), err)
+		return
+	}
+
 	// サービスにユーザ仮登録処理を依頼
-	users, err := gu.Service.GetUsers(ctx)
+	sizeInt, _ := strconv.Atoi(queries.Size)
+	users, err := gu.Service.GetUsers(ctx, service.GetUsersRequest{
+		Size:       sizeInt,
+		NextCursor: queries.NextToken,
+	})
 
 	// エラーレスポンスを返す
 	if err != nil {
@@ -55,9 +89,11 @@ func (gu *GetUsers) ServeHTTP(ctx *gin.Context) {
 	}
 
 	rsp := struct {
-		Users []user `json:"users"`
+		Users     []user `json:"users"`
+		NextToken string `json:"nextToken"`
 	}{
-		Users: usersRes,
+		Users:     usersRes,
+		NextToken: users.NextCursor,
 	}
 
 	APIResponse(ctx, http.StatusOK, "取得成功しました。", rsp)

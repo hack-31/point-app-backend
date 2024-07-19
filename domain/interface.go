@@ -21,6 +21,8 @@ type UserRepo interface {
 	UpdateEmail(ctx context.Context, db repository.Execer, userID model.UserID, newEmail string) error
 	UpdateAccount(ctx context.Context, db repository.Execer, email, familyName, familyNameKana, firstName, firstNameKana *string) error
 	GetAll(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error)
+	GetAllWithCursor(ctx context.Context, db repository.Queryer, param repository.GetAllWithCursorParam) ([]*entities.User, error)
+	GetUsers(ctx context.Context, db repository.Queryer, param repository.GetUsersParam) ([]*entities.User, error)
 }
 
 // 取引に対するインターフェース
