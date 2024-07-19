@@ -281,7 +281,7 @@ var _ GetUsersService = &GetUsersServiceMock{}
 //
 //		// make and configure a mocked GetUsersService
 //		mockedGetUsersService := &GetUsersServiceMock{
-//			GetUsersFunc: func(ctx context.Context) (service.GetUsersResponse, error) {
+//			GetUsersFunc: func(ctx context.Context, input service.GetUsersRequest) (service.GetUsersResponse, error) {
 //				panic("mock out the GetUsers method")
 //			},
 //		}
@@ -292,7 +292,7 @@ var _ GetUsersService = &GetUsersServiceMock{}
 //	}
 type GetUsersServiceMock struct {
 	// GetUsersFunc mocks the GetUsers method.
-	GetUsersFunc func(ctx context.Context) (service.GetUsersResponse, error)
+	GetUsersFunc func(ctx context.Context, input service.GetUsersRequest) (service.GetUsersResponse, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -300,25 +300,29 @@ type GetUsersServiceMock struct {
 		GetUsers []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Input is the input argument value.
+			Input service.GetUsersRequest
 		}
 	}
 	lockGetUsers sync.RWMutex
 }
 
 // GetUsers calls GetUsersFunc.
-func (mock *GetUsersServiceMock) GetUsers(ctx context.Context) (service.GetUsersResponse, error) {
+func (mock *GetUsersServiceMock) GetUsers(ctx context.Context, input service.GetUsersRequest) (service.GetUsersResponse, error) {
 	if mock.GetUsersFunc == nil {
 		panic("GetUsersServiceMock.GetUsersFunc: method is nil but GetUsersService.GetUsers was just called")
 	}
 	callInfo := struct {
-		Ctx context.Context
+		Ctx   context.Context
+		Input service.GetUsersRequest
 	}{
-		Ctx: ctx,
+		Ctx:   ctx,
+		Input: input,
 	}
 	mock.lockGetUsers.Lock()
 	mock.calls.GetUsers = append(mock.calls.GetUsers, callInfo)
 	mock.lockGetUsers.Unlock()
-	return mock.GetUsersFunc(ctx)
+	return mock.GetUsersFunc(ctx, input)
 }
 
 // GetUsersCalls gets all the calls that were made to GetUsers.
@@ -326,10 +330,12 @@ func (mock *GetUsersServiceMock) GetUsers(ctx context.Context) (service.GetUsers
 //
 //	len(mockedGetUsersService.GetUsersCalls())
 func (mock *GetUsersServiceMock) GetUsersCalls() []struct {
-	Ctx context.Context
+	Ctx   context.Context
+	Input service.GetUsersRequest
 } {
 	var calls []struct {
-		Ctx context.Context
+		Ctx   context.Context
+		Input service.GetUsersRequest
 	}
 	mock.lockGetUsers.RLock()
 	calls = mock.calls.GetUsers

@@ -440,8 +440,14 @@ func (mock *TokenGeneratorMock) GenerateTokenCalls() []struct {
 //			GetAllFunc: func(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error) {
 //				panic("mock out the GetAll method")
 //			},
+//			GetAllOrderPointFunc: func(ctx context.Context, db repository.Queryer, param repository.GetAllOrderPointParam) ([]*entities.User, error) {
+//				panic("mock out the GetAllOrderPoint method")
+//			},
 //			GetUserByIDFunc: func(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error) {
 //				panic("mock out the GetUserByID method")
+//			},
+//			GetUsersLimitFunc: func(ctx context.Context, db repository.Queryer, param repository.GetUsersLimitParam) ([]*entities.User, error) {
+//				panic("mock out the GetUsersLimit method")
 //			},
 //			RegisterUserFunc: func(ctx context.Context, db repository.Execer, u *entities.User) error {
 //				panic("mock out the RegisterUser method")
@@ -471,8 +477,14 @@ type UserRepoMock struct {
 	// GetAllFunc mocks the GetAll method.
 	GetAllFunc func(ctx context.Context, db repository.Queryer, columns ...string) ([]*entities.User, error)
 
+	// GetAllOrderPointFunc mocks the GetAllOrderPoint method.
+	GetAllOrderPointFunc func(ctx context.Context, db repository.Queryer, param repository.GetAllWithCursorParam) ([]*entities.User, error)
+
 	// GetUserByIDFunc mocks the GetUserByID method.
 	GetUserByIDFunc func(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error)
+
+	// GetUsersLimitFunc mocks the GetUsersLimit method.
+	GetUsersLimitFunc func(ctx context.Context, db repository.Queryer, param repository.GetUsersParam) ([]*entities.User, error)
 
 	// RegisterUserFunc mocks the RegisterUser method.
 	RegisterUserFunc func(ctx context.Context, db repository.Execer, u *entities.User) error
@@ -517,6 +529,15 @@ type UserRepoMock struct {
 			// Columns is the columns argument value.
 			Columns []string
 		}
+		// GetAllOrderPoint holds details about calls to the GetAllOrderPoint method.
+		GetAllOrderPoint []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// Param is the param argument value.
+			Param repository.GetAllWithCursorParam
+		}
 		// GetUserByID holds details about calls to the GetUserByID method.
 		GetUserByID []struct {
 			// Ctx is the ctx argument value.
@@ -525,6 +546,15 @@ type UserRepoMock struct {
 			Db repository.Queryer
 			// ID is the ID argument value.
 			ID model.UserID
+		}
+		// GetUsersLimit holds details about calls to the GetUsersLimit method.
+		GetUsersLimit []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Db is the db argument value.
+			Db repository.Queryer
+			// Param is the param argument value.
+			Param repository.GetUsersParam
 		}
 		// RegisterUser holds details about calls to the RegisterUser method.
 		RegisterUser []struct {
@@ -575,14 +605,16 @@ type UserRepoMock struct {
 			Pass *string
 		}
 	}
-	lockDeleteUserByID  sync.RWMutex
-	lockFindUserByEmail sync.RWMutex
-	lockGetAll          sync.RWMutex
-	lockGetUserByID     sync.RWMutex
-	lockRegisterUser    sync.RWMutex
-	lockUpdateAccount   sync.RWMutex
-	lockUpdateEmail     sync.RWMutex
-	lockUpdatePassword  sync.RWMutex
+	lockDeleteUserByID   sync.RWMutex
+	lockFindUserByEmail  sync.RWMutex
+	lockGetAll           sync.RWMutex
+	lockGetAllOrderPoint sync.RWMutex
+	lockGetUserByID      sync.RWMutex
+	lockGetUsersLimit    sync.RWMutex
+	lockRegisterUser     sync.RWMutex
+	lockUpdateAccount    sync.RWMutex
+	lockUpdateEmail      sync.RWMutex
+	lockUpdatePassword   sync.RWMutex
 }
 
 // DeleteUserByID calls DeleteUserByIDFunc.
@@ -709,6 +741,46 @@ func (mock *UserRepoMock) GetAllCalls() []struct {
 	return calls
 }
 
+// GetAllWithCursor calls GetAllOrderPointFunc.
+func (mock *UserRepoMock) GetAllWithCursor(ctx context.Context, db repository.Queryer, param repository.GetAllWithCursorParam) ([]*entities.User, error) {
+	if mock.GetAllOrderPointFunc == nil {
+		panic("UserRepoMock.GetAllOrderPointFunc: method is nil but UserRepo.GetAllOrderPoint was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    repository.Queryer
+		Param repository.GetAllWithCursorParam
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		Param: param,
+	}
+	mock.lockGetAllOrderPoint.Lock()
+	mock.calls.GetAllOrderPoint = append(mock.calls.GetAllOrderPoint, callInfo)
+	mock.lockGetAllOrderPoint.Unlock()
+	return mock.GetAllOrderPointFunc(ctx, db, param)
+}
+
+// GetAllOrderPointCalls gets all the calls that were made to GetAllOrderPoint.
+// Check the length with:
+//
+//	len(mockedUserRepo.GetAllOrderPointCalls())
+func (mock *UserRepoMock) GetAllOrderPointCalls() []struct {
+	Ctx   context.Context
+	Db    repository.Queryer
+	Param repository.GetAllWithCursorParam
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    repository.Queryer
+		Param repository.GetAllWithCursorParam
+	}
+	mock.lockGetAllOrderPoint.RLock()
+	calls = mock.calls.GetAllOrderPoint
+	mock.lockGetAllOrderPoint.RUnlock()
+	return calls
+}
+
 // GetUserByID calls GetUserByIDFunc.
 func (mock *UserRepoMock) GetUserByID(ctx context.Context, db repository.Queryer, ID model.UserID) (entities.User, error) {
 	if mock.GetUserByIDFunc == nil {
@@ -746,6 +818,46 @@ func (mock *UserRepoMock) GetUserByIDCalls() []struct {
 	mock.lockGetUserByID.RLock()
 	calls = mock.calls.GetUserByID
 	mock.lockGetUserByID.RUnlock()
+	return calls
+}
+
+// GetUsers calls GetUsersLimitFunc.
+func (mock *UserRepoMock) GetUsers(ctx context.Context, db repository.Queryer, param repository.GetUsersParam) ([]*entities.User, error) {
+	if mock.GetUsersLimitFunc == nil {
+		panic("UserRepoMock.GetUsersLimitFunc: method is nil but UserRepo.GetUsersLimit was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Db    repository.Queryer
+		Param repository.GetUsersParam
+	}{
+		Ctx:   ctx,
+		Db:    db,
+		Param: param,
+	}
+	mock.lockGetUsersLimit.Lock()
+	mock.calls.GetUsersLimit = append(mock.calls.GetUsersLimit, callInfo)
+	mock.lockGetUsersLimit.Unlock()
+	return mock.GetUsersLimitFunc(ctx, db, param)
+}
+
+// GetUsersLimitCalls gets all the calls that were made to GetUsersLimit.
+// Check the length with:
+//
+//	len(mockedUserRepo.GetUsersLimitCalls())
+func (mock *UserRepoMock) GetUsersLimitCalls() []struct {
+	Ctx   context.Context
+	Db    repository.Queryer
+	Param repository.GetUsersParam
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Db    repository.Queryer
+		Param repository.GetUsersParam
+	}
+	mock.lockGetUsersLimit.RLock()
+	calls = mock.calls.GetUsersLimit
+	mock.lockGetUsersLimit.RUnlock()
 	return calls
 }
 
