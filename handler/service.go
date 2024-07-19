@@ -26,7 +26,7 @@ type SigninService interface {
 }
 
 type GetUsersService interface {
-	GetUsers(ctx context.Context) (service.GetUsersResponse, error)
+	GetUsers(ctx context.Context, input service.GetUsersRequest) (service.GetUsersResponse, error)
 }
 
 type GetAccountService interface {
