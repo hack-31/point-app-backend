@@ -71,7 +71,7 @@ seed: ## データ挿入（コンテナ）
 model: ## モデル作成
 	rm -rf ./repository/entities
 	mkdir -p ./repository/entities
-	xo schema 'mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?parseTime=true&sql_mode=ansi' -o ./repository/entities --go-field-tag='json:"{{ .SQLName }}" db:"{{ .SQLName }}"'
+	dbtpl schema 'mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?parseTime=true&sql_mode=ansi' -o ./repository/entities --go-field-tag='json:"{{ .SQLName }}" db:"{{ .SQLName }}"'
 
 .PHONY: rdm
 rdm: ## 送信メールを確認
