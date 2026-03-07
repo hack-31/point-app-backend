@@ -1,7 +1,7 @@
 # ----------------------------------------------
 # ビルド用環境
 # ----------------------------------------------
-FROM golang:1.24-bullseye AS deploy-builder
+FROM golang:1.26-bullseye AS deploy-builder
 
 WORKDIR /app
 
@@ -30,7 +30,7 @@ CMD ["./app"]
 # ----------------------------------------------
 # 開発環境
 # ----------------------------------------------
-FROM golang:1.24-alpine AS dev
+FROM golang:1.26-alpine AS dev
 
 WORKDIR /app
 
@@ -44,4 +44,4 @@ RUN go install github.com/air-verse/air@latest \
   && go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest \
   && go install github.com/google/wire/cmd/wire@latest \
   && go install go.uber.org/mock/mockgen@latest \
-  && go install github.com/xo/xo@latest
+  && go install github.com/xo/dbtpl@latest
