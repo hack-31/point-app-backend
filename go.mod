@@ -1,8 +1,6 @@
 module github.com/hack-31/point-app-backend
 
-go 1.24
-
-toolchain go1.24
+go 1.26
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -29,6 +27,7 @@ require (
 )
 
 require (
+	github.com/Yuki-TU/yamlfix v0.2.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/bytedance/sonic v1.11.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
