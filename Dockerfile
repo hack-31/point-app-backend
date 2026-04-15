@@ -34,7 +34,7 @@ FROM golang:1.26-alpine AS dev
 
 WORKDIR /app
 
-RUN apk update && apk add alpine-sdk jq mysql mysql-client binutils-gold
+RUN apk update && apk add alpine-sdk jq mysql mysql-client binutils-gold bash
 
 RUN go install github.com/air-verse/air@latest \
   && go install github.com/sqldef/sqldef/cmd/mysqldef@latest \
